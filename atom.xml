@@ -1,103 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
 
-<!DOCTYPE html>
-<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
-<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
-<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
-<head>
-  <meta charset="utf-8">
-  <title>MR SHIH</title>
-  <meta name="author" content="施安宏">
-
-  
-  <meta name="description" content="比履歷強多了 寫blog真的是很好推薦自己的方式。當你寫履歷的時候如果可以丟出一個個人網站，你馬上就像坐上噴射機一樣把其他人甩在後面！網站上面有你長期對產業或專業的獨特見解，這比光看履歷表更加分。 因為履歷表有可能是騙人的，大量美化的！但一個長期經營的部落格不僅可以快速令人信服你是某方面的專家， &hellip;">
-  
-
-  <!-- http://t.co/dKP3o1e -->
-  <meta name="HandheldFriendly" content="True">
-  <meta name="MobileOptimized" content="320">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-
-  
-  <link rel="canonical" href="http://mrshih.github.io">
-  <link href="/favicon.png" rel="icon">
-  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
-  <link href="/atom.xml" rel="alternate" title="MR SHIH" type="application/atom+xml">
-  <script src="/javascripts/modernizr-2.0.js"></script>
-  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
-  <script src="/javascripts/octopress.js" type="text/javascript"></script>
-  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
-<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
-<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
-
-  
-
-</head>
-
-<body   >
-  <header role="banner"><hgroup>
-  <h1><a href="/">MR SHIH</a></h1>
-  
-    <h2>必幸施</h2>
-  
-</hgroup>
-
-</header>
-  <nav role="navigation"><ul class="subscription" data-subscription="rss">
-  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
-  
-</ul>
-  
-<form action="https://www.google.com/search" method="get">
-  <fieldset role="search">
-    <input type="hidden" name="q" value="site:mrshih.github.io" />
-    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
-  </fieldset>
-</form>
-  
-<ul class="main-navigation">
-  <li><a href="/">Blog</a></li>
-  <li><a href="/blog/archives">Archives</a></li>
-</ul>
-
-</nav>
-  <div id="main">
-    <div id="content">
-      <div class="blog-index">
-  
-  
-  
-    <article>
-      
-  <header>
+  <title><![CDATA[MR SHIH]]></title>
+  <link href="http://mrshih.github.io/atom.xml" rel="self"/>
+  <link href="http://mrshih.github.io/"/>
+  <updated>2015-05-20T20:16:41+08:00</updated>
+  <id>http://mrshih.github.io/</id>
+  <author>
+    <name><![CDATA[施安宏]]></name>
     
-      <h1 class="entry-title"><a href="/blog/2015/05/20/why-start-write-article/">為何又開始寫文章?</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
 
   
-
-
-<time datetime="2015-05-20T18:23:22+08:00" pubdate data-updated="true">May 20<sup>th</sup>, 2015</time>
-        
-           | <a href="/blog/2015/05/20/why-start-write-article/#disqus_thread"
-             data-disqus-identifier="http://mrshih.github.io/blog/2015/05/20/why-start-write-article/">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><img src="http://mrshih.github.io/images/sandglass-of-text.jpg" alt="image" /></p>
+  <entry>
+    <title type="html"><![CDATA[為何又開始寫文章?]]></title>
+    <link href="http://mrshih.github.io/blog/2015/05/20/why-start-write-article/"/>
+    <updated>2015-05-20T18:23:22+08:00</updated>
+    <id>http://mrshih.github.io/blog/2015/05/20/why-start-write-article</id>
+    <content type="html"><![CDATA[<p><img src="http://mrshih.github.io/images/sandglass-of-text.jpg" alt="image" /></p>
 
 <h2>比履歷強多了</h2>
 
@@ -135,45 +56,15 @@
 
 <p>我目前實在找不出經營一個自己的blog，持續寫有用的文章有任何壞處。
 如果有，可以留言分享你的看法。</p>
-</div>
+]]></content>
+  </entry>
   
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2014/07/23/pivot/">小技術大問題—救小狗Pivot到省百億</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2014-07-23T20:22:58+08:00" pubdate data-updated="true">Jul 23<sup>rd</sup>, 2014</time>
-        
-           | <a href="/blog/2014/07/23/pivot/#disqus_thread"
-             data-disqus-identifier="http://mrshih.github.io/blog/2014/07/23/pivot/">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><img src="http://mrshih.github.io/images/pivot1.jpg" alt="image" /></p>
+  <entry>
+    <title type="html"><![CDATA[小技術大問題—救小狗Pivot到省百億]]></title>
+    <link href="http://mrshih.github.io/blog/2014/07/23/pivot/"/>
+    <updated>2014-07-23T20:22:58+08:00</updated>
+    <id>http://mrshih.github.io/blog/2014/07/23/pivot</id>
+    <content type="html"><![CDATA[<p><img src="http://mrshih.github.io/images/pivot1.jpg" alt="image" /></p>
 
 <p>一種解決問題的作法套用在不同的情境上，產生的效益就可能相差數萬倍。我們專題一開始看到路邊有受傷流浪狗兒，如果冷眼旁觀實在是不忍心，但第一個你不知道該找誰幫忙？找市立收容所？電話是幾號？更別提還要花許多時間在通報，通報了也可能只是安樂死。第二個可以找當地流浪動物協會，但一般人根本不會知道有哪些協會可以幫忙！現代人很忙碌，很費工夫的事實在是心有餘而力不足。所以我們想利用智慧型手機結合當地相關協會標準化通報流程，就能快速定外拍照上傳通報一次搞定，解決通報麻煩的問題，也就是流浪動物通報系統。</p>
 
@@ -190,45 +81,15 @@
 <p>一切都要回到『你到底要解決什麼問題？』</p>
 
 <p>你要解決的問題很大很嚴重，別人根本就不會關心你用了什麼技術。悠游卡解決了你我不必每天辛苦找零錢的問題，但有人關心它使用的技術叫NFC嗎？除非你今天根本沒有解決別人真正關心的問題，才會需要拿絢麗的技術來拼命說來班門弄斧。所以一開始就選擇大問題去想方法，不要系統開發出來才發現沒人在意。</p>
-</div>
+]]></content>
+  </entry>
   
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2014/07/16/customer-talk/">客觀簡報的困難</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2014-07-16T21:13:31+08:00" pubdate data-updated="true">Jul 16<sup>th</sup>, 2014</time>
-        
-           | <a href="/blog/2014/07/16/customer-talk/#disqus_thread"
-             data-disqus-identifier="http://mrshih.github.io/blog/2014/07/16/customer-talk/">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><img src="http://mrshih.github.io/images/customer-talk1.jpg" alt="image" /></p>
+  <entry>
+    <title type="html"><![CDATA[客觀簡報的困難]]></title>
+    <link href="http://mrshih.github.io/blog/2014/07/16/customer-talk/"/>
+    <updated>2014-07-16T21:13:31+08:00</updated>
+    <id>http://mrshih.github.io/blog/2014/07/16/customer-talk</id>
+    <content type="html"><![CDATA[<p><img src="http://mrshih.github.io/images/customer-talk1.jpg" alt="image" /></p>
 
 <p>我曾經待在一個瘋狂報名比賽，講究技術的硬派實驗室裡，我們報的比賽都是如微電腦、嵌入式這樣非常硬派的技術比賽，幾百坪的空間通常都很樸素，一些簡單的標語旗幟就差不多了。但是，裡面每個評審可都是相關領域中專家中的專家，我們做的題目大概用了領域內的哪些高階技術，多新穎、多困難、要花多少時間、多努力大概你稍微解釋一下彼此都能馬上心領神會。所以報告的流程就是帶一下要解決的問題，接下來就直接DEMO實際系統，什麼前言、動機、問題嚴重性越少越好，有的評審乾脆會叫你跳過把時間留給實際DEMO。這種我稱之為工學院比賽。</p>
 
@@ -241,45 +102,15 @@
 <p>當你報告的時候評審在想的事情永遠都跟你想的事情不一樣。你在學校演練的講稿都是你自己想講的，都不是評審想聽的。你一定要多找老師反覆報告給他們聽，然後趕快根據回饋修正，這種顧客開發方式才會在客觀上抓住重(賣)點。絕對避免出去比賽前一天才把第一版的講稿生出來，然後感覺很充實很滿意，結果出去比賽才發現怎麼觀眾反映都在意料之外。</p>
 
 <p>想辦法把你的題目推銷給一般大眾，你要說服他們真的很難。不要花了一堆時間在講別人不懂的技術，然後看到自己的DEMO系統畫面就覺得很爽大功告成。重點真的不在你多寫了幾個小功能，因為別人真的不想知道「你」做了什麼，簡報的重點是讓「評審」有興趣，重點是這個系統跟他到底有什麼關係？不管是拿問題嚴重性來威嚇評審，拿效益比如你有跟哪幾個有名大咖合作來說服評審，或是拿流程圖外加講故事講到他們心有戚戚焉，這樣子反覆的透過他們的生活經驗講他們聽的懂的話，你的終極目標拿高分才有可能實現。沒有連結就結束的簡報就好像是跟評審說：我不想知道你到底懂了沒，反正我做了出來而且很讚，請給分。</p>
-</div>
+]]></content>
+  </entry>
   
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2014/07/09/what-different-between-programmer-and-manufacturing/">你確定寫程式跟製造業不一樣？</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2014-07-09T02:36:59+08:00" pubdate data-updated="true">Jul 9<sup>th</sup>, 2014</time>
-        
-           | <a href="/blog/2014/07/09/what-different-between-programmer-and-manufacturing/#disqus_thread"
-             data-disqus-identifier="http://mrshih.github.io/blog/2014/07/09/what-different-between-programmer-and-manufacturing/">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><img src="http://mrshih.github.io/images/what-different-between-programmer-and-manufacturing1.jpg" alt="image" /></p>
+  <entry>
+    <title type="html"><![CDATA[你確定寫程式跟製造業不一樣？]]></title>
+    <link href="http://mrshih.github.io/blog/2014/07/09/what-different-between-programmer-and-manufacturing/"/>
+    <updated>2014-07-09T02:36:59+08:00</updated>
+    <id>http://mrshih.github.io/blog/2014/07/09/what-different-between-programmer-and-manufacturing</id>
+    <content type="html"><![CDATA[<p><img src="http://mrshih.github.io/images/what-different-between-programmer-and-manufacturing1.jpg" alt="image" /></p>
 
 <p>台灣從過去製造業的思維延伸很喜歡做/教一件事，就是coustom development顧客開發的相反叫product development產品開發。而事實上創意特別是網路，一定是顧客開發，因為沒有什麼產品好做阿！我們又沒有什麼很厲害的晶片，很神奇的電路什麼的，引用一位網路業的前輩大師在他的FB上寫的這段話：</p>
 
@@ -298,93 +129,7 @@
 <p>在這個知識產業凌駕一切的時代上，所以我希望跟我一樣是7、8年級的，真的希望台灣脫離製造業思維，把自己從別人影子後面推出來。舉個例子，奇美面板一開廠就賠20億，那沒有意義阿，台灣有很多這種很奇怪的事，這代表說台灣真的需要走出來，我們需要把東西直接推出來面對消費者，而不是躲在後面。講難聽一點，就是要做鴻海，好歹談判的時候要在iphone後面要印個produced by foxconn吧，好歹做一點品牌吧！懂我意思嘛？</p>
 
 <p>不要一天到晚幫人家做事，然後交差就覺得很了不起這樣，沒有用。幫別人代工未來都賺不到什麼錢。</p>
-</div>
+]]></content>
+  </entry>
   
-  
-
-
-    </article>
-  
-  <div class="pagination">
-    
-    <a href="/blog/archives">Blog Archives</a>
-    
-  </div>
-</div>
-<aside class="sidebar">
-  
-    <section>
-  <h1>Recent Posts</h1>
-  <ul id="recent_posts">
-    
-      <li class="post">
-        <a href="/blog/2015/05/20/why-start-write-article/">為何又開始寫文章?</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2014/07/23/pivot/">小技術大問題—救小狗Pivot到省百億</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2014/07/16/customer-talk/">客觀簡報的困難</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2014/07/09/what-different-between-programmer-and-manufacturing/">你確定寫程式跟製造業不一樣？</a>
-      </li>
-    
-  </ul>
-</section>
-
-
-
-
-
-  
-</aside>
-
-    </div>
-  </div>
-  <footer role="contentinfo"><p>
-  Copyright &copy; 2015 - 施安宏 -
-  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
-</p>
-
-</footer>
-  
-
-<script type="text/javascript">
-      var disqus_shortname = 'mrshih';
-      
-        
-        var disqus_script = 'count.js';
-      
-    (function () {
-      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
-      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-    }());
-</script>
-
-
-
-
-
-
-
-  <script type="text/javascript">
-    (function(){
-      var twitterWidgets = document.createElement('script');
-      twitterWidgets.type = 'text/javascript';
-      twitterWidgets.async = true;
-      twitterWidgets.src = '//platform.twitter.com/widgets.js';
-      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
-    })();
-  </script>
-
-
-
-
-
-</body>
-</html>
+</feed>
