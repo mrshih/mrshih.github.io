@@ -31,6 +31,18 @@
 <link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
 
   
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-31868165-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
 
 </head>
 
@@ -314,7 +326,9 @@
 
 <h2>And then &hellip;資料的更新與VIEW的刷新</h2>
 
-<p>很明顯我們可以只要修改View Model就指定Table View Controller做刷新的動作，更大範圍來說這可以用KVO來時做追蹤View Model裡面的直有無變化來做畫面的更新。但這裡推薦最近發現的框架ReactiveCocoa，這個框架也是用來做數值追蹤，但本質上與之前的KVO, NSNotificationCenter都是截然不同的東西，我們在後續文章再來討論。</p>
+<p>整個流程是由ViewModel要發現source資料變化了，更新自己的property，接著通知Contorller根據ViewModel做更新UI的動作。這個通知學問就大了，可以有很多種方法。</p>
+
+<p>很明顯我們可以只要修改ViewModel就指定Controller做刷新的動作，更大範圍來說這可以用KVO來時做追蹤View Model裡面的直有無變化來做畫面的更新。但這裡推薦最近發現的框架ReactiveCocoa，這個框架也是用來做數值追蹤，但本質上與之前的KVO, NSNotificationCenter都是截然不同的東西，我們在後續文章再來討論。</p>
 </div>
   
   

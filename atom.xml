@@ -4,7 +4,7 @@
   <title><![CDATA[MR SHIH]]></title>
   <link href="http://mrshih.github.io/atom.xml" rel="self"/>
   <link href="http://mrshih.github.io/"/>
-  <updated>2015-08-24T15:55:28+08:00</updated>
+  <updated>2015-08-27T18:20:31+08:00</updated>
   <id>http://mrshih.github.io/</id>
   <author>
     <name><![CDATA[施安宏]]></name>
@@ -205,7 +205,9 @@
 
 <h2>And then &hellip;資料的更新與VIEW的刷新</h2>
 
-<p>很明顯我們可以只要修改View Model就指定Table View Controller做刷新的動作，更大範圍來說這可以用KVO來時做追蹤View Model裡面的直有無變化來做畫面的更新。但這裡推薦最近發現的框架ReactiveCocoa，這個框架也是用來做數值追蹤，但本質上與之前的KVO, NSNotificationCenter都是截然不同的東西，我們在後續文章再來討論。</p>
+<p>整個流程是由ViewModel要發現source資料變化了，更新自己的property，接著通知Contorller根據ViewModel做更新UI的動作。這個通知學問就大了，可以有很多種方法。</p>
+
+<p>很明顯我們可以只要修改ViewModel就指定Controller做刷新的動作，更大範圍來說這可以用KVO來時做追蹤View Model裡面的直有無變化來做畫面的更新。但這裡推薦最近發現的框架ReactiveCocoa，這個框架也是用來做數值追蹤，但本質上與之前的KVO, NSNotificationCenter都是截然不同的東西，我們在後續文章再來討論。</p>
 ]]></content>
   </entry>
   
