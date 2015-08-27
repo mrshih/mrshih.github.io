@@ -89,4 +89,6 @@ CalendarViewModel.m我們大致這樣實作
 這樣一來並沒有改動太多架構，但透過我們把資料產生邏輯從Controller抽出來，獨立放到View Model，很明顯看到程式可維護性提高許多，整個架構耦合性降低更易於測試除錯修改。
 
 ##And then ...資料的更新與VIEW的刷新
-很明顯我們可以只要修改View Model就指定Table View Controller做刷新的動作，更大範圍來說這可以用KVO來時做追蹤View Model裡面的直有無變化來做畫面的更新。但這裡推薦最近發現的框架ReactiveCocoa，這個框架也是用來做數值追蹤，但本質上與之前的KVO, NSNotificationCenter都是截然不同的東西，我們在後續文章再來討論。
+整個流程是由ViewModel要發現source資料變化了，更新自己的property，接著通知Contorller根據ViewModel做更新UI的動作。這個通知學問就大了，可以有很多種方法。
+
+很明顯我們可以只要修改ViewModel就指定Controller做刷新的動作，更大範圍來說這可以用KVO來時做追蹤View Model裡面的直有無變化來做畫面的更新。但這裡推薦最近發現的框架ReactiveCocoa，這個框架也是用來做數值追蹤，但本質上與之前的KVO, NSNotificationCenter都是截然不同的東西，我們在後續文章再來討論。
