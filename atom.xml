@@ -4,7 +4,7 @@
   <title><![CDATA[MR SHIH]]></title>
   <link href="http://mrshih.github.io/atom.xml" rel="self"/>
   <link href="http://mrshih.github.io/"/>
-  <updated>2015-12-10T02:58:41+08:00</updated>
+  <updated>2015-12-10T03:04:04+08:00</updated>
   <id>http://mrshih.github.io/</id>
   <author>
     <name><![CDATA[施安宏]]></name>
@@ -14,7 +14,7 @@
 
   
   <entry>
-    <title type="html"><![CDATA[iOS9管理Status Bar]]></title>
+    <title type="html"><![CDATA[iOS在不同ViewController指定Status Bar]]></title>
     <link href="http://mrshih.github.io/blog/2015/12/10/adjust-status-bar-style/"/>
     <updated>2015-12-10T01:36:49+08:00</updated>
     <id>http://mrshih.github.io/blog/2015/12/10/adjust-status-bar-style</id>
