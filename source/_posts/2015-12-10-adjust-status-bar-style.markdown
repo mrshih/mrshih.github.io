@@ -1,6 +1,6 @@
 ---
 layout: post
-title: iOS9管理Status Bar
+title: iOS在不同ViewController指定Status Bar
 date: '2015-12-10 01:36:49 +0800'
 comments: true
 categories: 良工巧匠集
