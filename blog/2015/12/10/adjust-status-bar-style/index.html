@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>小技術大問題—救小狗Pivot到省百億 - MR SHIH</title>
+  <title>iOS9管理Status Bar - MR SHIH</title>
   <meta name="author" content="施安宏">
 
   
-  <meta name="description" content="一種解決問題的作法套用在不同的情境上，產生的效益就可能相差數萬倍。我們專題一開始看到路邊有受傷流浪狗兒，如果冷眼旁觀實在是不忍心，但第一個你不知道該找誰幫忙？找市立收容所？電話是幾號？更別提還要花許多時間在通報，通報了也可能只是安樂死。第二個可以找當地流浪動物協會， &hellip;">
+  <meta name="description" content="查看文擋很容易發現viewController有個preferredStatusBarStyle接口，搭配語意明顯的setNeedsStatusBarAppearanceUpdate，看起來可以指定回調的UIStatusBarStyle比如白色與黑色。但時常調用了卻沒有回應。 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://mrshih.github.io/blog/2014/07/23/pivot">
+  <link rel="canonical" href="http://mrshih.github.io/blog/2015/12/10/adjust-status-bar-style">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="MR SHIH" type="application/atom+xml">
@@ -80,7 +80,7 @@
   
   <header>
     
-      <h1 class="entry-title">小技術大問題—救小狗Pivot到省百億</h1>
+      <h1 class="entry-title">iOS9管理Status Bar</h1>
     
     
       <p class="meta">
@@ -96,7 +96,7 @@
   
 
 
-<time datetime="2014-07-23T20:22:58+08:00" pubdate data-updated="true">Jul 23<sup>rd</sup>, 2014</time>
+<time datetime="2015-12-10T01:36:49+08:00" pubdate data-updated="true">Dec 10<sup>th</sup>, 2015</time>
         
            | <a href="#disqus_thread"
              data-disqus-identifier="http://mrshih.github.io">Comments</a>
@@ -106,23 +106,33 @@
   </header>
 
 
-<div class="entry-content"><p><img src="http://mrshih.github.io/images/pivot1.jpg" alt="image" /></p>
+<div class="entry-content"><p>查看文擋很容易發現viewController有個<code>preferredStatusBarStyle</code>接口，搭配語意明顯的<code>setNeedsStatusBarAppearanceUpdate</code>，看起來可以指定回調的<code>UIStatusBarStyle</code>比如白色與黑色。但時常調用了卻沒有回應。</p>
 
-<p>一種解決問題的作法套用在不同的情境上，產生的效益就可能相差數萬倍。我們專題一開始看到路邊有受傷流浪狗兒，如果冷眼旁觀實在是不忍心，但第一個你不知道該找誰幫忙？找市立收容所？電話是幾號？更別提還要花許多時間在通報，通報了也可能只是安樂死。第二個可以找當地流浪動物協會，但一般人根本不會知道有哪些協會可以幫忙！現代人很忙碌，很費工夫的事實在是心有餘而力不足。所以我們想利用智慧型手機結合當地相關協會標準化通報流程，就能快速定外拍照上傳通報一次搞定，解決通報麻煩的問題，也就是流浪動物通報系統。</p>
+<p>這時候查一查文擋內相同Section附近的API會是個好習慣。在Managing the Status Bar裡發現下面這個接口：</p>
 
-<p>但找到問題並想方法解決每個人都會，但重點是找到的問題到底有多重要？好比上面的例子，一個人一年當中有多少機會碰到一隻需要救援的流浪狗，又有多少可能你真的會想要通報而身邊剛好帶著智慧型手機又知道我們的程式？這樣算下來我們當初設想的使用情境幾乎根本不會發生，所以其實是沒有解決到任何人的問題，效益等於零。</p>
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="o">-</span> <span class="p">(</span><span class="no">UIViewController</span> <span class="o">*</span><span class="p">)</span><span class="n">childViewControllerForStatusBarStyle</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
 
-<p>但當時我們整個通報系統都做出來了，但是卻因為效益等於零被迫重新想一個。但最寶貴的資源就是時間，豈容你從頭開始再試。以前實驗室老師有一句話說得好：「跌倒了先別急著站起來，看看地上有沒有東西可以撿起來」。所以只能在既有的系統上想一個新的應用，試著去提高帶給別人的效益—Pivot。於是流浪貓狗通報系統就搖身一變改成雲端路平專案通報系統。</p>
 
-<p>Pivot的重點就是試著在不打掉根基的情況下，試著轉個情境找出新效益，而提高效益從問題面著手。路不有多嚴重？每年造成上百人傷亡、相關國賠高達上億，而每年花好幾百億就是改善不了，納稅人的錢都不知道被A到哪裡去，於上把通報系統應用在這麼大的問題上，帶來的效益就很可觀，畢竟這關乎到全用路人的權益。問題夠大也是後來全國專題競賽此系統能脫穎而出的關鍵。從來技術方法就不是重點，重點要有狼心、問題問大、問的讓人心有戚戚焉。</p>
+<p>按照苹果官方的解释：</p>
 
-<p>我們從舊有的方式去發現問題。傳統上人工報案曠日廢時又麻煩，就利用時下流行的智慧型手機標準化整個通報流程來解決，接著將資料上傳到我們在東京AWS的雲端伺服器做資料彙整。而常有部會首長要靠報紙才知道某個地方發生哪些問題，就彙整資料利用商業智慧的概念結合Google Map在上面標註圖案，首長透過視覺化圖表一眼就能了解全貌。而最重要的莫過於多年來花大錢路始終修不好，我們就把歷年資料全部公開，結合Facebook讓大家針對你不爽的事件來按讚分享，根據這些民怨做成熱門旁行榜，讓記者、議員來挖他們感興趣的資料，現在很多網友都利用這樣的模式來串連社群的力量幫自己來發聲，共同來監督公共工程。</p>
+<blockquote><p>If your container view controller derives its status bar style from one of its child view controllers, implement this method and return that child view controller. If you return nil or do not override this method, the status bar style for self is used. If the return value from this method changes, call the setNeedsStatusBarAppearanceUpdate method.</p></blockquote>
 
-<p>路不平問題關乎到上百條人命、上千億的金錢，就算解決方法很爛效益只有5％，算一算還是5條人命50億，怎樣都打死一票小問題的最大效益。</p>
+<p>調用<code>setNeedsStatusBarAppearanceUpdate</code>時，系統默認會去調用application.rootViewController的<code>preferredStatusBarStyle</code>方法，所以這時候當前自己的viewController的<code>preferredStatusBarStyle</code>方法根本不會被調用。</p>
 
-<p>一切都要回到『你到底要解決什麼問題？』</p>
+<p>這個接口很重要，這種情況下<code>childViewControllerForStatusBarStyle</code>就有用了。一般我們常用navigationController作為rootViewController，利用此接口便可以很方便自訂各個viewController的statusBarStyle。 子類化一個navigationController，並且override<code>childViewControllerForStatusBarStyle</code></p>
 
-<p>你要解決的問題很大很嚴重，別人根本就不會關心你用了什麼技術。悠游卡解決了你我不必每天辛苦找零錢的問題，但有人關心它使用的技術叫NFC嗎？除非你今天根本沒有解決別人真正關心的問題，才會需要拿絢麗的技術來拼命說來班門弄斧。所以一開始就選擇大問題去想方法，不要系統開發出來才發現沒人在意。</p>
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="o">-</span> <span class="p">(</span><span class="no">UIViewController</span> <span class="o">*</span> <span class="n">_Nullable</span><span class="p">)</span><span class="n">childViewControllerForStatusBarStyle</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="nb">self</span><span class="o">.</span><span class="n">topViewController</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>意思就是說不要調用我自己application.rootViewController（navigationController）的<code>preferredStatusBarStyle</code>方法，去調用｀childViewControllerForStatusBarStyle｀回傳的UIViewController的<code>preferredStatusBarStyle</code>。這裡回傳self.topViewController就可以保證當前顯示的viewController的<code>preferredStatusBarStyle</code>會被系統調用且正確的顯示。</p>
 </div>
 
 
@@ -145,15 +155,21 @@
   
 
 
-<time datetime="2014-07-23T20:22:58+08:00" pubdate data-updated="true">Jul 23<sup>rd</sup>, 2014</time>
+<time datetime="2015-12-10T01:36:49+08:00" pubdate data-updated="true">Dec 10<sup>th</sup>, 2015</time>
       
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/liang-gong-qiao-jiang-ji/'>良工巧匠集</a>
+  
+</span>
 
 
     </p>
     
       <div class="sharing">
   
-  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://mrshih.github.io/blog/2014/07/23/pivot/" data-via="DaanSHIH" data-counturl="http://mrshih.github.io/blog/2014/07/23/pivot/" >Tweet</a>
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://mrshih.github.io/blog/2015/12/10/adjust-status-bar-style/" data-via="DaanSHIH" data-counturl="http://mrshih.github.io/blog/2015/12/10/adjust-status-bar-style/" >Tweet</a>
   
   
   <div class="g-plusone" data-size="medium"></div>
@@ -166,10 +182,8 @@
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/blog/2014/07/16/customer-talk/" title="Previous Post: 客觀簡報的困難">&laquo; 客觀簡報的困難</a>
+        <a class="basic-alignment left" href="/blog/2015/08/24/past-three-year-mobile-trend/" title="Previous Post: 回看行動趨勢與我這三年">&laquo; 回看行動趨勢與我這三年</a>
       
-      
-        <a class="basic-alignment right" href="/blog/2015/05/20/why-start-write-article/" title="Next Post: 為何又開始寫文章?">為何又開始寫文章? &raquo;</a>
       
     </p>
   </footer>
@@ -235,8 +249,8 @@
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://mrshih.github.io/blog/2014/07/23/pivot/';
-        var disqus_url = 'http://mrshih.github.io/blog/2014/07/23/pivot/';
+        var disqus_identifier = 'http://mrshih.github.io/blog/2015/12/10/adjust-status-bar-style/';
+        var disqus_url = 'http://mrshih.github.io/blog/2015/12/10/adjust-status-bar-style/';
         var disqus_script = 'embed.js';
       
     (function () {

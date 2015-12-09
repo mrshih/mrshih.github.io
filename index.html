@@ -9,7 +9,7 @@
   <meta name="author" content="施安宏">
 
   
-  <meta name="description" content="無盡的新元素 過去三年陸續加上了穿戴式裝置，無人飛行機操控，行動支付，線上串線下服務（我其實很不喜歡文鄒鄒名詞，這裡指的就是Uber,airbnb等把供應者與消費者串起來的服務），車用APP等新元素，到底這些對於一個APP開發者的影響是什麼？ 2013開始的混沌應用時代 &hellip;">
+  <meta name="description" content="查看文擋很容易發現viewController有個preferredStatusBarStyle接口，搭配語意明顯的setNeedsStatusBarAppearanceUpdate，看起來可以指定回調的UIStatusBarStyle比如白色與黑色。但時常調用了卻沒有回應。 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -77,6 +77,71 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2015/12/10/adjust-status-bar-style/">iOS9管理Status Bar</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-12-10T01:36:49+08:00" pubdate data-updated="true">Dec 10<sup>th</sup>, 2015</time>
+        
+           | <a href="/blog/2015/12/10/adjust-status-bar-style/#disqus_thread"
+             data-disqus-identifier="http://mrshih.github.io/blog/2015/12/10/adjust-status-bar-style/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>查看文擋很容易發現viewController有個<code>preferredStatusBarStyle</code>接口，搭配語意明顯的<code>setNeedsStatusBarAppearanceUpdate</code>，看起來可以指定回調的<code>UIStatusBarStyle</code>比如白色與黑色。但時常調用了卻沒有回應。</p>
+
+<p>這時候查一查文擋內相同Section附近的API會是個好習慣。在Managing the Status Bar裡發現下面這個接口：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="o">-</span> <span class="p">(</span><span class="no">UIViewController</span> <span class="o">*</span><span class="p">)</span><span class="n">childViewControllerForStatusBarStyle</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>按照苹果官方的解释：</p>
+
+<blockquote><p>If your container view controller derives its status bar style from one of its child view controllers, implement this method and return that child view controller. If you return nil or do not override this method, the status bar style for self is used. If the return value from this method changes, call the setNeedsStatusBarAppearanceUpdate method.</p></blockquote>
+
+<p>調用<code>setNeedsStatusBarAppearanceUpdate</code>時，系統默認會去調用application.rootViewController的<code>preferredStatusBarStyle</code>方法，所以這時候當前自己的viewController的<code>preferredStatusBarStyle</code>方法根本不會被調用。</p>
+
+<p>這個接口很重要，這種情況下<code>childViewControllerForStatusBarStyle</code>就有用了。一般我們常用navigationController作為rootViewController，利用此接口便可以很方便自訂各個viewController的statusBarStyle。 子類化一個navigationController，並且override<code>childViewControllerForStatusBarStyle</code></p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="o">-</span> <span class="p">(</span><span class="no">UIViewController</span> <span class="o">*</span> <span class="n">_Nullable</span><span class="p">)</span><span class="n">childViewControllerForStatusBarStyle</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="nb">self</span><span class="o">.</span><span class="n">topViewController</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>意思就是說不要調用我自己application.rootViewController（navigationController）的<code>preferredStatusBarStyle</code>方法，去調用｀childViewControllerForStatusBarStyle｀回傳的UIViewController的<code>preferredStatusBarStyle</code>。這裡回傳self.topViewController就可以保證當前顯示的viewController的<code>preferredStatusBarStyle</code>會被系統調用且正確的顯示。</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -588,6 +653,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2015/12/10/adjust-status-bar-style/">iOS9管理Status Bar</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2015/08/24/past-three-year-mobile-trend/">回看行動趨勢與我這三年</a>
       </li>
     
@@ -601,10 +670,6 @@
     
       <li class="post">
         <a href="/blog/2014/07/23/pivot/">小技術大問題—救小狗Pivot到省百億</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2014/07/16/customer-talk/">客觀簡報的困難</a>
       </li>
     
   </ul>

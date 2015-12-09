@@ -3,6 +3,12 @@
   
   
   <url>
+    <loc>http://mrshih.github.io/blog/2015/12/10/adjust-status-bar-style/</loc>
+    <lastmod>2015-12-10T01:36:49+08:00</lastmod>
+    <priority>0.8</priority>
+  </url>
+  
+  <url>
     <loc>http://mrshih.github.io/blog/2015/08/24/past-three-year-mobile-trend/</loc>
     <lastmod>2015-08-24T13:22:30+08:00</lastmod>
     <priority>0.8</priority>
@@ -41,14 +47,14 @@
   
   <url>
     <loc>http://mrshih.github.io/blog/archives/</loc>
-    <lastmod>2015-08-27T18:20:31+08:00</lastmod>
+    <lastmod>2015-12-10T02:58:41+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   
   <url>
     <loc>http://mrshih.github.io/</loc>
-    <lastmod>2015-08-27T18:20:31+08:00</lastmod>
+    <lastmod>2015-12-10T02:58:41+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
