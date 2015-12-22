@@ -4,7 +4,7 @@
   <title><![CDATA[MR SHIH]]></title>
   <link href="http://mrshih.github.io/atom.xml" rel="self"/>
   <link href="http://mrshih.github.io/"/>
-  <updated>2015-12-10T03:04:04+08:00</updated>
+  <updated>2015-12-23T00:29:29+08:00</updated>
   <id>http://mrshih.github.io/</id>
   <author>
     <name><![CDATA[施安宏]]></name>
@@ -12,6 +12,58 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[推播結合背景更新 - 良好的使用者體驗]]></title>
+    <link href="http://mrshih.github.io/blog/2015/12/22/ios-background-mode-notification/"/>
+    <updated>2015-12-22T20:36:49+08:00</updated>
+    <id>http://mrshih.github.io/blog/2015/12/22/ios-background-mode-notification</id>
+    <content type="html"><![CDATA[<p>試想一個情境是相簿APP在後台收到伺服器傳來愛人分享的最新照片，但使用者興沖沖的打開之後面對轉阿轉不停的Loading indicator圓圈圈，多麼令人掃興。 動通知但被動下載資料顯然不是一個好方法。</p>
+
+<p>這個時候可以透過推播通知APP，並在背景讓程式預載相片，載好之後再通知使用者點開APP，立即可以看到所有相片，多棒的使用者體驗。</p>
+
+<p>要不打擾到使用者偷偷通知手機要實作<code>Silent Notification</code>，很簡單，只要把<code>title</code>,<code>body</code>,<code>sound</code>全部留空就好，但通常我們的APP都在後台，甚至沒有被載入到記憶體，這時候要啟用背景更新，做法就是額外在APNS Payload 加上<code>content-available=1</code>，並且在Xcode的Capabilities->Background Modes->Remotes Notification這裡把選項打勾。</p>
+
+<p>這時候在手機收到有<code>content-available=1</code>的推播，而且APP有enabled the remote notifications background mode的情況下，APP不管在前台或後台甚至沒被Lunch過，都會被喚醒並呼叫到下面這個方法：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="o">-</span> <span class="p">(</span><span class="n">void</span><span class="p">)</span><span class="ss">application</span><span class="p">:(</span><span class="no">UIApplication</span> <span class="o">*</span> <span class="n">_Nonnull</span><span class="p">)</span><span class="n">application</span> <span class="ss">didReceiveRemoteNotification</span><span class="p">:(</span><span class="no">NSDictionary</span> <span class="o">*</span> <span class="n">_Nonnull</span><span class="p">)</span><span class="n">userInfo</span> <span class="ss">fetchCompletionHandler</span><span class="p">:(</span><span class="n">void</span> <span class="p">(</span><span class="o">^</span> <span class="n">_Nonnull</span><span class="p">)(</span><span class="no">UIBackgroundFetchResult</span> <span class="n">result</span><span class="p">))</span><span class="n">handler</span> <span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="sr">//</span> <span class="err">下載資料</span><span class="o">.</span><span class="n">.</span><span class="o">.</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="sr">//</span> <span class="no">Local</span> <span class="no">Notification</span><span class="err">提示使用者下載好囉</span>
+</span><span class='line'>  <span class="no">UILocalNotification</span> <span class="o">*</span><span class="n">locNotification</span> <span class="o">=</span> <span class="o">[[</span><span class="no">UILocalNotification</span> <span class="n">alloc</span><span class="o">]</span> <span class="n">init</span><span class="o">]</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">locNotification</span><span class="o">.</span><span class="n">alertBody</span> <span class="o">=</span> <span class="err">@</span><span class="s2">&quot;Data have arrived!&quot;</span><span class="p">;</span>
+</span><span class='line'>    <span class="o">[[</span><span class="no">UIApplication</span> <span class="n">sharedApplication</span><span class="o">]</span><span class="ss">presentLocalNotificationNow</span><span class="p">:</span><span class="n">locNotification</span><span class="o">]</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="sr">//</span><span class="err">回調系統下載好了</span>
+</span><span class='line'>  <span class="n">handler</span><span class="p">(</span><span class="no">UIBackgroundFetchResultNewData</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<blockquote><p>&hellip;the system launches your app (or wakes it from the suspended state) and puts it in the background state when a remote notification arrives. However, the system does not automatically launch your app if the user has force-quit it. In that situation, the user must relaunch your app or restart the device before the system attempts to launch your app automatically again&hellip;&hellip;</p>
+
+<p>As soon as you finish processing the notification, you must call the block in the handler parameter or your app will be terminated. Your app has up to 30 seconds of wall-clock time to process the notification and call the specified completion handler block&hellip;.</p></blockquote>
+
+<p>官方文件說有例外，就是使用者曾經手動殺掉過這個APP，奇怪的是在我的開發經驗裡面，就算使用者手動殺掉系統在收到推播之後還是會去喚醒這個APP。</p>
+
+<p>然後系統大約會給你30的時間讓你去下載需要的資料到記憶體或硬碟，之後就必須要call handler<code>UIBackgroundFetchResult</code>告訴系統已經載入完畢。</p>
+
+<p>如果成功下載了我們要的資料，就可以發一個LocalNotification來通知使用者來享用你剛下載好的檔案，一打開就有下載好的內容，多棒的使用者體驗啊。</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[iOS在不同ViewController指定Status Bar]]></title>
