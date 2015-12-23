@@ -112,7 +112,7 @@
 
 <p>要不打擾到使用者偷偷通知手機要實作<code>Silent Notification</code>，很簡單，只要加上<code>content-available=1</code>，再來把<code>alert</code>,<code>badge</code>,<code>sound</code>全部留空就好，並且在Xcode的Capabilities->Background Modes->Remotes Notification這裡把選項打勾。</p>
 
-<p>這時候在手機收到有<code>content-available=1</code>的推播，iOS就會在背景喚醒你的APP，並且呼叫下面方法讓你下載資料或做些事，下次使用者打開就可以看到更新的內容了：</p>
+<p>這時候當手機收到有<code>content-available=1</code>的推播，iOS就會在背景喚醒你的APP，並且呼叫下面方法讓你下載資料或做些事，下次使用者打開就可以看到更新的內容了：</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>

@@ -4,7 +4,7 @@
   <title><![CDATA[Category: 良工巧匠集 | MR SHIH]]></title>
   <link href="http://mrshih.github.io/blog/categories/liang-gong-qiao-jiang-ji/atom.xml" rel="self"/>
   <link href="http://mrshih.github.io/"/>
-  <updated>2015-12-23T10:43:35+08:00</updated>
+  <updated>2015-12-23T10:45:50+08:00</updated>
   <id>http://mrshih.github.io/</id>
   <author>
     <name><![CDATA[施安宏]]></name>
@@ -24,7 +24,7 @@
 
 <p>要不打擾到使用者偷偷通知手機要實作<code>Silent Notification</code>，很簡單，只要加上<code>content-available=1</code>，再來把<code>alert</code>,<code>badge</code>,<code>sound</code>全部留空就好，並且在Xcode的Capabilities->Background Modes->Remotes Notification這裡把選項打勾。</p>
 
-<p>這時候在手機收到有<code>content-available=1</code>的推播，iOS就會在背景喚醒你的APP，並且呼叫下面方法讓你下載資料或做些事，下次使用者打開就可以看到更新的內容了：</p>
+<p>這時候當手機收到有<code>content-available=1</code>的推播，iOS就會在背景喚醒你的APP，並且呼叫下面方法讓你下載資料或做些事，下次使用者打開就可以看到更新的內容了：</p>
 
 <p>```Objective-C
 &ndash; (void)application:(UIApplication * <em>Nonnull)application didReceiveRemoteNotification:(NSDictionary * </em>Nonnull)userInfo fetchCompletionHandler:(void (^ _Nonnull)(UIBackgroundFetchResult result))handler {</p>
