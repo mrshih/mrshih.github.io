@@ -113,9 +113,9 @@
 
 <p>這個時候可以透過推播通知APP，並在背景讓程式預載相片，載好之後再通知使用者點開APP，立即可以看到所有相片，多棒的使用者體驗。</p>
 
-<p>要不打擾到使用者偷偷通知手機要實作<code>Silent Notification</code>，很簡單，只要把<code>title</code>,<code>body</code>,<code>sound</code>全部留空就好，但通常我們的APP都在後台，甚至沒有被載入到記憶體，這時候要啟用背景更新，做法就是額外在APNS Payload 加上<code>content-available=1</code>，並且在Xcode的Capabilities->Background Modes->Remotes Notification這裡把選項打勾。</p>
+<p>要不打擾到使用者偷偷通知手機要實作<code>Silent Notification</code>，很簡單，只要加上<code>content-available=1</code>，再來把<code>alert</code>,<code>badge</code>,<code>sound</code>全部留空就好，並且在Xcode的Capabilities->Background Modes->Remotes Notification這裡把選項打勾。</p>
 
-<p>這時候在手機收到有<code>content-available=1</code>的推播，而且APP有enabled the remote notifications background mode的情況下，APP不管在前台或後台甚至沒被Lunch過，都會被喚醒並呼叫到下面這個方法：</p>
+<p>這時候在手機收到有<code>content-available=1</code>的推播，iOS就會在背景喚醒你的APP，並且呼叫下面方法讓你下載資料或做些事，下次使用者打開就可以看到更新的內容了：</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
