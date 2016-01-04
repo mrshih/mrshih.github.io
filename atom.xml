@@ -4,7 +4,7 @@
   <title><![CDATA[MR SHIH]]></title>
   <link href="http://mrshih.github.io/atom.xml" rel="self"/>
   <link href="http://mrshih.github.io/"/>
-  <updated>2016-01-04T15:36:12+08:00</updated>
+  <updated>2016-01-04T22:27:12+08:00</updated>
   <id>http://mrshih.github.io/</id>
   <author>
     <name><![CDATA[施安宏]]></name>
@@ -86,11 +86,13 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>上面四個上傳任務實際上會在後台以併發Concurrent/Parallel的方式執行。在背景裡面上面4個上傳任務是同時進行的，一樣有可能造成APP崩潰。</p>
+<p>這裡有個大問題是uploadMovieInBackground本身已經是跑在背景，所以四個上傳任務實際上在後台是以併發Concurrent/Parallel的方式執行。</p>
 
-<p>額外副作用是你只可以控制任務執行的順序，但不能決定任務完成的順序，也就不能讓任務按照Serial的思維去執行。失去用Serial Queue的初衷。</p>
+<p>而多個高I/0負載任務被同時執行就有可能造成APP崩潰。</p>
 
-<p>實際執行結果會像這樣，但實際上不可預測，因為不能知道哪個會先完成：</p>
+<p>已Serial Queue的角度來看，你只可以控制任務執行的順序，但不能決定任務完成的順序，也就不能讓任務按照Serial的思維去執行，失去用Serial Queue的初衷。</p>
+
+<p>實際執行結果不可預測，但大概會像這樣：</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
