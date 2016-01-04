@@ -1,6 +1,6 @@
 ---
 layout: post
-title: iOS 以Serial思維執行背景任務
+title: iOS 大量網路或硬碟I/0處理
 date: '2016-01-04 15:00:00 +0800'
 comments: true
 categories: 良工巧匠集
@@ -12,6 +12,7 @@ categories: 良工巧匠集
 
 UI是不會被凍結沒錯，但很有可能背景操作網路或Disk I/O的量太多（通常是Disk），導致APP崩潰。
 
+##以Serial思維執行背景任務
 這時候就非常建議一次下載並儲存一部影片就好。也就是確保上個任務執行完畢，Queue在推送下一個任務去執行。
 
 ##混亂的完成順序
@@ -50,7 +51,7 @@ dispatch_async(_uploadToParseInBackgroundQueue(), ^{
 [self addTaskUploadMovie:d];
 ```
 
-這裡有個大問題是uploadMovieInBackground本身已經是跑在背景，所以四個上傳任務實際上在後台是以併發Concurrent/Parallel的方式執行。
+這裡有個大問題是`uploadMovieInBackground`本身已經是跑在背景，所以四個上傳任務實際上在後台是以併發Concurrent/Parallel的方式執行。
 
 而多個高I/0負載任務被同時執行就有可能造成APP崩潰。
 
@@ -82,11 +83,13 @@ d上傳Start.......
 d上傳Done
 ```
 
-###加入`dispatch_resume`與`dispatch_suspend`
+###加入`dispatch_suspend`與`dispatch_resume`
 
 加入這兩個操控Queue的方法就是做兩個目的：     
-- 當某個在Serial Queue的上傳任務Block被執行的時候，此任務在Block內馬上呼叫Queue的Suspend方法，來暫停這個Queue繼續執行下個上傳任務   
-- 而當前上傳任務執行完成之後，在該任務的call back block裡面馬上呼叫Queue的Resume，來讓下個上傳任務被執行。
+
+- 當某個在Serial Queue的上傳任務Block被執行的時候，此任務在Block內馬上呼叫Queue的Suspend方法，來暫停這個Queue繼續執行下個上傳任務  
+ 
+- 而當前上傳任務執行完成之後，在該任務的call back block裡面馬上呼叫Queue的Resume，來讓下個上傳任務被執行
 
 反覆上述行為就達到我們要的一次在背景做一件事情的效果了。
 
