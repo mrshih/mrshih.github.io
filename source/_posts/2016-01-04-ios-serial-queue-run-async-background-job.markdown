@@ -54,7 +54,7 @@ dispatch_async(_uploadToParseInBackgroundQueue(), ^{
 
 額外副作用是你只可以控制任務執行的順序，但不能決定任務完成的順序，也就不能讓任務按照Serial的思維去執行。失去用Serial Queue的初衷。
 
-實際執行結果會像這樣：
+實際執行結果會像這樣，但實際上不可預測，因為不能知道哪個會先完成：
 
 ```
 a上傳Start.......
@@ -63,8 +63,8 @@ a上傳Done
 c上傳Start.......
 c上傳Done
 d上傳Start.......
-b上傳Done
 d上傳Done
+b上傳Done
 ```
 
 ##可控制的完成順序  
