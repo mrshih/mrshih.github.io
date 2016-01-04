@@ -4,7 +4,7 @@
   <title><![CDATA[MR SHIH]]></title>
   <link href="http://mrshih.github.io/atom.xml" rel="self"/>
   <link href="http://mrshih.github.io/"/>
-  <updated>2016-01-04T15:26:13+08:00</updated>
+  <updated>2016-01-04T15:36:12+08:00</updated>
   <id>http://mrshih.github.io/</id>
   <author>
     <name><![CDATA[施安宏]]></name>
@@ -90,7 +90,7 @@
 
 <p>額外副作用是你只可以控制任務執行的順序，但不能決定任務完成的順序，也就不能讓任務按照Serial的思維去執行。失去用Serial Queue的初衷。</p>
 
-<p>實際執行結果會像這樣：</p>
+<p>實際執行結果會像這樣，但實際上不可預測，因為不能知道哪個會先完成：</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -106,8 +106,8 @@
 </span><span class='line'><span class="n">c</span><span class="err">上傳</span><span class="no">Start</span><span class="o">.</span><span class="n">.</span><span class="o">.</span><span class="n">.</span><span class="o">.</span><span class="n">.</span><span class="o">.</span>
 </span><span class='line'><span class="n">c</span><span class="err">上傳</span><span class="no">Done</span>
 </span><span class='line'><span class="n">d</span><span class="err">上傳</span><span class="no">Start</span><span class="o">.</span><span class="n">.</span><span class="o">.</span><span class="n">.</span><span class="o">.</span><span class="n">.</span><span class="o">.</span>
-</span><span class='line'><span class="n">b</span><span class="err">上傳</span><span class="no">Done</span>
 </span><span class='line'><span class="n">d</span><span class="err">上傳</span><span class="no">Done</span>
+</span><span class='line'><span class="n">b</span><span class="err">上傳</span><span class="no">Done</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
