@@ -5,7 +5,7 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>iOS 以Serial思維執行背景任務 - MR SHIH</title>
+  <title>iOS 大量網路或硬碟I/0處理 - MR SHIH</title>
   <meta name="author" content="施安宏">
 
   
@@ -80,7 +80,7 @@
   
   <header>
     
-      <h1 class="entry-title">iOS 以Serial思維執行背景任務</h1>
+      <h1 class="entry-title">iOS 大量網路或硬碟I/0處理</h1>
     
     
       <p class="meta">
@@ -111,6 +111,8 @@
 <p>比如影音APP使用者見獵心喜，一下子選了許多部影片要下載，如果現在把下載任務一股腦兒丟到背景，因為現在大部分下載需求都直接使用知名框架<code>AFNetworking</code>，而裡面的方法通常也都直接在背景運行，造成這些下載任務用Concurrent的方式併發執行，這下子產生大量的網路還有Disk I/O Request同時在背景跑。</p>
 
 <p>UI是不會被凍結沒錯，但很有可能背景操作網路或Disk I/O的量太多（通常是Disk），導致APP崩潰。</p>
+
+<h2>以Serial思維執行背景任務</h2>
 
 <p>這時候就非常建議一次下載並儲存一部影片就好。也就是確保上個任務執行完畢，Queue在推送下一個任務去執行。</p>
 
@@ -174,7 +176,7 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>這裡有個大問題是uploadMovieInBackground本身已經是跑在背景，所以四個上傳任務實際上在後台是以併發Concurrent/Parallel的方式執行。</p>
+<p>這裡有個大問題是<code>uploadMovieInBackground</code>本身已經是跑在背景，所以四個上傳任務實際上在後台是以併發Concurrent/Parallel的方式執行。</p>
 
 <p>而多個高I/0負載任務被同時執行就有可能造成APP崩潰。</p>
 
@@ -222,11 +224,15 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<h3>加入<code>dispatch_resume</code>與<code>dispatch_suspend</code></h3>
+<h3>加入<code>dispatch_suspend</code>與<code>dispatch_resume</code></h3>
 
-<p>加入這兩個操控Queue的方法就是做兩個目的：   <br/>
-&ndash; 當某個在Serial Queue的上傳任務Block被執行的時候，此任務在Block內馬上呼叫Queue的Suspend方法，來暫停這個Queue繼續執行下個上傳任務 <br/>
-&ndash; 而當前上傳任務執行完成之後，在該任務的call back block裡面馬上呼叫Queue的Resume，來讓下個上傳任務被執行。</p>
+<p>加入這兩個操控Queue的方法就是做兩個目的：</p>
+
+<ul>
+<li><p>當某個在Serial Queue的上傳任務Block被執行的時候，此任務在Block內馬上呼叫Queue的Suspend方法，來暫停這個Queue繼續執行下個上傳任務</p></li>
+<li><p>而當前上傳任務執行完成之後，在該任務的call back block裡面馬上呼叫Queue的Resume，來讓下個上傳任務被執行</p></li>
+</ul>
+
 
 <p>反覆上述行為就達到我們要的一次在背景做一件事情的效果了。</p>
 
@@ -335,7 +341,7 @@
   <ul id="recent_posts">
     
       <li class="post">
-        <a href="/blog/2016/01/04/ios-serial-queue-run-async-background-job/">iOS 以Serial思維執行背景任務</a>
+        <a href="/blog/2016/01/04/ios-serial-queue-run-async-background-job/">iOS 大量網路或硬碟I/0處理</a>
       </li>
     
       <li class="post">
