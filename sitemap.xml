@@ -3,6 +3,12 @@
   
   
   <url>
+    <loc>http://mrshih.github.io/blog/2016/01/08/first-presentation-flow/</loc>
+    <lastmod>2016-01-08T18:10:00+08:00</lastmod>
+    <priority>0.8</priority>
+  </url>
+  
+  <url>
     <loc>http://mrshih.github.io/blog/2016/01/04/ios-serial-queue-run-async-background-job/</loc>
     <lastmod>2016-01-04T15:00:00+08:00</lastmod>
     <priority>0.8</priority>
@@ -39,6 +45,108 @@
   </url>
   
   <url>
+    <loc>http://mrshih.github.io/blog/2014/12/23/of-lorems-and-ipsii-9/</loc>
+    <lastmod>2014-12-23T08:04:23+08:00</lastmod>
+    <priority>0.8</priority>
+  </url>
+  
+  <url>
+    <loc>http://mrshih.github.io/blog/2014/12/23/of-lorems-and-ipsii-8/</loc>
+    <lastmod>2014-12-23T08:04:23+08:00</lastmod>
+    <priority>0.8</priority>
+  </url>
+  
+  <url>
+    <loc>http://mrshih.github.io/blog/2014/12/23/of-lorems-and-ipsii-7/</loc>
+    <lastmod>2014-12-23T08:04:23+08:00</lastmod>
+    <priority>0.8</priority>
+  </url>
+  
+  <url>
+    <loc>http://mrshih.github.io/blog/2014/12/23/of-lorems-and-ipsii-6/</loc>
+    <lastmod>2014-12-23T08:04:23+08:00</lastmod>
+    <priority>0.8</priority>
+  </url>
+  
+  <url>
+    <loc>http://mrshih.github.io/blog/2014/12/23/of-lorems-and-ipsii-5/</loc>
+    <lastmod>2014-12-23T08:04:23+08:00</lastmod>
+    <priority>0.8</priority>
+  </url>
+  
+  <url>
+    <loc>http://mrshih.github.io/blog/2014/12/23/of-lorems-and-ipsii-4/</loc>
+    <lastmod>2014-12-23T08:04:23+08:00</lastmod>
+    <priority>0.8</priority>
+  </url>
+  
+  <url>
+    <loc>http://mrshih.github.io/blog/2014/12/23/of-lorems-and-ipsii-3/</loc>
+    <lastmod>2014-12-23T08:04:23+08:00</lastmod>
+    <priority>0.8</priority>
+  </url>
+  
+  <url>
+    <loc>http://mrshih.github.io/blog/2014/12/23/of-lorems-and-ipsii-2/</loc>
+    <lastmod>2014-12-23T08:04:23+08:00</lastmod>
+    <priority>0.8</priority>
+  </url>
+  
+  <url>
+    <loc>http://mrshih.github.io/blog/2014/12/23/of-lorems-and-ipsii-16/</loc>
+    <lastmod>2014-12-23T08:04:23+08:00</lastmod>
+    <priority>0.8</priority>
+  </url>
+  
+  <url>
+    <loc>http://mrshih.github.io/blog/2014/12/23/of-lorems-and-ipsii-15/</loc>
+    <lastmod>2014-12-23T08:04:23+08:00</lastmod>
+    <priority>0.8</priority>
+  </url>
+  
+  <url>
+    <loc>http://mrshih.github.io/blog/2014/12/23/of-lorems-and-ipsii-14/</loc>
+    <lastmod>2014-12-23T08:04:23+08:00</lastmod>
+    <priority>0.8</priority>
+  </url>
+  
+  <url>
+    <loc>http://mrshih.github.io/blog/2014/12/23/of-lorems-and-ipsii-13/</loc>
+    <lastmod>2014-12-23T08:04:23+08:00</lastmod>
+    <priority>0.8</priority>
+  </url>
+  
+  <url>
+    <loc>http://mrshih.github.io/blog/2014/12/23/of-lorems-and-ipsii-12/</loc>
+    <lastmod>2014-12-23T08:04:23+08:00</lastmod>
+    <priority>0.8</priority>
+  </url>
+  
+  <url>
+    <loc>http://mrshih.github.io/blog/2014/12/23/of-lorems-and-ipsii-11/</loc>
+    <lastmod>2014-12-23T08:04:23+08:00</lastmod>
+    <priority>0.8</priority>
+  </url>
+  
+  <url>
+    <loc>http://mrshih.github.io/blog/2014/12/23/of-lorems-and-ipsii-10/</loc>
+    <lastmod>2014-12-23T08:04:23+08:00</lastmod>
+    <priority>0.8</priority>
+  </url>
+  
+  <url>
+    <loc>http://mrshih.github.io/blog/2014/12/23/of-lorems-and-ipsii-1/</loc>
+    <lastmod>2014-12-23T08:04:23+08:00</lastmod>
+    <priority>0.8</priority>
+  </url>
+  
+  <url>
+    <loc>http://mrshih.github.io/blog/2014/12/23/of-lorems-and-ipsii/</loc>
+    <lastmod>2014-12-23T08:04:23+08:00</lastmod>
+    <priority>0.8</priority>
+  </url>
+  
+  <url>
     <loc>http://mrshih.github.io/blog/2014/07/23/pivot/</loc>
     <lastmod>2014-07-23T20:22:58+08:00</lastmod>
     <priority>0.8</priority>
@@ -59,14 +167,28 @@
   
   <url>
     <loc>http://mrshih.github.io/blog/archives/</loc>
-    <lastmod>2016-01-04T23:34:13+08:00</lastmod>
+    <lastmod>2016-01-08T18:38:38+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <url>
+    <loc>http://mrshih.github.io/archives/</loc>
+    <lastmod>2016-01-08T18:38:38+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <url>
+    <loc>http://mrshih.github.io/blog/</loc>
+    <lastmod>2016-01-08T18:38:38+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   
   <url>
     <loc>http://mrshih.github.io/</loc>
-    <lastmod>2016-01-04T23:34:13+08:00</lastmod>
+    <lastmod>2016-01-08T18:38:38+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>

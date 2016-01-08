@@ -4,7 +4,7 @@
   <title><![CDATA[Category: 良工巧匠集 | MR SHIH]]></title>
   <link href="http://mrshih.github.io/blog/categories/liang-gong-qiao-jiang-ji/atom.xml" rel="self"/>
   <link href="http://mrshih.github.io/"/>
-  <updated>2016-01-04T23:34:13+08:00</updated>
+  <updated>2016-01-08T18:38:38+08:00</updated>
   <id>http://mrshih.github.io/</id>
   <author>
     <name><![CDATA[施安宏]]></name>
@@ -12,6 +12,288 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[iOS 實作SlideMenu - 初探ViewController切換]]></title>
+    <link href="http://mrshih.github.io/blog/2016/01/08/first-presentation-flow/"/>
+    <updated>2016-01-08T18:10:00+08:00</updated>
+    <id>http://mrshih.github.io/blog/2016/01/08/first-presentation-flow</id>
+    <content type="html"><![CDATA[<p><img src="/images/2016-01-08-first-presentation-flow.jpg" />
+所有關於ViewController切換的行為基本稱做為Model，Navegation特有的Push等等也是Model的分支。 在iOS7裡面把制定切換ViewController的行為拆分成許多Class，目的是為了要降低耦合，讓Code重用度提高，比如Coustom一個切換Animation物件可以用在好幾個ViewController之間。</p>
+
+<p>要切換ViewController你要告訴UIKit兩件事情，顯示成怎樣<code>
+UIModalPresentationStyle
+</code>和過場動畫<code>Animations</code>。</p>
+
+<h2>UIModalPresentationStyle</h2>
+
+<p><code>UIModalPresentationStyle</code>是<code>UIViewController</code>裡的參數。定義了Presented最終呈現的樣式，比如：</p>
+
+<ul>
+<li>覆蓋全螢幕類的<code>UIModalPresentationFullScreen</code></li>
+<li>iPad上常見的<code>UIModalPresentationPopover</code></li>
+<li><code>UIModalPresentationCurrentContext</code>指定特定ViewController去做覆蓋</li>
+<li>而我們想要的Slide Menu這樣的顯示效果不是上面幾種類型的，我們就必須要Coustom一個。也就必須實作<code>TransitioningDelegate</code>來提供下面兩種物件：
+
+<ul>
+<li><code>UIPresentationController</code></li>
+<li>實作<code>UIViewControllerAnimatedTransitioning</code>的Animation</li>
+</ul>
+</li>
+</ul>
+
+
+<p>兩個物件後面會提到怎麼產生。</p>
+
+<h2>使用Segue切換View Controller</h2>
+
+<p>用Code寫的話常見做法是在Prestenting View Controller裡面呼叫<code>presentViewController</code>。而在這個可視化當道的年代當然要配合Storyboard搭配Segue才不會在未來多螢幕適配被淘汰掉。</p>
+
+<p>在StoryBoard裡面拉出一條Segue，並且把Kind指定成Coustom。這樣就是告訴StoryBoard我們不用UIKit內建的展示和轉場效果，要自己建立一個Subcalss<code>UIStoryboardSegue</code>的Coustom Segue物件：</p>
+
+<p><code>Objective-C
+@interface SlideLeftCustomSegue : UIStoryboardSegue
+</code>
+在這裡只要實作<code>perform</code>方法，在裡面設定：</p>
+
+<p>```Objective-C
+// 系統調用prepareForSegue就是調用這裡
+&ndash; (void)perform{</p>
+
+<pre><code>UIViewController *srcViewController = (UIViewController *) self.sourceViewController;
+SettingTableViewController *destViewController = (SettingTableViewController *) self.destinationViewController;
+
+SlideMenuShowTransition *trainstionDelegate = [[SlideMenuShowTransition alloc]init];
+[destViewController setTd:trainstionDelegate];
+
+//把Presented View Controller的`ModalPresentationStyle屬性改成UIModalPresentationCustom
+[destViewController setModalPresentationStyle:UIModalPresentationCustom];
+
+//設置TransitioningDelegate。這個代理主要用來提供待會兒切換會用到的所有物件。下面會介紹到
+[destViewController setTransitioningDelegate:trainstionDelegate];
+
+//最後呼叫presentViewController，來呼叫UIKit做開始切換
+[srcViewController presentViewController:destViewController animated:YES completion:nil];
+</code></pre>
+
+<p>}</p>
+
+<p>```</p>
+
+<h2>TransitioningDelegate</h2>
+
+<p>當系統發現Predented View Controller指定<code>ModalPresentationStyle</code>參數為<code>UIModalPresentationCustom</code>時，就會去呼叫<code>TransitioningDelegate</code>來提供上面有提到Model切換轉場所需的相關物件：<code>UIPresentationController</code>與Animation。</p>
+
+<p>只要創一個實作<code>TransitioningDelegate</code>的NSObject，並指定給Presented View Controller就可以了。</p>
+
+<p>執行的時候UIKit會先抓UIPresentaionController再依照情況抓取要的Animaion物件。</p>
+
+<ol>
+<li>提交<code>UIPresentaionController</code>來決定Presented View的Final的Frame。</li>
+<li>提交所有轉場，包誇Present View Controller進來, Dismiss View Controller，還有交互等等。我們這裡簡單討論Present還有Dismiss的Animation物件怎麼做。</li>
+</ol>
+
+
+<p>系統會先抓<code>UIPresentaionController</code>一部分是因為Animation物件需要知道Prested View Final Frame。</p>
+
+<p>```
+// present時uikit會從這裡拿資料&lt;過場動畫>
+&ndash; (id<UIViewControllerAnimatedTransitioning> <em>Nullable)animationControllerForPresentedController:(UIViewController * </em>Nonnull)presented presentingController:(UIViewController * <em>Nonnull)presenting sourceController:(UIViewController * </em>Nonnull)source {</p>
+
+<pre><code>SlideMenuAnimator *animator = [[SlideMenuAnimator alloc]init];
+[animator setPresenting:YES];
+return animator;
+</code></pre>
+
+<p>}</p>
+
+<p>// dismiss時uikit會從這裡拿資料&lt;過場動畫>
+&ndash; (id<UIViewControllerAnimatedTransitioning> <em>Nullable)animationControllerForDismissedController:(UIViewController * </em>Nonnull)dismissed {</p>
+
+<pre><code>SlideMenuAnimator *animator = [[SlideMenuAnimator alloc]init];
+[animator setPresenting:NO];
+return animator;
+</code></pre>
+
+<p>}</p>
+
+<p>// UIKit在切換之初從這裡要UIPresentationController
+&ndash; (UIPresentationController <em>)presentationControllerForPresentedViewController:
+(UIViewController </em>)presented</p>
+
+<pre><code>                                                  presentingViewController:(UIViewController *)presenting
+                                                      sourceViewController:(UIViewController *)source {
+
+SlideMenuPresentaionController* myPresentation = [[SlideMenuPresentaionController alloc]
+                                            initWithPresentedViewController:presented presentingViewController:presenting];
+
+return myPresentation;
+</code></pre>
+
+<p>}
+```</p>
+
+<h2>UIPresentationController</h2>
+
+<p>在iOS 7裡面引進了這個<code>UIPresentationController</code>，可以決定以下事情</p>
+
+<ul>
+<li>Set the size of the presented view controller.</li>
+<li>Add custom views to change the visual appearance of the presented content.</li>
+<li>Supply transition animations for any of its custom views.</li>
+<li>Adapt the visual appearance of the presentation when changes occur in the app’s environment.（之後另設補充）</li>
+</ul>
+
+
+<p>這裡只先介紹前三項，指定Presented View Frame的方法，還有額外增加Coustom View如陰影層的方法:</p>
+
+<p>```Objective-C
+// 決定了使用UIModalPresentationCustom這樣的Model切換方式，就可以在這裡直接指定PresentedView的frame
+&ndash; (CGRect)frameOfPresentedViewInContainerView {</p>
+
+<pre><code>CGRect presentedViewFrame = CGRectZero;
+CGRect containerBounds = [[self containerView] bounds];
+
+presentedViewFrame.size = CGSizeMake(floorf(containerBounds.size.width * 0.7),
+                                     containerBounds.size.height);
+return presentedViewFrame;
+</code></pre>
+
+<p>}</p>
+
+<p>// Present的時候可以增加一些Coustom View，靠animateAlongsideTransition來顯示新增的Coustom過場動畫
+// 這裡用dimmingView來做Coustom View的例子
+&ndash; (void)presentationTransitionWillBegin {</p>
+
+<pre><code>self.dimmingView = [[UIView alloc]init];
+[self.dimmingView setFrame:self.containerView.frame];
+[self.dimmingView setBackgroundColor:[UIColor blackColor]];
+[self.dimmingView setAlpha:0.3f];
+
+// Add a custom dimming view behind the presented view controller's view
+[[self containerView] addSubview:self.dimmingView];
+[self.dimmingView addSubview:[[self presentedViewController] view]];
+</code></pre>
+
+<h1>pragma clang diagnostic push</h1>
+
+<h1>pragma clang diagnostic ignored &ldquo;-Wundeclared-selector&rdquo;</h1>
+
+<pre><code>UITapGestureRecognizer *dimmingViewSingleTap =
+[[UITapGestureRecognizer alloc] initWithTarget:self.presentingViewController
+                                        action:@selector(handleDimmingViewSingleTap)];
+</code></pre>
+
+<h1>pragma clang diagnostic pop</h1>
+
+<pre><code>[self.dimmingView addGestureRecognizer:dimmingViewSingleTap];
+
+// Fade in the dimming view during the transition.
+[self.dimmingView setAlpha:0.0];
+// Use the transition coordinator to set up the animations.
+[[[self presentingViewController] transitionCoordinator] animateAlongsideTransition:^(id&lt;UIViewControllerTransitionCoordinatorContext&gt;  _Nonnull context) {
+    [self.dimmingView setAlpha:0.55];
+} completion:^(id&lt;UIViewControllerTransitionCoordinatorContext&gt;  _Nonnull context) {
+
+}];
+</code></pre>
+
+<p>}</p>
+
+<ul>
+<li><p>(void)dismissalTransitionWillBegin {
+  [[[self presentingViewController] transitionCoordinator] animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext>  <em>Nonnull context) {
+      [self.dimmingView setAlpha:0.0];
+  } completion:^(id<UIViewControllerTransitionCoordinatorContext>  </em>Nonnull context) {</p>
+
+<p>  }];
+}</p></li>
+</ul>
+
+
+<p>```</p>
+
+<h2>Animation</h2>
+
+<p>建立一個實作<code>UIViewControllerAnimatedTransitioning</code> protocol的<code>NSObject</code>，裡面會有系統傳入的<code>UIViewControllerContextTransitioning</code>，這裡面會包含你後面要做動畫所需的所有物件。</p>
+
+<p>主要兩個方法，一個方法專門玩動畫，一個方法單純回傳動畫所需時間。</p>
+
+<p>我們可以把Present和Dismiss的動畫寫在一起，但<code>transitionContext</code>傳入的資訊什麼都有，就是沒有現在是Present還是Dismiss狀態的參數。</p>
+
+<p>所以要自己設一個，並且在<code>TransitioningDelegate</code>回傳動畫方法時指定給Animation物件知道:</p>
+
+<p><code>Objective-C
+@interface SlideMenuAnimator : NSObject&lt;UIViewControllerAnimatedTransitioning&gt;
+@property (nonatomic) Boolean presenting;
+@end
+</code></p>
+
+<p>```Objective-C
+// 這裡UIKit會給我們兩個View，包在transitionContext裡面，只要取出來玩就好了
+// 這裡是真的作動畫的地方
+&ndash; (void)animateTransition:(id<UIViewControllerContextTransitioning> _Nonnull)transitionContext {</p>
+
+<pre><code>// Get the set of relevant objects.
+UIView *containerView = [transitionContext containerView];
+UIViewController *fromVC = [transitionContext
+                            viewControllerForKey:UITransitionContextFromViewControllerKey];
+UIViewController *toVC   = [transitionContext
+                            viewControllerForKey:UITransitionContextToViewControllerKey];
+
+UIView *toView = [transitionContext viewForKey:UITransitionContextToViewKey];
+UIView *fromView = [transitionContext viewForKey:UITransitionContextFromViewKey];
+
+// Set up some variables for the animation.
+//CGRect containerFrame = containerView.frame;
+//CGRect toViewStartFrame = [transitionContext initialFrameForViewController:toVC];
+CGRect fromViewStartFrame = [transitionContext initialFrameForViewController:fromVC];
+CGRect toViewFinalFrame = [transitionContext finalFrameForViewController:toVC];
+CGRect fromViewFinalFrame = [transitionContext finalFrameForViewController:fromVC];
+
+// 3. Add toVC's view to containerView
+[containerView addSubview:toView];
+if (self.presenting) {
+    [toView setFrame:CGRectOffset(toViewFinalFrame, -1*toViewFinalFrame.size.width, 0)];
+}else {
+    [fromView setFrame:fromViewStartFrame];
+}
+
+// Creating the animations using Core Animation or UIView animation methods.
+[UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
+    if (self.presenting) {
+        toView.frame = toViewFinalFrame;
+    }else {
+        fromView.frame = CGRectOffset(fromViewFinalFrame, -1*fromViewFinalFrame.size.width, 0);
+    }
+} completion:^(BOOL finished) {
+    // 3.Cleaning up and completing the transition.
+    [transitionContext completeTransition:YES];
+}];
+</code></pre>
+
+<p>}
+```</p>
+
+<h2>嚴謹有序的切換View Controller Flow</h2>
+
+<p>到這邊就可以做出一個會動，有PresentingView有陰影Mask的SlideMenu了，視覺上是仿照Google Photo。基本上iOS 7所引進的這些許多新方法都是為了要解構，使之可以更容易管理，更有邏輯性。</p>
+
+<p>有關切換ViewController來有些重要Feature，留待之後想到應用實作再增加</p>
+
+<ul>
+<li>InteractiveTransition交互動畫的部分</li>
+<li>跟<code>UIPresentationController</code>適配不同場景的應用Adapting to Different Size Classes</li>
+</ul>
+
+
+<h3>參考資料</h3>
+
+<p> <a href="https://developer.apple.com/videos/play/wwdc2014-228/">https://developer.apple.com/videos/play/wwdc2014-228/</a>
+&ndash; <a href="http://onevcat.com/2013/10/vc-transition-in-ios7/">http://onevcat.com/2013/10/vc-transition-in-ios7/</a>
+&ndash; <a href="https://developer.apple.com/library/ios/featuredarticles/ViewControllerPGforiPhoneOS/DefiningCustomPresentations.html#//apple_ref/doc/uid/TP40007457-CH25-SW1">https://developer.apple.com/library/ios/featuredarticles/ViewControllerPGforiPhoneOS/DefiningCustomPresentations.html#//apple_ref/doc/uid/TP40007457-CH25-SW1</a></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[iOS 大量網路與硬碟I/0處理]]></title>
