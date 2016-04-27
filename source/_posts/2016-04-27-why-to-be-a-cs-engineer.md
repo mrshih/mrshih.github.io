@@ -1,7 +1,7 @@
 ---
 layout: post
 title: 為什麼要當個CS工程師
-date: '2016-01-04 15:00:00 +0800'
+date: '2016-04-27 15:00:00 +0800'
 comments: true
 categories: 記錄集
 ---
