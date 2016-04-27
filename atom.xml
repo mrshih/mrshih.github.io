@@ -4,7 +4,7 @@
   <title><![CDATA[MR SHIH]]></title>
   <link href="http://mrshih.github.io/atom.xml" rel="self"/>
   <link href="http://mrshih.github.io/"/>
-  <updated>2016-01-08T18:51:09+08:00</updated>
+  <updated>2016-04-27T15:25:47+08:00</updated>
   <id>http://mrshih.github.io/</id>
   <author>
     <name><![CDATA[施安宏]]></name>
@@ -12,6 +12,66 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[為什麼要當個CS工程師]]></title>
+    <link href="http://mrshih.github.io/blog/2016/04/27/why-to-be-a-cs-engineer/"/>
+    <updated>2016-04-27T15:00:00+08:00</updated>
+    <id>http://mrshih.github.io/blog/2016/04/27/why-to-be-a-cs-engineer</id>
+    <content type="html"><![CDATA[<p>在電腦科學的領域裡面打滾這幾年發現一件事，當你能夠橫向操縱越多領域的工具，組合出來東西往往價值會很高。比如要組合一個APP開門鎖系統橫向需要連結PHP, Pthon, Objective-C, HTML約四種語言，其實每一種都不用太深入，單組合出來的系統往往一般人一時半刻不了解，需要問你是怎麼兜出來得。</p>
+
+<p>這個發現在最近開發的新應用系統也得到驗證。其實可以這麼看，新的系統往往是由過往的工具所搭建出來，賦予新名稱，創造出新功能，如此而已。每個語言與工具有擅長的地方，拿上面提到的開鎖系統為例：</p>
+
+<blockquote><ol>
+<li>Liunx+Apache+MySql+PHP+HTML = 家裡接收開鎖請求的Server</li>
+<li>Raspberry Pi + Python = 負責控制馬達開鎖的模組</li>
+<li>Objective-C     = 當然就負責遠端送訊號，自動感應是不是快到家了</li>
+<li>ibeacon = 放在門附近負責讓手機知道自己快到家了</li>
+</ol>
+</blockquote>
+
+<p>第一點其實資訊相關科技畢業基本一定要會，不然讀資訊科系真的是可惜。接下的幾點需要你能夠不怕生的上網找資料，並且學著去試試看。</p>
+
+<h2>何謂試試看?</h2>
+
+<p>打個比方，蜘蛛人一開始也不知道怎麼吐絲，所以他第一步不會直接把蜘蛛絲噴到摩天大樓，然後試著在大樓建拋來拋去。第一步當然是所謂的Hello, World。</p>
+
+<p>幾乎每個工具或語言都有提供Quick start guide，你會找上這個工具就代表你應該有先上網Google過，發現這個工具可以幫你解決問題，而接下來就是照著文章去試試看。很多人不敢試是因為害怕失敗，但我想說得是每個看似風光厲害完成些什麼的工程師都是Error Message海裡面爬出來的。遇到錯誤訊息就去Google，就這麼簡單。想要什麼功能就把手弄髒去做就對了。</p>
+
+<h2>失敗到心寒</h2>
+
+<p>很多人其實卡死在這裡。前面說到Error的數量，確定程式設計師的力量，但要如何撐過Error海？這就要說到理想跟錢了。你為什麼選擇程式設計？</p>
+
+<p>程式設計在可預見的30年內一定還會一直缺人，越缺越大而已，說直白的很混的可以就溫飽三餐小確幸，強的可以過得非常爽，而其他職業在未來只會被軟體吞掉而已。你選擇了這個看似高大上的行業，可以做的事情真的很多很多，幾乎是一個應許之地。你對前端沒興趣可以走後端，也可以轉資料庫，轉Hacker，轉Linux設定架設維護寫Shall&hellip;</p>
+
+<p>做這個行業傲嬌的點應該在於對別人來說，你就像魔法師，有沒有用過星巴克QR Code掃一掃就可以付錢？Uber有搭乘過嗎？為什麼有人說Line不安全，那什麼是安全的軟體？在未來世界大家都離不開軟體，對一般人而已這一切都像是魔術，而程式設計可以了解背後資訊的流動，你可以解釋這一切magic一般的事情。強一點的之後你可以創造Magic，有這麼神奇的技能那有人願意付你錢真的是理所當然。</p>
+
+<p>你要對自己身為魔術師感到驕傲，這幫助我在Error海裡面保持一顆赤子之心。</p>
+
+<h2>Be傲嬌</h2>
+
+<p>當你靠著自己得力量打造一個自豪的小系統，有人看到你的才能，你也相信自己的才能，自然而然你會得到錢，會得到自信，一切都像滾雪球一般停不下來。這個時代需要這樣的技能，選擇大於努力，跟對領域能事半功倍。</p>
+
+<p>最後還是要補一句，學資訊系統的過程當然痛苦，但如果你物慾很強，夢想開拉風跑車，去普及島度假住水上小屋，還是一句話，你可以選擇繼續鬱卒，也可以選擇努力，花的力氣跟時間是一樣的，而程式設計這一條路可以是個方向。</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[iOS Camera Design Pattern 回顧]]></title>
+    <link href="http://mrshih.github.io/blog/2016/02/05/ios-camera-design-pattern-review/"/>
+    <updated>2016-02-05T15:00:00+08:00</updated>
+    <id>http://mrshih.github.io/blog/2016/02/05/ios-camera-design-pattern-review</id>
+    <content type="html"><![CDATA[<h2>主題：要刪除某張照片?</h2>
+
+<pre><code>- Beat Practice 應該要由Model做發起去通知資料已變化。比如刪除照片： 
+    1.  由某個UIButton觸發Model的Delete方法
+    2.  Model做處理，處理完之後去通知相關連的ViewModel去更新（Notification）
+    3.  ViewModel收到needUpdate通知，去Fetch並整理資料，最後通知View Reload
+</code></pre>
+
+<p>未完&hellip;</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[iOS 實作SlideMenu - 初探ViewController切換]]></title>

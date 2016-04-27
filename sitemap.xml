@@ -3,6 +3,18 @@
   
   
   <url>
+    <loc>http://mrshih.github.io/blog/2016/04/27/why-to-be-a-cs-engineer/</loc>
+    <lastmod>2016-04-27T15:00:00+08:00</lastmod>
+    <priority>0.8</priority>
+  </url>
+  
+  <url>
+    <loc>http://mrshih.github.io/blog/2016/02/05/ios-camera-design-pattern-review/</loc>
+    <lastmod>2016-02-05T15:00:00+08:00</lastmod>
+    <priority>0.8</priority>
+  </url>
+  
+  <url>
     <loc>http://mrshih.github.io/blog/2016/01/08/first-presentation-flow/</loc>
     <lastmod>2016-01-08T18:10:00+08:00</lastmod>
     <priority>0.8</priority>
@@ -65,28 +77,28 @@
   
   <url>
     <loc>http://mrshih.github.io/blog/archives/</loc>
-    <lastmod>2016-01-08T18:51:09+08:00</lastmod>
+    <lastmod>2016-04-27T15:25:47+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   
   <url>
     <loc>http://mrshih.github.io/archives/</loc>
-    <lastmod>2016-01-08T18:51:09+08:00</lastmod>
+    <lastmod>2016-04-27T15:25:47+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   
   <url>
     <loc>http://mrshih.github.io/blog/</loc>
-    <lastmod>2016-01-08T18:51:09+08:00</lastmod>
+    <lastmod>2016-04-27T15:25:47+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   
   <url>
     <loc>http://mrshih.github.io/</loc>
-    <lastmod>2016-01-08T18:51:09+08:00</lastmod>
+    <lastmod>2016-04-27T15:25:47+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
