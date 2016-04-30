@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: 巧匠集 | MR SHIH]]></title>
+  <link href="http://mrshih.github.io/blog/categories/qiao-jiang-ji/atom.xml" rel="self"/>
+  <link href="http://mrshih.github.io/"/>
+  <updated>2016-05-01T03:25:01+08:00</updated>
+  <id>http://mrshih.github.io/</id>
+  <author>
+    <name><![CDATA[施安宏]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[有關製作iOS客製化Animation的詳細過程]]></title>
+    <link href="http://mrshih.github.io/blog/2016/05/01/detail-custom-ios-model-animation/"/>
+    <updated>2016-05-01T03:05:19+08:00</updated>
+    <id>http://mrshih.github.io/blog/2016/05/01/detail-custom-ios-model-animation</id>
+    <content type="html"><![CDATA[<h2>為何寫這篇</h2>
+
+<p>前幾篇有寫到如何<a href="http://mrshih.github.io/blog/2016/01/08/first-presentation-flow/">製作SlideMenu</a>，大概講了cocoa framework在客製化<code>UIView</code>動畫的世界觀，這裡則寫一個手把手的詳細步驟，這樣搭配比較有感覺，不然Apple把class之間解構的這麼徹底，實在是東一個西一個的，一時之間不好下手。</p>
+
+<h2>手把手開始</h2>
+
+<p>0.建segue並且設立id<br/>
+1.segue kind選custom<br/>
+2.建立subclass(UIStoryboardSegue)<br/>
+3.override perform function</p>
+
+<blockquote><p>how to override perform function</p></blockquote>
+
+<p>1.取得self.sourceViewController<br/>
+2.取得self.destinationViewController<br/>
+3.set destVC 的setModalPresentationStyle = UIModalPresentationCustom//顯示面積客製化<br/>
+4.誰提供客製化的資訊呢？在這裡！ 建立一格subclass UIViewControllerTransitioningDelegate class(裡面怎麼實作請看段A)<br/>
+5.set第四步的步驟為destVC的TransitioningDelegate<br/>
+6.srcVC presentViewController destVC，動畫animated設置為YES</p>
+
+<h2>段A</h2>
+
+<blockquote><p>hwo to create a subclass <code>UIViewControllerTransitioningDelegate</code> 的object。</p>
+
+<p>這裡就是實作perform跟dismiss的時候動畫要怎麼走的地方，還有系統要<code>UIPresentationController</code>的地方，簡單來說就是系統從這邊獲取怎麼客製化顯示範圍與顯示動畫的資訊。</p></blockquote>
+
+<ul>
+<li>1.提供override下面方法</li>
+</ul>
+
+
+<p>```
+&ndash; (UIPresentationController <em>)presentationControllerForPresentedViewController:(UIViewController </em>)presented presentingViewController:(UIViewController <em>)presenting sourceViewController:(UIViewController </em>)source{</p>
+
+<p>1.透過if ([presented isKindOfClass:AlbumMenuViewController class])來分別要提供對應PresentationController{
+2.建立一個subclass UIPresentationController的class。(怎麼建請看段B)
+3.透過UIPresentationController的父方法initWithPresentedViewController&hellip;(略)去instance這個PresentationController object。
+}</p>
+
+<p>}
+```</p>
+
+<ul>
+<li>2.override下面方法來提供prestedVC顯示時的動畫物件animator(從哪裡移動到哪裡，所以其實最後prestedVC的x,y是由這裡提供的動畫物件決定)</li>
+</ul>
+
+
+<p>```
+&ndash; (id<UIViewControllerAnimatedTransitioning> <em>Nullable)animationControllerForPresentedController:(UIViewController * </em>Nonnull)presented presentingController:(UIViewController * <em>Nonnull)presenting sourceController:(UIViewController * </em>Nonnull)source{</p>
+
+<p>1.用if去知道你等等要回傳那個對應的animator
+if([presented isKindOfClass:[HelperTableViewController class]]){
+2.SlideMenuAnimator *animator = [[SlideMenuAnimator alloc]init];//製作一個實作UIViewControllerAnimatedTransitioning協議的animator class，怎麼做看段C
+3.[animator setPresenting:YES];// 我設計的animator可以同時包含出場與離場的動畫，這樣就不用寫兩個animator了，所以裡面有個參數可以選擇要回傳哪種動畫，這裡是出場就設定YES。
+}</p>
+
+<p>}
+```</p>
+
+<ul>
+<li>3.override下面方法來提供prestedVC dismiss時的動畫，功能如上，決定哪裡到哪裡</li>
+</ul>
+
+
+<p><code>
+- (id&lt;UIViewControllerAnimatedTransitioning&gt; _Nullable)animationControllerForDismissedController:(UIViewController * _Nonnull)dismissed{
+1.用if去知道你等等要回傳那個對應的animator
+if([presented isKindOfClass:[HelperTableViewController class]]){
+2.SlideMenuAnimator *animator = [[SlideMenuAnimator alloc]init];//前面解釋過
+3.[animator setPresenting:NO];//前面解釋過
+}
+}
+</code></p>
+
+<h2>段B</h2>
+
+<ul>
+<li>1.override &ndash; <code>frameOfPresentedViewInContainerView</code>這個方法來指定prestenVC要顯示的"大小"，注意不包含位置(x,y)喔</li>
+</ul>
+
+
+<p>```
+(CGRect)frameOfPresentedViewInContainerView
+{
+CGRect presentedViewFrame = CGRectZero;//我們要回傳的數值
+CGRect containerBounds = [[self containerView] bounds];//得到prestingVC的bounds
+// 到這裡你已經可以運加減乘除算出你要顯示的VC的大小，下面示範的是要根據ipad跟iphone做特別處理的做法</p>
+
+<p>if (self.traitCollection.userInterfaceIdiom == UIUserInterfaceIdiomPhone) {
+presentedViewFrame.size = CGSizeMake(floorf(containerBounds.size.width * 0.75),
+containerBounds.size.height);
+}else if(self.traitCollection.userInterfaceIdiom == UIUserInterfaceIdiomPad){
+presentedViewFrame.size = CGSizeMake(floorf(300),
+containerBounds.size.height);
+}</p>
+
+<p>return presentedViewFrame;//最後當然是回傳
+}
+```</p>
+
+<blockquote><p>補充：<br/>
+除了override上面的方法去指定顯示大小外，你還可以override一些方法動態的去新增或拿掉view，比如切換VC時，prested如果沒有蓋滿presting，則剩下的地方可以放上一層黑色半透明的view來做區別。<br/>
+下面是範例:</p></blockquote>
+
+<ul>
+<li>2.新增<code>property @property (nonatomic) UIView *dimmingView;</code></li>
+<li>3.複寫下面兩個方法，一個是當要切換時做什麼，另一個是當要隱藏時做什麼。搭配起來就可以動態新增刪除陰影view</li>
+</ul>
+
+
+<p>```
+&ndash; (void)presentationTransitionWillBegin {</p>
+
+<p>self.dimmingView = [[UIView alloc]init];
+[self.dimmingView setFrame:self.containerView.frame];
+[self.dimmingView setBackgroundColor:[UIColor blackColor]];
+[self.dimmingView setAlpha:0.3f];</p>
+
+<p>// Add a custom dimming view behind the presented view controller&rsquo;s view
+[[self containerView] addSubview:self.dimmingView];
+[self.dimmingView addSubview:[[self presentedViewController] view]];</p>
+
+<h1>pragma clang diagnostic push</h1>
+
+<h1>pragma clang diagnostic ignored &ldquo;-Wundeclared-selector&rdquo;</h1>
+
+<p>UITapGestureRecognizer *dimmingViewSingleTap =
+[[UITapGestureRecognizer alloc] initWithTarget:self.presentingViewController
+action:@selector(handleDimmingViewSingleTap)];</p>
+
+<h1>pragma clang diagnostic pop</h1>
+
+<p>[self.dimmingView addGestureRecognizer:dimmingViewSingleTap];</p>
+
+<p>// Fade in the dimming view during the transition.
+[self.dimmingView setAlpha:0.0];
+// Use the transition coordinator to set up the animations.
+[[[self presentingViewController] transitionCoordinator] animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext>  <em>Nonnull context) {
+[self.dimmingView setAlpha:0.55];
+} completion:^(id<UIViewControllerTransitionCoordinatorContext>  </em>Nonnull context) {</p>
+
+<p>}];
+}
+```</p>
+
+<blockquote><p>在dismiss做一些額外coustom的事情，在這裡用讓dimmingView淡出來當例子</p></blockquote>
+
+<p>```
+&ndash; (void)dismissalTransitionWillBegin {
+[[[self presentingViewController] transitionCoordinator] animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext>  <em>Nonnull context) {
+[self.dimmingView setAlpha:0.0];
+} completion:^(id<UIViewControllerTransitionCoordinatorContext>  </em>Nonnull context) {</p>
+
+<p>}];
+}
+```</p>
+
+<h2>段C</h2>
+
+<ul>
+<li>4.override下面方法，可以拿來改變一些基於class size變化的改變。</li>
+</ul>
+
+
+<p>```
+&ndash; (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator</p>
+
+<p>//製作實作UIViewControllerAnimatedTransitioning協議的animator，系統會去這裡要VC的初始位置跟Final位置，系統再去補齊動畫。
+//1 override 下面function來提供動畫內容（兩個位置）
+&ndash; (void)animateTransition:(id<UIViewControllerContextTransitioning> _Nonnull)transitionContext {
+1.// 主畫布
+UIView *containerView = [transitionContext containerView];</p>
+
+<p>2.// 對進場來說（toVC是prestedVC），拿到後可以再去拿VC的view
+UIViewController *toVC   = [transitionContext
+viewControllerForKey:UITransitionContextToViewControllerKey];</p>
+
+<p>3.// 對進場來說（fromVC是prestingVC)，拿到後可以再去拿VC的view
+UIViewController *fromVC = [transitionContext
+viewControllerForKey:UITransitionContextFromViewControllerKey];</p>
+
+<p>4.//取得view，後面動畫主要就是都在操作這裡
+UIView <em>toView = [transitionContext viewForKey:UITransitionContextToViewKey];
+UIView </em>fromView = [transitionContext viewForKey:UITransitionContextFromViewKey];</p>
+
+<p>5.//取得兩個VC的最終大小，大小是在frameOfPresentedViewInContainerView決定。
+// Set up some variables for the animation.
+CGRect containerFrame = containerView.frame;
+CGRect toViewStartFrame = [transitionContext initialFrameForViewController:toVC];
+CGRect fromViewStartFrame = [transitionContext initialFrameForViewController:fromVC];
+CGRect toViewFinalFrame = [transitionContext finalFrameForViewController:toVC];
+CGRect fromViewFinalFrame = [transitionContext finalFrameForViewController:fromVC];</p>
+
+<p>6.// 開始作畫 Add toVC&rsquo;s view to containerView
+// 把toView加進來
+[containerView addSubview:toView];</p>
+
+<p>7.//決定一開始的frame
+if (self.presenting) {
+//這邊直接用預設的
+CGSize size = toViewFinalFrame.size;
+[toView setFrame:CGRectMake(0, containerFrame.size.height+toViewFinalFrame.size.height, size.width, size.height)];//size一樣。x=0,y=總高度+toView的高
+}</p>
+
+<p>//決定最終的frame
+if (self.presenting) {
+[UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
+//大小一樣。位置就只要到x=0, y=總高度-toView高度
+CGSize size = toViewFinalFrame.size;
+CGPoint point = CGPointMake(0, containerFrame.size.height-toViewFinalFrame.size.height);
+[toView setFrame:CGRectMake(point.x, point.y, size.width, size.height)];
+}completion:^(BOOL finished) {
+// 3.Cleaning up and completing the transition.
+[transitionContext completeTransition:YES];
+}];
+}
+}
+```</p>
+
+<p>5.override來提供動畫時間</p>
+
+<p><code>
+- (NSTimeInterval)transitionDuration:(id&lt;UIViewControllerContextTransitioning&gt; _Nullable)transitionContext {
+return 0.2f;
+}
+</code></p>
+]]></content>
+  </entry>
+  
+</feed>
