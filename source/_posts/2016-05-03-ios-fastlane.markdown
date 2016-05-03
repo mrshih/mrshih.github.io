@@ -12,7 +12,10 @@ categories:
 >
 >長遠看來，有沒有做自動化工具的團隊，差距可謂天與地。
 
-知道了自動化的重要性，首先我會先請你到官方文件那裡安裝必要的工具，之後我在介紹你tips，讓你可以快速達到自動部署上TestFlight的要求。當然你之後可以串接Test的流程，確認沒問題了再上TestFlight。
+知道了自動化的重要性，再來就iOS而言有一套[國外Twitter青年才俊高富帥工程師從side project發展成全職開發的iOS自動化工具組](https://krausefx.com/blog/fastlane-is-now-part-of-fabric)-fastlane，國外紅一陣子了，但中文的介紹似乎不多，秉持人飢己飢的精神(?)，也方便之後回顧，就來寫這篇吧。
+
+首先我會先請你到官方文件那裡安裝必要的工具，之後我在介紹你tips，讓你可以快速達到自動部署上TestFlight的要求。
+當然你之後可以串接Test的流程，確認沒問題了再上TestFlight。
 
 首先到[Fastlane](https://github.com/fastlane/fastlane)的GitHub上依照最新的`Installation`章節安裝好Fastlane。接著依照`Quick Start`章節的步驟建好初步的文件。這中間可能會問你App ID啦，Apple ID的帳密呀，諸如此類的基礎設定。
 
@@ -58,7 +61,7 @@ Literally，`increment_build_number `就是自動增加build版號，別小看�
 
 這是幫我們自動部署到TestFlight的，使用時需要加上`team_name`參數是因為筆者帳號下有兩個Team，你如果不填上這個Fastlane跑到一半就會問你，這樣自動化就沒意義了。
 
-然後Xcode要配合在`info.plist`加上下面這個屬性：
+然後記得搭配pilot時，Xcode要配合在`info.plist`加上下面這個屬性：
 
 ```
 <key>ITSAppUsesNonExemptEncryption</key>
