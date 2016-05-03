@@ -34,12 +34,11 @@ desc "Submit a new Beta Build to Apple TestFlight"
 
 看到`lane :beta do`，代表之後我們只要下`fastlane beta`就可以指定執行一直到`end`包起來的這個區塊的動作。
 
-我們先定義我們的beta要做什麼事情:
-
-1. 把cocoapod裝一次
-2. 把build號碼+1
-3. 用Production的Provisioning Profiles，build一個ipa出來
-4. 把這個版本送到TestFlight上，並送給tester
+我們先定義我們的beta要做什麼事情:  
+1. 把cocoapod裝一次  
+2. 把build號碼+1  
+3. 用Production的Provisioning Profiles，build一個ipa出來  
+4. 把這個版本送到TestFlight上，並送給tester  
 
 基本上如果上述都手動的話，大約要花上15分鐘左右（切換Provisioning Profiles, 上傳時間, 還有等iTunes connect處理新版build, 最後再手動送出分發測試版本到tester手上），透過自動化工具可以做到打一行指令後就可以不理了。
 
