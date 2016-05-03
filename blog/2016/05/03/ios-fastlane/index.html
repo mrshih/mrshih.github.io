@@ -1,0 +1,369 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>iOS Fastlane打造快速TestFlight部署 - MR SHIH</title>
+  <meta name="author" content="施安宏">
+
+  
+  <meta name="description" content="老生常談得一件事情，如果一個團隊花一個禮拜的時間寫好自動部署的工具，比如用shell，把平常又臭又長或者很繁瑣的指令集結起來，這後再做這些繁瑣重複工作的時間就可以省下來。 表面上看起來或許一年之後你才能把剩下來的那幾秒鐘累積成一個禮拜，達成回本的動作，但是如果你不這樣做， &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://mrshih.github.io/blog/2016/05/03/ios-fastlane">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="MR SHIH" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-31868165-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">MR SHIH</a></h1>
+  
+    <h2>必幸施</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:mrshih.github.io" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">iOS Fastlane打造快速TestFlight部署</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-05-03T14:59:51+08:00" pubdate data-updated="true">May 3<sup>rd</sup>, 2016</time>
+        
+           | <a href="#disqus_thread"
+             data-disqus-identifier="http://mrshih.github.io">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>老生常談得一件事情，如果一個團隊花一個禮拜的時間寫好自動部署的工具，比如用shell，把平常又臭又長或者很繁瑣的指令集結起來，這後再做這些繁瑣重複工作的時間就可以省下來。</p>
+
+<blockquote><p>表面上看起來或許一年之後你才能把剩下來的那幾秒鐘累積成一個禮拜，達成回本的動作，但是如果你不這樣做，你把那一個禮拜的時間打散到一年裡面，換來的就是你一年的開發效率都低落。</p>
+
+<p>長期下來，有沒有做瑣碎事情自動化的團隊之間的差距可謂天與地。</p></blockquote>
+
+<p>知道了自動化的重要性，首先我會先請你到官方文件那裡安裝必要的工具，之後我在介紹你tips，讓你可以快速達到自動部署上TestFlight的要求。當然你之後可以串接Test的流程，確認沒問題了再上TestFlight。</p>
+
+<p>首先到<a href="https://github.com/fastlane/fastlane">Fastlane</a>的GitHub上依照最新的<code>Installation</code>章節安裝好Fastlane。接著依照<code>Quick Start</code>章節的步驟建好初步的文件。</p>
+
+<p>接著看到目錄裡面的Fastfile文件，下面文件已經是我改好可以Run的版本，跟初始化的版本會不太一樣，而下面我會介紹是怎麼改過來的，要知其然：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>desc "Submit a new Beta Build to Apple TestFlight"
+</span><span class='line'>  desc "This will also make sure the profile is up to date"
+</span><span class='line'>  lane :beta do
+</span><span class='line'>    increment_build_number
+</span><span class='line'>    # match(type: "appstore") # more information: https://codesigning.guide
+</span><span class='line'>    gym(scheme: "SecureMedia", use_legacy_build_api: true) # Build your app - more options available
+</span><span class='line'>    pilot(team_name: "CUTE LIMITED")
+</span><span class='line'>
+</span><span class='line'>    # sh "your_script.sh"
+</span><span class='line'>    # You can also use other beta testing services here (run `fastlane actions`)
+</span><span class='line'>  end</span></code></pre></td></tr></table></div></figure>
+
+
+<p>看到<code>lane :beta do</code>，代表之後我們只要下<code>fastlane beta</code>就可以指定執行一直到<code>end</code>包起來的這個區塊的動作。</p>
+
+<p>我們先定義我們的beta要做什麼事情:<br/>
+1. 把cocoapod裝一次<br/>
+2. 把build號碼+1<br/>
+3. 用Production的Provisioning Profiles，build一個ipa出來<br/>
+4. 把這個版本送到TestFlight上，並送給tester</p>
+
+<p>基本上如果上述都手動的話，大約要花上15分鐘左右（切換Provisioning Profiles, 上傳時間, 還有等iTunes connect處理新版build, 最後再手動送出分發測試版本到tester手上），透過自動化工具可以做到打一行指令後就可以不理了。</p>
+
+<p>上述流程在Fastlane裡面被寫成三行，這三行的設定tips就分三項介紹</p>
+
+<h3>increment_build_number</h3>
+
+<p>Literally，<code>increment_build_number</code>就是自動增加build版號，別小看這個功能，以前常常是都發布出去了才發現沒有新增版號！</p>
+
+<p>需要配合設定Xcode參數<code>Current Project Version</code>。參照圖片或<a href="http://www.markschabacker.com/blog/2013/01/04/agvtool_with_new_projects/">這邊</a>。</p>
+
+<p><img src="http://mrshih.github.io/images/ios-fastlane-1.png" alt="image" /></p>
+
+<h3>gym</h3>
+
+<p>這是幫我們產生ipa檔案的。後面跟上兩個參數<code>scheme</code>通常就是你得App名稱，<code>use_legacy_build_api</code>，則是因為<a href="https://github.com/fastlane/gym/issues/104">Xcode 7.0的上傳API更改了，所以在使用時有時候會錯</a>，這時候要改用舊的。</p>
+
+<h3>pilot</h3>
+
+<p>這是幫我們自動部署到TestFlight的，使用時需要加上<code>team_name</code>參數是因為筆者帳號下有兩個Team，你如果不填上這個Fastlane跑到一半就會問你，這樣自動化就沒意義了。</p>
+
+<p>然後Xcode要配合在<code>info.plist</code>加上下面這個屬性：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;key&gt;ITSAppUsesNonExemptEncryption&lt;/key&gt;
+</span><span class='line'>&lt;false/&gt;</span></code></pre></td></tr></table></div></figure>
+
+
+<p>討論串是說iTunes connect建議手動上傳要使用這個參數。相關討論在這個<a href="https://github.com/fastlane/pilot/issues/156">issue</a>頁。</p>
+
+<h2>後記</h2>
+
+<p>之後可以串接上Slack做完成時的顯示，再更進一步可以搭配Hubot，這樣連<code>fastlane beta</code>都省了。然後因為沒接觸CI Server，之後也可以研究兩者如何搭配。</p>
+
+<p>其實筆者在用octopress發布文章的時候，明明指令沒幾行也硬是寫了三個shell來發布(new, preview, publish)，但實在是幫我省了很多時間，不然每次我可都要去google指令，很煩的。</p>
+
+<p>只能說工程師的懶沒有極限，但正是這種懶造就了人類文明的進步（？）。</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">施安宏</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-05-03T14:59:51+08:00" pubdate data-updated="true">May 3<sup>rd</sup>, 2016</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://mrshih.github.io/blog/2016/05/03/ios-fastlane/" data-via="DaanSHIH" data-counturl="http://mrshih.github.io/blog/2016/05/03/ios-fastlane/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2016/05/01/detail-custom-ios-model-animation/" title="Previous Post: 有關製作iOS客製化Animation的詳細過程">&laquo; 有關製作iOS客製化Animation的詳細過程</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2016/05/03/ios-fastlane/">iOS Fastlane打造快速TestFlight部署</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/05/01/detail-custom-ios-model-animation/">有關製作iOS客製化Animation的詳細過程</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/04/27/why-to-be-a-cs-engineer/">為什麼要當個CS工程師</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/02/05/ios-camera-design-pattern-review/">iOS Camera Design Pattern 回顧</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/01/08/first-presentation-flow/">iOS 實作SlideMenu - 初探ViewController切換</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/01/04/ios-serial-queue-run-async-background-job/">iOS 大量網路與硬碟I/0處理</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/12/22/ios-background-mode-notification/">推播結合背景更新 - 良好的使用者體驗</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/12/10/adjust-status-bar-style/">iOS 在不同ViewController指定Status Bar</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/08/24/past-three-year-mobile-trend/">回看行動趨勢與我這三年</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/07/02/ios-model-view-viewmodel-shi-zuo/">iOS Model-View-ViewModel 實作</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2016 - 施安宏 -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'mrshih';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://mrshih.github.io/blog/2016/05/03/ios-fastlane/';
+        var disqus_url = 'http://mrshih.github.io/blog/2016/05/03/ios-fastlane/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id; js.async = true;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
