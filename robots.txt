@@ -1,4 +1,4 @@
 User-agent: *
 Disallow: 
 
-Sitemap: http://mrshih.github.io/sitemap.xml 
+Sitemap: http://sah.tw/sitemap.xml 

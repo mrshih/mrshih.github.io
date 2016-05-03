@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: 巧匠集 | MR SHIH]]></title>
-  <link href="http://mrshih.github.io/blog/categories/qiao-jiang-ji/atom.xml" rel="self"/>
-  <link href="http://mrshih.github.io/"/>
-  <updated>2016-05-03T18:18:39+08:00</updated>
-  <id>http://mrshih.github.io/</id>
+  <link href="http://sah.tw/blog/categories/qiao-jiang-ji/atom.xml" rel="self"/>
+  <link href="http://sah.tw/"/>
+  <updated>2016-05-03T18:19:44+08:00</updated>
+  <id>http://sah.tw/</id>
   <author>
     <name><![CDATA[施安宏]]></name>
     
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[有關製作iOS客製化Animation的詳細過程]]></title>
-    <link href="http://mrshih.github.io/blog/2016/05/01/detail-custom-ios-model-animation/"/>
+    <link href="http://sah.tw/blog/2016/05/01/detail-custom-ios-model-animation/"/>
     <updated>2016-05-01T03:05:19+08:00</updated>
-    <id>http://mrshih.github.io/blog/2016/05/01/detail-custom-ios-model-animation</id>
+    <id>http://sah.tw/blog/2016/05/01/detail-custom-ios-model-animation</id>
     <content type="html"><![CDATA[<h2>為何寫這篇</h2>
 
 <p>前幾篇有寫到如何<a href="http://mrshih.github.io/blog/2016/01/08/first-presentation-flow/">製作SlideMenu</a>，大概講了cocoa framework在客製化<code>UIView</code>動畫的世界觀，這裡則寫一個手把手的詳細步驟，這樣搭配比較有感覺，不然Apple把class之間解構的這麼徹底，實在是東一個西一個的，一時之間不好下手。</p>
