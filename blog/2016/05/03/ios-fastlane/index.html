@@ -112,7 +112,10 @@
 
 <p>長遠看來，有沒有做自動化工具的團隊，差距可謂天與地。</p></blockquote>
 
-<p>知道了自動化的重要性，首先我會先請你到官方文件那裡安裝必要的工具，之後我在介紹你tips，讓你可以快速達到自動部署上TestFlight的要求。當然你之後可以串接Test的流程，確認沒問題了再上TestFlight。</p>
+<p>知道了自動化的重要性，再來就iOS而言有一套<a href="https://krausefx.com/blog/fastlane-is-now-part-of-fabric">國外Twitter青年才俊高富帥工程師從side project發展成全職開發的iOS自動化工具組</a>-fastlane，國外紅一陣子了，但中文的介紹似乎不多，秉持人飢己飢的精神(?)，也方便之後回顧，就來寫這篇吧。</p>
+
+<p>首先我會先請你到官方文件那裡安裝必要的工具，之後我在介紹你tips，讓你可以快速達到自動部署上TestFlight的要求。
+當然你之後可以串接Test的流程，確認沒問題了再上TestFlight。</p>
 
 <p>首先到<a href="https://github.com/fastlane/fastlane">Fastlane</a>的GitHub上依照最新的<code>Installation</code>章節安裝好Fastlane。接著依照<code>Quick Start</code>章節的步驟建好初步的文件。這中間可能會問你App ID啦，Apple ID的帳密呀，諸如此類的基礎設定。</p>
 
@@ -168,7 +171,7 @@
 
 <p>這是幫我們自動部署到TestFlight的，使用時需要加上<code>team_name</code>參數是因為筆者帳號下有兩個Team，你如果不填上這個Fastlane跑到一半就會問你，這樣自動化就沒意義了。</p>
 
-<p>然後Xcode要配合在<code>info.plist</code>加上下面這個屬性：</p>
+<p>然後記得搭配pilot時，Xcode要配合在<code>info.plist</code>加上下面這個屬性：</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
