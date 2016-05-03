@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[MR SHIH]]></title>
-  <link href="http://mrshih.github.io/atom.xml" rel="self"/>
-  <link href="http://mrshih.github.io/"/>
-  <updated>2016-05-03T18:07:50+08:00</updated>
-  <id>http://mrshih.github.io/</id>
+  <link href="http://sah.tw/atom.xml" rel="self"/>
+  <link href="http://sah.tw/"/>
+  <updated>2016-05-03T18:17:01+08:00</updated>
+  <id>http://sah.tw/</id>
   <author>
     <name><![CDATA[施安宏]]></name>
     
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[iOS Fastlane打造快速TestFlight部署]]></title>
-    <link href="http://mrshih.github.io/blog/2016/05/03/ios-fastlane/"/>
+    <link href="http://sah.tw/blog/2016/05/03/ios-fastlane/"/>
     <updated>2016-05-03T14:59:51+08:00</updated>
-    <id>http://mrshih.github.io/blog/2016/05/03/ios-fastlane</id>
+    <id>http://sah.tw/blog/2016/05/03/ios-fastlane</id>
     <content type="html"><![CDATA[<p>老生常談得一件事情，如果一個團隊花一個禮拜的時間寫好自動部署的工具，比如用shell，把平常又臭又長或者很繁瑣的指令集結起來，這後再做這些繁瑣重複工作的時間就可以省下來。</p>
 
 <blockquote><p>表面上看起來或許一年之後你才能把剩下來的那幾秒鐘累積成一個禮拜，達成回本的動作，但是如果你不這樣做，你把那一個禮拜的時間打散到一年裡面，換來的就是你一年的開發效率都低落。</p>
@@ -104,9 +104,9 @@
   
   <entry>
     <title type="html"><![CDATA[有關製作iOS客製化Animation的詳細過程]]></title>
-    <link href="http://mrshih.github.io/blog/2016/05/01/detail-custom-ios-model-animation/"/>
+    <link href="http://sah.tw/blog/2016/05/01/detail-custom-ios-model-animation/"/>
     <updated>2016-05-01T03:05:19+08:00</updated>
-    <id>http://mrshih.github.io/blog/2016/05/01/detail-custom-ios-model-animation</id>
+    <id>http://sah.tw/blog/2016/05/01/detail-custom-ios-model-animation</id>
     <content type="html"><![CDATA[<h2>為何寫這篇</h2>
 
 <p>前幾篇有寫到如何<a href="http://mrshih.github.io/blog/2016/01/08/first-presentation-flow/">製作SlideMenu</a>，大概講了cocoa framework在客製化<code>UIView</code>動畫的世界觀，這裡則寫一個手把手的詳細步驟，這樣搭配比較有感覺，不然Apple把class之間解構的這麼徹底，實在是東一個西一個的，一時之間不好下手。</p>
@@ -456,9 +456,9 @@
   
   <entry>
     <title type="html"><![CDATA[為什麼要當個CS工程師]]></title>
-    <link href="http://mrshih.github.io/blog/2016/04/27/why-to-be-a-cs-engineer/"/>
+    <link href="http://sah.tw/blog/2016/04/27/why-to-be-a-cs-engineer/"/>
     <updated>2016-04-27T15:00:00+08:00</updated>
-    <id>http://mrshih.github.io/blog/2016/04/27/why-to-be-a-cs-engineer</id>
+    <id>http://sah.tw/blog/2016/04/27/why-to-be-a-cs-engineer</id>
     <content type="html"><![CDATA[<p>在電腦科學的領域裡面打滾這幾年發現一件事，當你能夠橫向操縱越多領域的工具，組合出來東西往往價值會很高。比如要組合一個APP開門鎖系統橫向需要連結PHP, Pthon, Objective-C, HTML約四種語言，其實每一種都不用太深入，單組合出來的系統往往一般人一時半刻不了解，需要問你是怎麼兜出來得。</p>
 
 <p>這個發現在最近開發的新應用系統也得到驗證。其實可以這麼看，新的系統往往是由過往的工具所搭建出來，賦予新名稱，創造出新功能，如此而已。每個語言與工具有擅長的地方，拿上面提到的開鎖系統為例：</p>
@@ -499,9 +499,9 @@
   
   <entry>
     <title type="html"><![CDATA[iOS Camera Design Pattern 回顧]]></title>
-    <link href="http://mrshih.github.io/blog/2016/02/05/ios-camera-design-pattern-review/"/>
+    <link href="http://sah.tw/blog/2016/02/05/ios-camera-design-pattern-review/"/>
     <updated>2016-02-05T15:00:00+08:00</updated>
-    <id>http://mrshih.github.io/blog/2016/02/05/ios-camera-design-pattern-review</id>
+    <id>http://sah.tw/blog/2016/02/05/ios-camera-design-pattern-review</id>
     <content type="html"><![CDATA[<h2>主題：要刪除某張照片?</h2>
 
 <pre><code>- Beat Practice 應該要由Model做發起去通知資料已變化。比如刪除照片： 
@@ -516,10 +516,10 @@
   
   <entry>
     <title type="html"><![CDATA[iOS 實作SlideMenu - 初探ViewController切換]]></title>
-    <link href="http://mrshih.github.io/blog/2016/01/08/first-presentation-flow/"/>
+    <link href="http://sah.tw/blog/2016/01/08/first-presentation-flow/"/>
     <updated>2016-01-08T18:10:00+08:00</updated>
-    <id>http://mrshih.github.io/blog/2016/01/08/first-presentation-flow</id>
-    <content type="html"><![CDATA[<p><img src="http://mrshih.github.io/images/2016-01-08-first-presentation-flow.jpg" />
+    <id>http://sah.tw/blog/2016/01/08/first-presentation-flow</id>
+    <content type="html"><![CDATA[<p><img src="http://sah.tw/images/2016-01-08-first-presentation-flow.jpg" />
 所有關於ViewController切換的行為基本稱做為Model，Navegation特有的Push等等也是Model的分支。 在iOS7裡面把制定切換ViewController的行為拆分成許多Class，目的是為了要降低耦合，讓Code重用度提高，比如Coustom一個切換Animation物件可以用在好幾個ViewController之間。</p>
 
 <p>要切換ViewController你要告訴UIKit兩件事情，顯示成怎樣<code>
@@ -910,9 +910,9 @@ UIModalPresentationStyle
   
   <entry>
     <title type="html"><![CDATA[iOS 大量網路與硬碟I/0處理]]></title>
-    <link href="http://mrshih.github.io/blog/2016/01/04/ios-serial-queue-run-async-background-job/"/>
+    <link href="http://sah.tw/blog/2016/01/04/ios-serial-queue-run-async-background-job/"/>
     <updated>2016-01-04T15:00:00+08:00</updated>
-    <id>http://mrshih.github.io/blog/2016/01/04/ios-serial-queue-run-async-background-job</id>
+    <id>http://sah.tw/blog/2016/01/04/ios-serial-queue-run-async-background-job</id>
     <content type="html"><![CDATA[<p>很多時候操作網路或者Disk的I/O，我們都會把工作丟到背景去執行，避免凍結使用者的畫面。但是這造成一個問題是一下子太多背景任務同時執行有可能導致APP崩潰。</p>
 
 <p>比如影音APP使用者見獵心喜，一下子選了許多部影片要下載，如果現在把下載任務一股腦兒丟到背景，因為現在大部分下載需求都直接使用知名框架<code>AFNetworking</code>，而裡面的方法通常也都直接在背景運行，造成這些下載任務用Concurrent的方式併發執行，這下子產生大量的網路還有Disk I/O Request同時在背景跑。</p>
@@ -1082,9 +1082,9 @@ UIModalPresentationStyle
   
   <entry>
     <title type="html"><![CDATA[推播結合背景更新 - 良好的使用者體驗]]></title>
-    <link href="http://mrshih.github.io/blog/2015/12/22/ios-background-mode-notification/"/>
+    <link href="http://sah.tw/blog/2015/12/22/ios-background-mode-notification/"/>
     <updated>2015-12-22T20:36:49+08:00</updated>
-    <id>http://mrshih.github.io/blog/2015/12/22/ios-background-mode-notification</id>
+    <id>http://sah.tw/blog/2015/12/22/ios-background-mode-notification</id>
     <content type="html"><![CDATA[<p>試想一個情境是相簿APP在後台收到伺服器傳來愛人分享的最新照片，但使用者興沖沖的打開之後面對轉阿轉不停的Loading indicator圓圈圈，多麼令人掃興。 動通知但被動下載資料顯然不是一個好方法。</p>
 
 <p>這個時候可以透過推播通知APP，並在背景讓程式預載相片，載好之後再通知使用者點開APP，立即可以看到所有相片，多棒的使用者體驗。</p>
@@ -1134,9 +1134,9 @@ UIModalPresentationStyle
   
   <entry>
     <title type="html"><![CDATA[iOS 在不同ViewController指定Status Bar]]></title>
-    <link href="http://mrshih.github.io/blog/2015/12/10/adjust-status-bar-style/"/>
+    <link href="http://sah.tw/blog/2015/12/10/adjust-status-bar-style/"/>
     <updated>2015-12-10T01:36:49+08:00</updated>
-    <id>http://mrshih.github.io/blog/2015/12/10/adjust-status-bar-style</id>
+    <id>http://sah.tw/blog/2015/12/10/adjust-status-bar-style</id>
     <content type="html"><![CDATA[<p>查看文擋很容易發現viewController有個<code>preferredStatusBarStyle</code>接口，搭配語意明顯的<code>setNeedsStatusBarAppearanceUpdate</code>，看起來可以指定回調的<code>UIStatusBarStyle</code>比如白色與黑色。但時常調用了卻沒有回應。</p>
 
 <p>這時候查一查文擋內相同Section附近的API會是個好習慣。在Managing the Status Bar裡發現下面這個接口：</p>
@@ -1169,9 +1169,9 @@ UIModalPresentationStyle
   
   <entry>
     <title type="html"><![CDATA[回看行動趨勢與我這三年]]></title>
-    <link href="http://mrshih.github.io/blog/2015/08/24/past-three-year-mobile-trend/"/>
+    <link href="http://sah.tw/blog/2015/08/24/past-three-year-mobile-trend/"/>
     <updated>2015-08-24T13:22:30+08:00</updated>
-    <id>http://mrshih.github.io/blog/2015/08/24/past-three-year-mobile-trend</id>
+    <id>http://sah.tw/blog/2015/08/24/past-three-year-mobile-trend</id>
     <content type="html"><![CDATA[<h3>無盡的新元素</h3>
 
 <p>過去三年陸續加上了穿戴式裝置，無人飛行機操控，行動支付，線上串線下服務（我其實很不喜歡文鄒鄒名詞，這裡指的就是Uber,airbnb等把供應者與消費者串起來的服務），車用APP等新元素，到底這些對於一個APP開發者的影響是什麼？</p>
@@ -1217,9 +1217,9 @@ UIModalPresentationStyle
   
   <entry>
     <title type="html"><![CDATA[iOS Model-View-ViewModel 實作]]></title>
-    <link href="http://mrshih.github.io/blog/2015/07/02/ios-model-view-viewmodel-shi-zuo/"/>
+    <link href="http://sah.tw/blog/2015/07/02/ios-model-view-viewmodel-shi-zuo/"/>
     <updated>2015-07-02T16:30:05+08:00</updated>
-    <id>http://mrshih.github.io/blog/2015/07/02/ios-model-view-viewmodel-shi-zuo</id>
+    <id>http://sah.tw/blog/2015/07/02/ios-model-view-viewmodel-shi-zuo</id>
     <content type="html"><![CDATA[<h2>MVC架構遭遇困境</h2>
 
 <p>在iOS SDK的設計下開發者都會走向apple安排好的MVC架構，即便你不知道MVC但SDK早幫你切好view controller，很自然你也會走向類似架構。但隨著開發時間越長有幾個MVC框架問題越來越不可忽視。本文會先討論遇到的問題，並介紹最近我實作過覺得很棒的另一套架構MVVM，可以輕易讓程式碼彼此耦合降低，進而增加可維護性與易開發性，可以說是替代MVC更先進好用的架構。</p>
@@ -1367,9 +1367,9 @@ UIModalPresentationStyle
   
   <entry>
     <title type="html"><![CDATA[為何又開始寫文章?]]></title>
-    <link href="http://mrshih.github.io/blog/2015/05/20/why-start-write-article/"/>
+    <link href="http://sah.tw/blog/2015/05/20/why-start-write-article/"/>
     <updated>2015-05-20T18:23:22+08:00</updated>
-    <id>http://mrshih.github.io/blog/2015/05/20/why-start-write-article</id>
+    <id>http://sah.tw/blog/2015/05/20/why-start-write-article</id>
     <content type="html"><![CDATA[<p><img src="http://mrshih.github.io/images/sandglass-of-text.jpg" alt="image" /></p>
 
 <h2>比履歷強多了</h2>
@@ -1413,9 +1413,9 @@ UIModalPresentationStyle
   
   <entry>
     <title type="html"><![CDATA[小技術大問題—救小狗Pivot到省百億]]></title>
-    <link href="http://mrshih.github.io/blog/2014/07/23/pivot/"/>
+    <link href="http://sah.tw/blog/2014/07/23/pivot/"/>
     <updated>2014-07-23T20:22:58+08:00</updated>
-    <id>http://mrshih.github.io/blog/2014/07/23/pivot</id>
+    <id>http://sah.tw/blog/2014/07/23/pivot</id>
     <content type="html"><![CDATA[<p><img src="http://mrshih.github.io/images/pivot1.jpg" alt="image" /></p>
 
 <p>一種解決問題的作法套用在不同的情境上，產生的效益就可能相差數萬倍。我們專題一開始看到路邊有受傷流浪狗兒，如果冷眼旁觀實在是不忍心，但第一個你不知道該找誰幫忙？找市立收容所？電話是幾號？更別提還要花許多時間在通報，通報了也可能只是安樂死。第二個可以找當地流浪動物協會，但一般人根本不會知道有哪些協會可以幫忙！現代人很忙碌，很費工夫的事實在是心有餘而力不足。所以我們想利用智慧型手機結合當地相關協會標準化通報流程，就能快速定外拍照上傳通報一次搞定，解決通報麻煩的問題，也就是流浪動物通報系統。</p>
@@ -1438,9 +1438,9 @@ UIModalPresentationStyle
   
   <entry>
     <title type="html"><![CDATA[客觀簡報的困難]]></title>
-    <link href="http://mrshih.github.io/blog/2014/07/16/customer-talk/"/>
+    <link href="http://sah.tw/blog/2014/07/16/customer-talk/"/>
     <updated>2014-07-16T21:13:31+08:00</updated>
-    <id>http://mrshih.github.io/blog/2014/07/16/customer-talk</id>
+    <id>http://sah.tw/blog/2014/07/16/customer-talk</id>
     <content type="html"><![CDATA[<p><img src="http://mrshih.github.io/images/customer-talk1.jpg" alt="image" /></p>
 
 <p>我曾經待在一個瘋狂報名比賽，講究技術的硬派實驗室裡，我們報的比賽都是如微電腦、嵌入式這樣非常硬派的技術比賽，幾百坪的空間通常都很樸素，一些簡單的標語旗幟就差不多了。但是，裡面每個評審可都是相關領域中專家中的專家，我們做的題目大概用了領域內的哪些高階技術，多新穎、多困難、要花多少時間、多努力大概你稍微解釋一下彼此都能馬上心領神會。所以報告的流程就是帶一下要解決的問題，接下來就直接DEMO實際系統，什麼前言、動機、問題嚴重性越少越好，有的評審乾脆會叫你跳過把時間留給實際DEMO。這種我稱之為工學院比賽。</p>
@@ -1459,9 +1459,9 @@ UIModalPresentationStyle
   
   <entry>
     <title type="html"><![CDATA[你確定寫程式跟製造業不一樣？]]></title>
-    <link href="http://mrshih.github.io/blog/2014/07/09/what-different-between-programmer-and-manufacturing/"/>
+    <link href="http://sah.tw/blog/2014/07/09/what-different-between-programmer-and-manufacturing/"/>
     <updated>2014-07-09T02:36:59+08:00</updated>
-    <id>http://mrshih.github.io/blog/2014/07/09/what-different-between-programmer-and-manufacturing</id>
+    <id>http://sah.tw/blog/2014/07/09/what-different-between-programmer-and-manufacturing</id>
     <content type="html"><![CDATA[<p><img src="http://mrshih.github.io/images/what-different-between-programmer-and-manufacturing1.jpg" alt="image" /></p>
 
 <p>台灣從過去製造業的思維延伸很喜歡做/教一件事，就是coustom development顧客開發的相反叫product development產品開發。而事實上創意特別是網路，一定是顧客開發，因為沒有什麼產品好做阿！我們又沒有什麼很厲害的晶片，很神奇的電路什麼的，引用一位網路業的前輩大師在他的FB上寫的這段話：</p>

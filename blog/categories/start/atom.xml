@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: Start | MR SHIH]]></title>
-  <link href="http://mrshih.github.io/blog/categories/start/atom.xml" rel="self"/>
-  <link href="http://mrshih.github.io/"/>
-  <updated>2016-05-03T18:07:50+08:00</updated>
-  <id>http://mrshih.github.io/</id>
+  <link href="http://sah.tw/blog/categories/start/atom.xml" rel="self"/>
+  <link href="http://sah.tw/"/>
+  <updated>2016-05-03T18:17:01+08:00</updated>
+  <id>http://sah.tw/</id>
   <author>
     <name><![CDATA[施安宏]]></name>
     
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[為何又開始寫文章?]]></title>
-    <link href="http://mrshih.github.io/blog/2015/05/20/why-start-write-article/"/>
+    <link href="http://sah.tw/blog/2015/05/20/why-start-write-article/"/>
     <updated>2015-05-20T18:23:22+08:00</updated>
-    <id>http://mrshih.github.io/blog/2015/05/20/why-start-write-article</id>
+    <id>http://sah.tw/blog/2015/05/20/why-start-write-article</id>
     <content type="html"><![CDATA[<p><img src="http://mrshih.github.io/images/sandglass-of-text.jpg" alt="image" /></p>
 
 <h2>比履歷強多了</h2>

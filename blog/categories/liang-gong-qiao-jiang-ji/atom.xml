@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: 良工巧匠集 | MR SHIH]]></title>
-  <link href="http://mrshih.github.io/blog/categories/liang-gong-qiao-jiang-ji/atom.xml" rel="self"/>
-  <link href="http://mrshih.github.io/"/>
-  <updated>2016-05-03T18:07:50+08:00</updated>
-  <id>http://mrshih.github.io/</id>
+  <link href="http://sah.tw/blog/categories/liang-gong-qiao-jiang-ji/atom.xml" rel="self"/>
+  <link href="http://sah.tw/"/>
+  <updated>2016-05-03T18:17:01+08:00</updated>
+  <id>http://sah.tw/</id>
   <author>
     <name><![CDATA[施安宏]]></name>
     
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[iOS 實作SlideMenu - 初探ViewController切換]]></title>
-    <link href="http://mrshih.github.io/blog/2016/01/08/first-presentation-flow/"/>
+    <link href="http://sah.tw/blog/2016/01/08/first-presentation-flow/"/>
     <updated>2016-01-08T18:10:00+08:00</updated>
-    <id>http://mrshih.github.io/blog/2016/01/08/first-presentation-flow</id>
+    <id>http://sah.tw/blog/2016/01/08/first-presentation-flow</id>
     <content type="html"><![CDATA[<p><img src="/images/2016-01-08-first-presentation-flow.jpg" />
 所有關於ViewController切換的行為基本稱做為Model，Navegation特有的Push等等也是Model的分支。 在iOS7裡面把制定切換ViewController的行為拆分成許多Class，目的是為了要降低耦合，讓Code重用度提高，比如Coustom一個切換Animation物件可以用在好幾個ViewController之間。</p>
 
@@ -297,9 +297,9 @@ if (self.presenting) {
   
   <entry>
     <title type="html"><![CDATA[iOS 大量網路與硬碟I/0處理]]></title>
-    <link href="http://mrshih.github.io/blog/2016/01/04/ios-serial-queue-run-async-background-job/"/>
+    <link href="http://sah.tw/blog/2016/01/04/ios-serial-queue-run-async-background-job/"/>
     <updated>2016-01-04T15:00:00+08:00</updated>
-    <id>http://mrshih.github.io/blog/2016/01/04/ios-serial-queue-run-async-background-job</id>
+    <id>http://sah.tw/blog/2016/01/04/ios-serial-queue-run-async-background-job</id>
     <content type="html"><![CDATA[<p>很多時候操作網路或者Disk的I/O，我們都會把工作丟到背景去執行，避免凍結使用者的畫面。但是這造成一個問題是一下子太多背景任務同時執行有可能導致APP崩潰。</p>
 
 <p>比如影音APP使用者見獵心喜，一下子選了許多部影片要下載，如果現在把下載任務一股腦兒丟到背景，因為現在大部分下載需求都直接使用知名框架<code>AFNetworking</code>，而裡面的方法通常也都直接在背景運行，造成這些下載任務用Concurrent的方式併發執行，這下子產生大量的網路還有Disk I/O Request同時在背景跑。</p>
@@ -421,9 +421,9 @@ dispatch_suspend(_uploadToParseInBackgroundQueue());
   
   <entry>
     <title type="html"><![CDATA[推播結合背景更新 - 良好的使用者體驗]]></title>
-    <link href="http://mrshih.github.io/blog/2015/12/22/ios-background-mode-notification/"/>
+    <link href="http://sah.tw/blog/2015/12/22/ios-background-mode-notification/"/>
     <updated>2015-12-22T20:36:49+08:00</updated>
-    <id>http://mrshih.github.io/blog/2015/12/22/ios-background-mode-notification</id>
+    <id>http://sah.tw/blog/2015/12/22/ios-background-mode-notification</id>
     <content type="html"><![CDATA[<p>試想一個情境是相簿APP在後台收到伺服器傳來愛人分享的最新照片，但使用者興沖沖的打開之後面對轉阿轉不停的Loading indicator圓圈圈，多麼令人掃興。 動通知但被動下載資料顯然不是一個好方法。</p>
 
 <p>這個時候可以透過推播通知APP，並在背景讓程式預載相片，載好之後再通知使用者點開APP，立即可以看到所有相片，多棒的使用者體驗。</p>
@@ -463,9 +463,9 @@ dispatch_suspend(_uploadToParseInBackgroundQueue());
   
   <entry>
     <title type="html"><![CDATA[iOS 在不同ViewController指定Status Bar]]></title>
-    <link href="http://mrshih.github.io/blog/2015/12/10/adjust-status-bar-style/"/>
+    <link href="http://sah.tw/blog/2015/12/10/adjust-status-bar-style/"/>
     <updated>2015-12-10T01:36:49+08:00</updated>
-    <id>http://mrshih.github.io/blog/2015/12/10/adjust-status-bar-style</id>
+    <id>http://sah.tw/blog/2015/12/10/adjust-status-bar-style</id>
     <content type="html"><![CDATA[<p>查看文擋很容易發現viewController有個<code>preferredStatusBarStyle</code>接口，搭配語意明顯的<code>setNeedsStatusBarAppearanceUpdate</code>，看起來可以指定回調的<code>UIStatusBarStyle</code>比如白色與黑色。但時常調用了卻沒有回應。</p>
 
 <p>這時候查一查文擋內相同Section附近的API會是個好習慣。在Managing the Status Bar裡發現下面這個接口：</p>
