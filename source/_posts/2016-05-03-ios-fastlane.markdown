@@ -1,22 +1,22 @@
 ---
 layout: post
-title: "iOS Fastlane打造快速TestFlight部署"
+title: "運用iOS Fastlane自動化部署TestFlight"
 date: 2016-05-03 14:59:51 +0800
 comments: true
 categories: 
 ---
 
-老生常談得一件事情，如果一個團隊花一個禮拜的時間寫好自動部署的工具，比如用shell，把平常又臭又長或者很繁瑣的指令集結起來，這後再做這些繁瑣重複工作的時間就可以省下來。
+老生常談得一件事情，如果一個團隊花一個禮拜的時間寫好自動部署的工具，比如用shell，把平常又臭又長或者很繁瑣的指令集結起來，之後這些繁瑣重複的工作就可以透過自動化工具省下不少時間。
 
->表面上看起來或許一年之後你才能把剩下來的那幾秒鐘累積成一個禮拜，達成回本的動作，但是如果你不這樣做，你把那一個禮拜的時間打散到一年裡面，換來的就是你一年的開發效率都低落。
+>表面上看起來或許一年之後你才能把剩下來的那幾秒鐘累積成一個禮拜，達成回本的動作，但是如果你不這樣做，你把那一個禮拜的時間打散到一年裡面，換來的就是你一年的開發效率低落。
 >
->長期下來，有沒有做瑣碎事情自動化的團隊之間的差距可謂天與地。
+>長遠看來，有沒有做自動化工具的團隊，差距可謂天與地。
 
 知道了自動化的重要性，首先我會先請你到官方文件那裡安裝必要的工具，之後我在介紹你tips，讓你可以快速達到自動部署上TestFlight的要求。當然你之後可以串接Test的流程，確認沒問題了再上TestFlight。
 
-首先到[Fastlane](https://github.com/fastlane/fastlane)的GitHub上依照最新的`Installation`章節安裝好Fastlane。接著依照`Quick Start`章節的步驟建好初步的文件。
+首先到[Fastlane](https://github.com/fastlane/fastlane)的GitHub上依照最新的`Installation`章節安裝好Fastlane。接著依照`Quick Start`章節的步驟建好初步的文件。這中間可能會問你App ID啦，Apple ID的帳密呀，諸如此類的基礎設定。
 
-接著看到目錄裡面的Fastfile文件，下面文件已經是我改好可以Run的版本，跟初始化的版本會不太一樣，而下面我會介紹是怎麼改過來的，要知其然：
+接著看到目錄裡面的Fastfile文件，下面文件已經是我改好可以Run的版本，跟初始化的版本會不太一樣，更下面我會介紹是怎麼改過來的：
 
 ```
 desc "Submit a new Beta Build to Apple TestFlight"
@@ -46,9 +46,7 @@ desc "Submit a new Beta Build to Apple TestFlight"
 
 ###increment_build_number
 
-Literally，`increment_build_number `就是自動增加build版號，別小看這個功能，以前常常是都發布出去了才發現沒有新增版號！  
-
-需要配合設定Xcode參數`Current Project Version`。參照圖片或[這邊](http://www.markschabacker.com/blog/2013/01/04/agvtool_with_new_projects/)。
+Literally，`increment_build_number `就是自動增加build版號，別小看這個功能，以前常常是都發布出去了才發現沒有新增版號！需要配合設定Xcode參數`Current Project Version`。參照圖片或[這邊](http://www.markschabacker.com/blog/2013/01/04/agvtool_with_new_projects/)。
 
 ![image](http://mrshih.github.io/images/ios-fastlane-1.png)
 
