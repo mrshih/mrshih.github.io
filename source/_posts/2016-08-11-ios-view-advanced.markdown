@@ -22,7 +22,7 @@ MVVM是iOS開發近來熱門的開發架構，最近工作上不停用到這個�
 
 比如常見的新聞頁面
 
-![Alt text](http://sah.tw/2016-08-11-ios-view-advanced.png)
+![YahooNews](http://sah.tw/images/2016-08-11-ios-view-advanced.png)
 
 這個頁面大致需要下面幾個控件:
 
