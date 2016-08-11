@@ -3,6 +3,12 @@
   
   
   <url>
+    <loc>http://sah.tw/blog/2016/08/11/ios-view-advanced/</loc>
+    <lastmod>2016-08-11T22:02:46+08:00</lastmod>
+    <priority>0.8</priority>
+  </url>
+  
+  <url>
     <loc>http://sah.tw/blog/2016/05/03/ios-fastlane/</loc>
     <lastmod>2016-05-03T14:59:51+08:00</lastmod>
     <priority>0.8</priority>
@@ -89,28 +95,28 @@
   
   <url>
     <loc>http://sah.tw/blog/archives/</loc>
-    <lastmod>2016-05-03T22:47:22+08:00</lastmod>
+    <lastmod>2016-08-12T01:00:54+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   
   <url>
     <loc>http://sah.tw/archives/</loc>
-    <lastmod>2016-05-03T22:47:22+08:00</lastmod>
+    <lastmod>2016-08-12T01:00:54+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   
   <url>
     <loc>http://sah.tw/blog/</loc>
-    <lastmod>2016-05-03T22:47:22+08:00</lastmod>
+    <lastmod>2016-08-12T01:00:54+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   
   <url>
     <loc>http://sah.tw/</loc>
-    <lastmod>2016-05-03T22:47:22+08:00</lastmod>
+    <lastmod>2016-08-12T01:00:54+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>

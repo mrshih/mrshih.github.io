@@ -1,0 +1,401 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>從零到穩固的基礎 - 談iOS刻畫UI - MR SHIH</title>
+  <meta name="author" content="施安宏">
+
+  
+  <meta name="description" content="MVVM是iOS開發近來熱門的開發架構，最近工作上不停用到這個架構去建立各種頁面，對於如何從零開始架構出一個方便開發與維護的MVVM架構有些實作上總結出的Tips或稱為想法在，這裡記錄下來與回顧。 系列第一篇會先從MVVM裡面的View開始講，通常這也是我開發的第一也是很重要的步驟， &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://sah.tw/blog/2016/08/11/ios-view-advanced">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="MR SHIH" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-31868165-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">MR SHIH</a></h1>
+  
+    <h2>必幸施</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:sah.tw" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">從零到穩固的基礎 - 談iOS刻畫UI</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-08-11T22:02:46+08:00" pubdate data-updated="true">Aug 11<sup>th</sup>, 2016</time>
+        
+           | <a href="#disqus_thread"
+             data-disqus-identifier="http://sah.tw">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>MVVM是iOS開發近來熱門的開發架構，最近工作上不停用到這個架構去建立各種頁面，對於如何從零開始架構出一個方便開發與維護的MVVM架構有些實作上總結出的Tips或稱為想法在，這裡記錄下來與回顧。</p>
+
+<p>系列第一篇會先從MVVM裡面的View開始講，通常這也是我開發的第一也是很重要的步驟，這裡一開始沒規劃好浪費的時間絕對是最多的，因為方向就錯了麻。</p>
+
+<h2>看UI圖然後先想想</h2>
+
+<p>第一步當然就是看著UI出好的圖，然後想想這個畫面上會用的什麼<code>UIKit</code>的控件。大部分不外乎是<code>TableView</code>, <code>CollectionView</code>, <code>PageView</code>，互相搭配即可組出框架。某些例外比如登入登出註冊頁面則通常就會一張空白<code>View</code>自己拉畫面，不太用到上面提到的控件。</p>
+
+<p>真的有問題比如需要重新打造一個控件，或不好實作，卡到時間等，都在這裡即時反應給UI是最好的。不會先做下去遇到問題卡住再來溝通，這樣事倍功半真的也很浪費時間。</p>
+
+<h2>先大致上命名好</h2>
+
+<p>曾經有看過程式設計裡面在資深開發人員裡排名第一的難題是命名。這是因為如果一開始沒有想好階層式的命名方式，等到架構一大你就會開始需要在腦袋裡面Dump一堆記憶體來存這些Name的意義，久了也一定會忘記。</p>
+
+<p>比如常見的新聞頁面</p>
+
+<p><img src="http://sah.tw/2016-08-11-ios-view-advanced.png" alt="Alt text" /></p>
+
+<p>這個頁面大致需要下面幾個控件:</p>
+
+<ol>
+<li>主要<code>ViewController</code></li>
+<li>一個<code>CollectionView</code>來當Indicator，顯示有那些類別</li>
+<li>一個<code>PageController</code>來橫向翻頁在不同類別的新聞頁面</li>
+<li>多個<code>TableView</code>拿來顯示新聞</li>
+</ol>
+
+
+<p>那在命名上就要先大致想好：</p>
+
+<ol>
+<li><code>SHReaderViewController</code></li>
+<li><code>SHReaderCategoryIndicatorViewController</code> &ndash; <code>SHReaderCategoryIndicatorCell</code></li>
+<li><code>SHReaderPageViewController</code></li>
+<li><code>SHReaderNewsViewController</code> &ndash; <code>SHReaderNewsCell</code></li>
+</ol>
+
+
+<p>只要名字的Prefix按照大方向一樣，階層想好定下來後，不管是要新增Coustom Class，或是要在<code>Storyboard</code>上標註對應的<code>Storyboard Identifier</code>都很方便，之後再開發與維護上會因為也脈絡可循的命名而容易許多。</p>
+
+<h2>多使用StackView</h2>
+
+<p>在iOS9加入<code>StackView</code>之後，整個畫面裡面<code>Autolayout</code>所需要的<code>Constraints</code>大幅的減少很多，事實上官方也建議最好<code>Autolayout</code>任何畫面可以考慮直接用<code>StackView</code>開始。</p>
+
+<p><code>StackView</code>的強項在於可以定義一個母區塊，讓裡面的<code>SubView</code>能Depend在母區塊的邊界上設定<code>Constraints</code>與做<code>Autolayout</code>，同時也限制這裡面的<code>StackView</code>裡的<code>SubView</code>改動不會影響到<code>StackView</code>之外的其他<code>View</code>。</p>
+
+<p>在沒有<code>StackView</code>之前只有一個<code>RootView</code>要給整個畫面上一堆<code>SubView</code>當做參照，這樣在設計<code>Autolayout</code>上往往牽一髮動全身，一個<code>SubView</code>的更改常常就會連帶影響一大推其他的<code>View</code>。</p>
+
+<h2>用Storyboard Reference切割不同功能的畫面</h2>
+
+<p>比如<code>Tabbar</code>分出來的全部連到<code>Storyboard Reference</code>，或多次在不同地方會單獨<code>M  odel</code>出來的畫面要拆分出來。這樣一個團隊才可以同時協作開發多個頁面，解決了<code>Storyboard</code>一開始被大家詬病的<code>Git</code>協作問題。</p>
+
+<h2>還有一些比較瑣碎的Tips</h2>
+
+<h3>適時用Xib搭配Storyboard</h3>
+
+<p>當我們有時候要自製一個小控件比如<code>Segment Control</code>，裡面的<code>Cell</code>便可以用xib。掌握住<code>initWithCoder</code>用來再<code>Storyboard</code>載入，比如：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="sr">//</span> <span class="no">If</span> <span class="n">you</span> <span class="n">are</span> <span class="n">loading</span> <span class="n">it</span> <span class="n">from</span> <span class="n">a</span> <span class="n">nib</span> <span class="n">file</span> <span class="p">(</span><span class="ow">or</span> <span class="n">a</span> <span class="n">storyboard</span><span class="p">),</span> <span class="ss">initWithCoder</span><span class="p">:</span> <span class="n">will</span> <span class="n">be</span> <span class="n">used</span><span class="o">.</span>
+</span><span class='line'><span class="o">-</span> <span class="p">(</span><span class="n">instancetype</span><span class="p">)</span><span class="ss">initWithCoder</span><span class="p">:(</span><span class="no">NSCoder</span> <span class="o">*</span><span class="p">)</span><span class="n">aDecoder</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="nb">self</span> <span class="o">=</span> <span class="o">[</span><span class="k">super</span> <span class="ss">initWithCoder</span><span class="p">:</span><span class="n">aDecoder</span><span class="o">]</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="nb">self</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="o">[</span><span class="nb">self</span> <span class="ss">addSubview</span><span class="p">:</span><span class="o">[[[</span><span class="no">NSBundle</span> <span class="n">mainBundle</span><span class="o">]</span> <span class="ss">loadNibNamed</span><span class="p">:</span><span class="no">NSStringFromClass</span><span class="p">(</span><span class="o">[</span><span class="nb">self</span> <span class="n">class</span><span class="o">]</span><span class="p">)</span> <span class="ss">owner</span><span class="p">:</span><span class="nb">self</span> <span class="ss">options</span><span class="p">:</span><span class="kp">nil</span><span class="o">]</span> <span class="ss">objectAtIndex</span><span class="p">:</span><span class="mi">0</span><span class="o">]]</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="k">return</span> <span class="nb">self</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><code>initWithFrame</code>則是有時候不得已用Code的方式呼叫：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="o">-</span> <span class="p">(</span><span class="nb">id</span><span class="p">)</span><span class="ss">initWithFrame</span><span class="p">:(</span><span class="no">CGRect</span><span class="p">)</span><span class="n">frame</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="nb">self</span> <span class="o">=</span> <span class="o">[</span><span class="k">super</span> <span class="ss">initWithFrame</span><span class="p">:</span><span class="n">frame</span><span class="o">]</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="nb">self</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="sr">//</span> <span class="no">Initialization</span> <span class="n">code</span>
+</span><span class='line'>        <span class="nb">self</span><span class="o">.</span><span class="n">autoresizesSubviews</span> <span class="o">=</span> <span class="no">YES</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="k">return</span> <span class="nb">self</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>並且記得如果用Code呼叫要<code>Frame</code>，要在<code>viewDidAppear</code>這裡面做，因為根據<code>ViewController</code>這裡才是<code>Frame</code>經過<code>Autolayout</code>等計算後真正確定的地方。</p>
+
+<h3>利用SizeClass</h3>
+
+<p>比如轉向的需求，利用<code>Storyboard</code>的<code>SizeClass</code>在不同情境下就可以很輕易漂亮的適配出你要的螢幕Layout，比如影片橫幅要佔滿全螢幕等。</p>
+
+<h2>Then&hellip;</h2>
+
+<p>其實在Xcode裡面刻畫環境真的是很享受的過程，當你刻畫出的UI在<code>Storyboard</code>上跟UI出的圖一樣時，那樣的成就感很高。尤其Apple近幾年推出的<code>Autolayout</code>跟<code>SizeClass</code>其實都走在很前端的地方，給開發者很大的彈性與方便。</p>
+
+<p>這裡也推薦這個網站Zeplin，我現在配合的設計師可以很方便地更新圖給大家，上面尺寸也都可以標註到很細，甚至這個網站還有Mac的APP，裡面有個特異功能是可以把素材匯進到專案的<code>Assets.xcassets</code>真的很棒！</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">施安宏</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-08-11T22:02:46+08:00" pubdate data-updated="true">Aug 11<sup>th</sup>, 2016</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://sah.tw/blog/2016/08/11/ios-view-advanced/" data-via="DaanSHIH" data-counturl="http://sah.tw/blog/2016/08/11/ios-view-advanced/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2016/05/03/ios-fastlane/" title="Previous Post: 運用iOS Fastlane自動化部署TestFlight">&laquo; 運用iOS Fastlane自動化部署TestFlight</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2016/08/11/ios-view-advanced/">從零到穩固的基礎 - 談iOS刻畫UI</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/05/03/ios-fastlane/">運用iOS Fastlane自動化部署TestFlight</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/05/01/detail-custom-ios-model-animation/">有關製作iOS客製化Animation的詳細過程</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/04/27/why-to-be-a-cs-engineer/">為什麼要當個CS工程師</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/02/05/ios-camera-design-pattern-review/">iOS Camera Design Pattern 回顧</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/01/08/first-presentation-flow/">iOS 實作SlideMenu - 初探ViewController切換</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/01/04/ios-serial-queue-run-async-background-job/">iOS 大量網路與硬碟I/0處理</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/12/22/ios-background-mode-notification/">推播結合背景更新 - 良好的使用者體驗</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/12/10/adjust-status-bar-style/">iOS 在不同ViewController指定Status Bar</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/08/24/past-three-year-mobile-trend/">回看行動趨勢與我這三年</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2016 - 施安宏 -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'mrshih';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://sah.tw/blog/2016/08/11/ios-view-advanced/';
+        var disqus_url = 'http://sah.tw/blog/2016/08/11/ios-view-advanced/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id; js.async = true;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
