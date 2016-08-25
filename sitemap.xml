@@ -3,6 +3,12 @@
   
   
   <url>
+    <loc>http://sah.tw/blog/2016/08/24/iap-payment-model-design/</loc>
+    <lastmod>2016-08-24T23:30:18+08:00</lastmod>
+    <priority>0.8</priority>
+  </url>
+  
+  <url>
     <loc>http://sah.tw/blog/2016/08/11/ios-view-advanced/</loc>
     <lastmod>2016-08-11T22:02:46+08:00</lastmod>
     <priority>0.8</priority>
@@ -95,28 +101,28 @@
   
   <url>
     <loc>http://sah.tw/blog/archives/</loc>
-    <lastmod>2016-08-12T01:12:31+08:00</lastmod>
+    <lastmod>2016-08-26T00:02:41+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   
   <url>
     <loc>http://sah.tw/archives/</loc>
-    <lastmod>2016-08-12T01:12:31+08:00</lastmod>
+    <lastmod>2016-08-26T00:02:41+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   
   <url>
     <loc>http://sah.tw/blog/</loc>
-    <lastmod>2016-08-12T01:12:31+08:00</lastmod>
+    <lastmod>2016-08-26T00:02:41+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   
   <url>
     <loc>http://sah.tw/</loc>
-    <lastmod>2016-08-12T01:12:31+08:00</lastmod>
+    <lastmod>2016-08-26T00:02:41+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>

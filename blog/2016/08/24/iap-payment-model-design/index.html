@@ -1,0 +1,531 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>In-App-Purchase交易模組設計 - MR SHIH</title>
+  <meta name="author" content="施安宏">
+
+  
+  <meta name="description" content="網路上很多介紹如何運用StoreKit裡面的API在iOS上付款的文章，但實務上因為In-App-Purchase是程式裡面需要密集配合業務需求的部分，如果沒有一個良好抽象化的設計，在高可維護性與彈性，可擴展能力下功夫，一旦業務需求一複雜或反覆迭代更改，就會讓IAP相關的邏輯變得難以修改與維護。 &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://sah.tw/blog/2016/08/24/iap-payment-model-design">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="MR SHIH" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-31868165-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">MR SHIH</a></h1>
+  
+    <h2>必幸施</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:sah.tw" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">In-App-Purchase交易模組設計</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-08-24T23:30:18+08:00" pubdate data-updated="true">Aug 24<sup>th</sup>, 2016</time>
+        
+           | <a href="#disqus_thread"
+             data-disqus-identifier="http://sah.tw">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>網路上很多介紹如何運用<code>StoreKit</code>裡面的API在iOS上付款的文章，但實務上因為<code>In-App-Purchase</code>是程式裡面需要密集配合業務需求的部分，如果沒有一個良好抽象化的設計，在高可維護性與彈性，可擴展能力下功夫，一旦業務需求一複雜或反覆迭代更改，就會讓IAP相關的邏輯變得難以修改與維護。</p>
+
+<p>以上原因，所以如何在APP中設計一套可維護可擴展易整合的IAP架構，是開發大型APP與進階開發者應該關心的議題。接下來的文章把IAP付款架構有關執行交易與交易結果處理的這部分，抽象成TNStoreObserver類別。</p>
+
+<h2>StoreObserver</h2>
+
+<p>付款流程是APP根據一組定義在iTunesConnect的商品ID，向Apple Server請求對應的<code>SKPayment</code>物件，裡面包含了Localization的商品名稱與價錢，把這個想成一個商品。而一旦把這個<code>SKPayment</code>物件放到由系統維護的<code>SKPaymentQueue</code>時，這時候就開始進入按指紋，輸入iTunes Store帳密的程序。</p>
+
+<p>而<code>StoreKit</code>說明，當<code>SKPayment</code>加入到<code>SKPaymentQueue</code>後，開發者需要實作一個adopt<code>SKPaymentTransactionObserver</code>protocol的物件，並加入到<code>SKPaymentQueue</code>裡。之後這個Observer就是負責處理各種交易結果。比如成功時就要開啟對應的功能等。</p>
+
+<p>所以這個Class就取名叫StoreObserver，職責是實作<code>SKPaymentTransactionObserver</code>protocol，處理交易完成的後續行為。並負責與<code>SKPaymentQueue</code>互動，比如購買，取回過去的購買紀錄。最後可方便的在任何地方發動購買，然後在需要的地方容易接收到結果。</p>
+
+<p>基於以上需求，開去構思這個模組。</p>
+
+<p>先處理交易的部分，這就是單純與StoreKit串接。以下兩個Public方法：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>// 購買SKProduct
+</span><span class='line'>// Create and add a payment request to the payment queue
+</span><span class='line'>-(void)buy:(SKProduct *)product
+</span><span class='line'>{
+</span><span class='line'>    SKMutablePayment *payment = [SKMutablePayment paymentWithProduct:product];
+</span><span class='line'>  [[SKPaymentQueue defaultQueue] addPayment:payment];
+</span><span class='line'>}
+</span><span class='line'>
+</span><span class='line'>// 取回過去完成交易的非消耗品購買與自動續訂紀錄
+</span><span class='line'>-(void)restore
+</span><span class='line'>{
+</span><span class='line'>    [[SKPaymentQueue defaultQueue] restoreCompletedTransactions];
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>實作上會把這個<code>StoreObserver</code>做成<code>Singleton</code>，因為APP裡面可能會有許多頁面允許付款，只要<code>[[StoreObserver sharedInstance] buy:product];</code>就可以購買商品。然後因應上面的<code>restore</code>方法，這裡需要一個<code>NSArray</code>來裝取回的商品們，命名為<code>productsRestored</code>。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>+ (StoreObserver *)sharedInstance
+</span><span class='line'>{
+</span><span class='line'>    static dispatch_once_t onceToken;
+</span><span class='line'>    static StoreObserver * storeObserverSharedInstance;
+</span><span class='line'>    
+</span><span class='line'>    dispatch_once(&onceToken, ^{
+</span><span class='line'>        storeObserverSharedInstance = [[StoreObserver alloc] init];
+</span><span class='line'>    });
+</span><span class='line'>    return storeObserverSharedInstance;
+</span><span class='line'>}
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'>- (instancetype)init
+</span><span class='line'>{
+</span><span class='line'>  self = [super init];
+</span><span class='line'>  if (self != nil)
+</span><span class='line'>    {
+</span><span class='line'>        _productsRestored = [[NSMutableArray alloc] initWithCapacity:0];
+</span><span class='line'>    }
+</span><span class='line'>  return self;
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>這邊重要的來了，如果程式的某個地方呼叫了<code>StoreObserver</code>的<code>buy</code>發法，之後<code>StoreObserver</code>收到交易完成的資訊，而APP裡面可能會有很多地方因為這個交易而產生UI上的變化，比如買了一部影片，影片要開始播放，影片櫃需要新增新影片，會員的購買紀律需要增加一筆。該怎麼通知那麼多地方？這裡用了<code>NSNotificationCenter</code>。</p>
+
+<p>為什麼呢？因為在上述一對多的狀況下，<code>StoreObserver</code>會被設計成它不關心那些畫面或地方需要這些訊息。但它會把資料準備好，接著廣播。</p>
+
+<p>當通知的人不關心他會通知到誰，但可能需要被通知的人很多時，<code>NSNotificationCenter</code>機制就派上用場了。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>NSString * const TNIAPPurchaseNotification = @"TNIAPPurchaseNotification";</span></code></pre></td></tr></table></div></figure>
+
+
+<p>再來是讓接收廣播的地方容易做處理。在這個Class裡面我們設置三個Property，<code>status</code>，<code>message</code>和<code>purchasedID</code>。當這個Class實作<code>SKPaymentTransactionObserver</code>時，根據收到的資訊做整理，讓接收的人可以很方便利用交易結果。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>typedef NS_ENUM(NSInteger, TNIAPPurchaseNotificationStatus)
+</span><span class='line'>{
+</span><span class='line'>    TNIAPPurchaseFailed, // Indicate that the purchase was unsuccessful
+</span><span class='line'>    TNIAPPurchaseSucceeded, // Indicate that the purchase was successful
+</span><span class='line'>    TNIAPRestoredFailed, // Indicate that restore products was unsuccessful
+</span><span class='line'>    TNIAPRestoredSucceeded // Indicate that restore products was successful
+</span><span class='line'>};
+</span><span class='line'>
+</span><span class='line'>@property (nonatomic) TNIAPPurchaseNotificationStatus status;
+</span><span class='line'>@property (nonatomic, copy) NSString *purchasedID;
+</span><span class='line'>@property (nonatomic, copy) NSString *message;</span></code></pre></td></tr></table></div></figure>
+
+
+<p>比如當我們實作的<code>SKPaymentTransactionObserver</code>方法被<code>SKPaymentQueue</code>呼叫時，整理一下再POST Notification出去</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>// Called when an error occur while restoring purchases. Notify the user about the error.
+</span><span class='line'>- (void)paymentQueue:(SKPaymentQueue *)queue restoreCompletedTransactionsFailedWithError:(NSError *)error
+</span><span class='line'>{
+</span><span class='line'>    if (error.code != SKErrorPaymentCancelled)
+</span><span class='line'>    {
+</span><span class='line'>        self.status = IAPRestoredFailed;
+</span><span class='line'>        self.message = error.localizedDescription;
+</span><span class='line'>        [[NSNotificationCenter defaultCenter] postNotificationName:TNIAPPurchaseNotification object:self];
+</span><span class='line'>    }
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>實際運作</h2>
+
+<p>這邊我們不考慮要怎麼取得到SKPayment物件，因為這部分邏輯不在<code>StoreObserver</code>負責範圍內。</p>
+
+<h3>在任何地方容易的發動購買</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>SKProduct *product = (SKProduct *)productRequestResponse[indexPath.row];
+</span><span class='line'>        // Attempt to purchase the tapped product
+</span><span class='line'>        [[TNStoreObserver sharedInstance] buy:product];</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>在需要的地方容易收到並做處理</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>[[NSNotificationCenter defaultCenter] addObserver:self
+</span><span class='line'>                                             selector:@selector(handlePurchasesNotification:)
+</span><span class='line'>                                                 name:TNIAPPurchaseNotification
+</span><span class='line'>                                               object:[StoreObserver sharedInstance]];
+</span><span class='line'>
+</span><span class='line'>// Update the UI according to the purchase request notification result
+</span><span class='line'>-(void)handlePurchasesNotification:(NSNotification *)notification
+</span><span class='line'>{
+</span><span class='line'>    StoreObserver *purchasesNotification = (StoreObserver *)notification.object;
+</span><span class='line'>    
+</span><span class='line'>    IAPPurchaseNotificationStatus status = (IAPPurchaseNotificationStatus)purchasesNotification.status;
+</span><span class='line'>    NSString *message = purchasesNotification.message;
+</span><span class='line'>    NSString *purchasedID = purchasesNotification.purchasedID;
+</span><span class='line'>   
+</span><span class='line'>
+</span><span class='line'>  switch (status)
+</span><span class='line'>    {
+</span><span class='line'>        case IAPPurchaseFailed:
+</span><span class='line'>            //購買失敗...
+</span><span class='line'>          break;
+</span><span class='line'>            
+</span><span class='line'>        case IAPDownloadSucceeded:
+</span><span class='line'>        {
+</span><span class='line'>            //購買成功...
+</span><span class='line'>        }
+</span><span class='line'>          break;
+</span><span class='line'>        
+</span><span class='line'>        case IAPRestoredSucceeded:
+</span><span class='line'>        {
+</span><span class='line'>            //回復成功...
+</span><span class='line'>        }
+</span><span class='line'>            break;
+</span><span class='line'>            
+</span><span class='line'>        case IAPRestoredFailed:
+</span><span class='line'>            //回復失敗...
+</span><span class='line'>            break;
+</span><span class='line'>  } 
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">施安宏</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-08-24T23:30:18+08:00" pubdate data-updated="true">Aug 24<sup>th</sup>, 2016</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://sah.tw/blog/2016/08/24/iap-payment-model-design/" data-via="DaanSHIH" data-counturl="http://sah.tw/blog/2016/08/24/iap-payment-model-design/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2016/08/11/ios-view-advanced/" title="Previous Post: 從零到穩固的基礎 - 談iOS刻畫UI">&laquo; 從零到穩固的基礎 - 談iOS刻畫UI</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2016/08/24/iap-payment-model-design/">In-App-Purchase交易模組設計</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/08/11/ios-view-advanced/">從零到穩固的基礎 - 談iOS刻畫UI</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/05/03/ios-fastlane/">運用iOS Fastlane自動化部署TestFlight</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/05/01/detail-custom-ios-model-animation/">有關製作iOS客製化Animation的詳細過程</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/04/27/why-to-be-a-cs-engineer/">為什麼要當個CS工程師</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/02/05/ios-camera-design-pattern-review/">iOS Camera Design Pattern 回顧</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/01/08/first-presentation-flow/">iOS 實作SlideMenu - 初探ViewController切換</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/01/04/ios-serial-queue-run-async-background-job/">iOS 大量網路與硬碟I/0處理</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/12/22/ios-background-mode-notification/">推播結合背景更新 - 良好的使用者體驗</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/12/10/adjust-status-bar-style/">iOS 在不同ViewController指定Status Bar</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2016 - 施安宏 -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'mrshih';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://sah.tw/blog/2016/08/24/iap-payment-model-design/';
+        var disqus_url = 'http://sah.tw/blog/2016/08/24/iap-payment-model-design/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id; js.async = true;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

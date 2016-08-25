@@ -9,7 +9,7 @@
   <meta name="author" content="施安宏">
 
   
-  <meta name="description" content="MVVM是iOS開發近來熱門的開發架構，最近工作上不停用到這個架構去建立各種頁面，對於如何從零開始架構出一個方便開發與維護的MVVM架構有些實作上總結出的Tips或稱為想法在，這裡記錄下來與回顧。 系列第一篇會先從MVVM裡面的View開始講，通常這也是我開發的第一也是很重要的步驟， &hellip;">
+  <meta name="description" content="網路上很多介紹如何運用StoreKit裡面的API在iOS上付款的文章，但實務上因為In-App-Purchase是程式裡面需要密集配合業務需求的部分，如果沒有一個良好抽象化的設計，在高可維護性與彈性，可擴展能力下功夫，一旦業務需求一複雜或反覆迭代更改，就會讓IAP相關的邏輯變得難以修改與維護。 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -77,6 +77,287 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2016/08/24/iap-payment-model-design/">In-App-Purchase交易模組設計</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-08-24T23:30:18+08:00" pubdate data-updated="true">Aug 24<sup>th</sup>, 2016</time>
+        
+           | <a href="/blog/2016/08/24/iap-payment-model-design/#disqus_thread"
+             data-disqus-identifier="http://sah.tw/blog/2016/08/24/iap-payment-model-design/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>網路上很多介紹如何運用<code>StoreKit</code>裡面的API在iOS上付款的文章，但實務上因為<code>In-App-Purchase</code>是程式裡面需要密集配合業務需求的部分，如果沒有一個良好抽象化的設計，在高可維護性與彈性，可擴展能力下功夫，一旦業務需求一複雜或反覆迭代更改，就會讓IAP相關的邏輯變得難以修改與維護。</p>
+
+<p>以上原因，所以如何在APP中設計一套可維護可擴展易整合的IAP架構，是開發大型APP與進階開發者應該關心的議題。接下來的文章把IAP付款架構有關執行交易與交易結果處理的這部分，抽象成TNStoreObserver類別。</p>
+
+<h2>StoreObserver</h2>
+
+<p>付款流程是APP根據一組定義在iTunesConnect的商品ID，向Apple Server請求對應的<code>SKPayment</code>物件，裡面包含了Localization的商品名稱與價錢，把這個想成一個商品。而一旦把這個<code>SKPayment</code>物件放到由系統維護的<code>SKPaymentQueue</code>時，這時候就開始進入按指紋，輸入iTunes Store帳密的程序。</p>
+
+<p>而<code>StoreKit</code>說明，當<code>SKPayment</code>加入到<code>SKPaymentQueue</code>後，開發者需要實作一個adopt<code>SKPaymentTransactionObserver</code>protocol的物件，並加入到<code>SKPaymentQueue</code>裡。之後這個Observer就是負責處理各種交易結果。比如成功時就要開啟對應的功能等。</p>
+
+<p>所以這個Class就取名叫StoreObserver，職責是實作<code>SKPaymentTransactionObserver</code>protocol，處理交易完成的後續行為。並負責與<code>SKPaymentQueue</code>互動，比如購買，取回過去的購買紀錄。最後可方便的在任何地方發動購買，然後在需要的地方容易接收到結果。</p>
+
+<p>基於以上需求，開去構思這個模組。</p>
+
+<p>先處理交易的部分，這就是單純與StoreKit串接。以下兩個Public方法：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>// 購買SKProduct
+</span><span class='line'>// Create and add a payment request to the payment queue
+</span><span class='line'>-(void)buy:(SKProduct *)product
+</span><span class='line'>{
+</span><span class='line'>    SKMutablePayment *payment = [SKMutablePayment paymentWithProduct:product];
+</span><span class='line'>  [[SKPaymentQueue defaultQueue] addPayment:payment];
+</span><span class='line'>}
+</span><span class='line'>
+</span><span class='line'>// 取回過去完成交易的非消耗品購買與自動續訂紀錄
+</span><span class='line'>-(void)restore
+</span><span class='line'>{
+</span><span class='line'>    [[SKPaymentQueue defaultQueue] restoreCompletedTransactions];
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>實作上會把這個<code>StoreObserver</code>做成<code>Singleton</code>，因為APP裡面可能會有許多頁面允許付款，只要<code>[[StoreObserver sharedInstance] buy:product];</code>就可以購買商品。然後因應上面的<code>restore</code>方法，這裡需要一個<code>NSArray</code>來裝取回的商品們，命名為<code>productsRestored</code>。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>+ (StoreObserver *)sharedInstance
+</span><span class='line'>{
+</span><span class='line'>    static dispatch_once_t onceToken;
+</span><span class='line'>    static StoreObserver * storeObserverSharedInstance;
+</span><span class='line'>    
+</span><span class='line'>    dispatch_once(&onceToken, ^{
+</span><span class='line'>        storeObserverSharedInstance = [[StoreObserver alloc] init];
+</span><span class='line'>    });
+</span><span class='line'>    return storeObserverSharedInstance;
+</span><span class='line'>}
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'>- (instancetype)init
+</span><span class='line'>{
+</span><span class='line'>  self = [super init];
+</span><span class='line'>  if (self != nil)
+</span><span class='line'>    {
+</span><span class='line'>        _productsRestored = [[NSMutableArray alloc] initWithCapacity:0];
+</span><span class='line'>    }
+</span><span class='line'>  return self;
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>這邊重要的來了，如果程式的某個地方呼叫了<code>StoreObserver</code>的<code>buy</code>發法，之後<code>StoreObserver</code>收到交易完成的資訊，而APP裡面可能會有很多地方因為這個交易而產生UI上的變化，比如買了一部影片，影片要開始播放，影片櫃需要新增新影片，會員的購買紀律需要增加一筆。該怎麼通知那麼多地方？這裡用了<code>NSNotificationCenter</code>。</p>
+
+<p>為什麼呢？因為在上述一對多的狀況下，<code>StoreObserver</code>會被設計成它不關心那些畫面或地方需要這些訊息。但它會把資料準備好，接著廣播。</p>
+
+<p>當通知的人不關心他會通知到誰，但可能需要被通知的人很多時，<code>NSNotificationCenter</code>機制就派上用場了。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>NSString * const TNIAPPurchaseNotification = @"TNIAPPurchaseNotification";</span></code></pre></td></tr></table></div></figure>
+
+
+<p>再來是讓接收廣播的地方容易做處理。在這個Class裡面我們設置三個Property，<code>status</code>，<code>message</code>和<code>purchasedID</code>。當這個Class實作<code>SKPaymentTransactionObserver</code>時，根據收到的資訊做整理，讓接收的人可以很方便利用交易結果。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>typedef NS_ENUM(NSInteger, TNIAPPurchaseNotificationStatus)
+</span><span class='line'>{
+</span><span class='line'>    TNIAPPurchaseFailed, // Indicate that the purchase was unsuccessful
+</span><span class='line'>    TNIAPPurchaseSucceeded, // Indicate that the purchase was successful
+</span><span class='line'>    TNIAPRestoredFailed, // Indicate that restore products was unsuccessful
+</span><span class='line'>    TNIAPRestoredSucceeded // Indicate that restore products was successful
+</span><span class='line'>};
+</span><span class='line'>
+</span><span class='line'>@property (nonatomic) TNIAPPurchaseNotificationStatus status;
+</span><span class='line'>@property (nonatomic, copy) NSString *purchasedID;
+</span><span class='line'>@property (nonatomic, copy) NSString *message;</span></code></pre></td></tr></table></div></figure>
+
+
+<p>比如當我們實作的<code>SKPaymentTransactionObserver</code>方法被<code>SKPaymentQueue</code>呼叫時，整理一下再POST Notification出去</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>// Called when an error occur while restoring purchases. Notify the user about the error.
+</span><span class='line'>- (void)paymentQueue:(SKPaymentQueue *)queue restoreCompletedTransactionsFailedWithError:(NSError *)error
+</span><span class='line'>{
+</span><span class='line'>    if (error.code != SKErrorPaymentCancelled)
+</span><span class='line'>    {
+</span><span class='line'>        self.status = IAPRestoredFailed;
+</span><span class='line'>        self.message = error.localizedDescription;
+</span><span class='line'>        [[NSNotificationCenter defaultCenter] postNotificationName:TNIAPPurchaseNotification object:self];
+</span><span class='line'>    }
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>實際運作</h2>
+
+<p>這邊我們不考慮要怎麼取得到SKPayment物件，因為這部分邏輯不在<code>StoreObserver</code>負責範圍內。</p>
+
+<h3>在任何地方容易的發動購買</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>SKProduct *product = (SKProduct *)productRequestResponse[indexPath.row];
+</span><span class='line'>        // Attempt to purchase the tapped product
+</span><span class='line'>        [[TNStoreObserver sharedInstance] buy:product];</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>在需要的地方容易收到並做處理</h3>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>[[NSNotificationCenter defaultCenter] addObserver:self
+</span><span class='line'>                                             selector:@selector(handlePurchasesNotification:)
+</span><span class='line'>                                                 name:TNIAPPurchaseNotification
+</span><span class='line'>                                               object:[StoreObserver sharedInstance]];
+</span><span class='line'>
+</span><span class='line'>// Update the UI according to the purchase request notification result
+</span><span class='line'>-(void)handlePurchasesNotification:(NSNotification *)notification
+</span><span class='line'>{
+</span><span class='line'>    StoreObserver *purchasesNotification = (StoreObserver *)notification.object;
+</span><span class='line'>    
+</span><span class='line'>    IAPPurchaseNotificationStatus status = (IAPPurchaseNotificationStatus)purchasesNotification.status;
+</span><span class='line'>    NSString *message = purchasesNotification.message;
+</span><span class='line'>    NSString *purchasedID = purchasesNotification.purchasedID;
+</span><span class='line'>   
+</span><span class='line'>
+</span><span class='line'>  switch (status)
+</span><span class='line'>    {
+</span><span class='line'>        case IAPPurchaseFailed:
+</span><span class='line'>            //購買失敗...
+</span><span class='line'>          break;
+</span><span class='line'>            
+</span><span class='line'>        case IAPDownloadSucceeded:
+</span><span class='line'>        {
+</span><span class='line'>            //購買成功...
+</span><span class='line'>        }
+</span><span class='line'>          break;
+</span><span class='line'>        
+</span><span class='line'>        case IAPRestoredSucceeded:
+</span><span class='line'>        {
+</span><span class='line'>            //回復成功...
+</span><span class='line'>        }
+</span><span class='line'>            break;
+</span><span class='line'>            
+</span><span class='line'>        case IAPRestoredFailed:
+</span><span class='line'>            //回復失敗...
+</span><span class='line'>            break;
+</span><span class='line'>  } 
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1624,84 +1905,6 @@ UIModalPresentationStyle
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2015/08/24/past-three-year-mobile-trend/">回看行動趨勢與我這三年</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2015-08-24T13:22:30+08:00" pubdate data-updated="true">Aug 24<sup>th</sup>, 2015</time>
-        
-           | <a href="/blog/2015/08/24/past-three-year-mobile-trend/#disqus_thread"
-             data-disqus-identifier="http://sah.tw/blog/2015/08/24/past-three-year-mobile-trend/">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h3>無盡的新元素</h3>
-
-<p>過去三年陸續加上了穿戴式裝置，無人飛行機操控，行動支付，線上串線下服務（我其實很不喜歡文鄒鄒名詞，這裡指的就是Uber,airbnb等把供應者與消費者串起來的服務），車用APP等新元素，到底這些對於一個APP開發者的影響是什麼？</p>
-
-<h3>2013開始的混沌應用時代</h3>
-
-<p>當時最簡單最簡單的APP開發者應用就是加入銀行或者是媒體，幫他們寫APP。我在那時候發現各大媒體寫出來的新聞APP點進去以後是Web View，裡面有大量Javascript加上3G連線速度慢，所以很多人在當時看新聞APP是痛苦的，於是我寫了一個APP單純載入HTML並把內文Parser出來，只剩下純文字，但載入時間從一般Web往往要5~6秒，降低到1秒以下，整個看新聞體驗變得是很愉悅的，而這個APP在當時也如願衝到台灣新聞類付費下載第一名，整個從開發到上架都是一手包。題外話是當時有媒體公司發函說要告我，很可惜當初沒告，不然我覺得事後發展會很有趣。</p>
-
-<p>但後來去馬祖當兵也就沒有維護這個APP，之後媒體公司寫的APP也都從善如流把Web view拿掉，改成直接call api給內文，並且用native的方法顯示出內文。很高興成為台灣先驅。</p>
-
-<p>事後來想，當初應該把這APP改成免費，衝高流量，反正後端提供內容的Server不是我的XD，並在下面加上如Instagram般很輕量的討論功能，之後搭配Google analytics把大家有興趣的新聞做成Facebook post（這功能其實有加入，但當時沒想法要拿來做什麼）
-，用現在蘋果日報粉絲頁的方式操作，流量一定非常高，我就可以來去跟媒體業談談要不要跟我配合做網路新聞散播，我相信結果會很不一樣的。但當時想法實在太小，只想寫一個方便大家的APP。</p>
-
-<p>這時期也接觸到amazon的cloud服務，從租ec2開始摸linux架起lamp，到租s3搭配php sdk做圖片儲存（那時候大學專題做的題目需要存圖片），搭配nginx還有apache，做出動靜態網頁sacble，這一連串摸索架起後台的實戰經驗純粹就是好玩，但後來幫助我許多，讓我日後再用parse的時候遇到問題可以大略推斷問題是出在我這邊還是parse那邊。不會之前然而不知其所以然。</p>
-
-<p>串接facebook sdk也是在這時候接觸的，大致上是拿來做single sign on，然後能po文到使用者的timeline上。對於參與設計一個給很多人使用的sdk我十分嚮往，等等下面再舉例子。</p>
-
-<p>這時期的下一個爆點是線上串線下服務，在台灣有EATABLE為代表。不知道為什麼最近demo day還是有很多人做訂餐廳服務，很想聊一聊是經過怎樣分析決定再跟EATABLE競爭。</p>
-
-<h3>2014往線下滲透與硬體</h3>
-
-<p>印象最深刻莫過於Uber，這APP是目前我花錢花最多的APP，遠遠大於其他APP所加起來的總合，你可以說他是吸金功力很強的APP沒錯，儘管Uber依舊虧損，但那龐大的金流量足以吸引無限創投砸錢讓它燒。Airbnb在台灣也可用到了，兩者在單純服務的背後都有很遠大規劃。比如Uber想作物流配送，Airbnb在租房背後考量到為出租者提供打掃，維護等服務，衍伸出來的許多應用這就是老外厲害地方，很會也很敢去想Bussiness model，這也是我在13年做得不足的地方。</p>
-
-<p>技術上這時期出現了maker運動，自從arduino的爆發，如四旋翼攝影機，小機器人到未來的車控APP，這些在未來我相信都是用手機來做遙控，這時候如果具備有protocol撰寫的經驗，配合BLE或wifi等，對單純軟體APP工程師而言可以有另一片藍海。我在這年退伍並加入一家做穿戴式裝置的新創，就剛好學習這領域相關知識。</p>
-
-<p>而在這間新創公司接觸到了aglie開發模式與超級無敵好用的git，這都是非常令我興奮可以學到的技能，畢竟git flow還是要配合同事一起使用才能像住精神時光屋一樣快速上手。</p>
-
-<p>未來APP要考量的不只是單純的介面設計，與網路異步處理等很單純UI interface得部分，更有趣的部分比如Uber如何算出兩地的估計搭乘費用，怎麼根據資料算出熱門時段加成費率與什麼時候加，怎麼精確算出大約需要多久可以叫到附近計程車。這都是牽扯到資料後會產生很有趣的問題，通常也是人類真正關心的問題，也是能讓你的APP讓使用者真正覺方便好用的部分。這是非常吸引我的APP開發部分。</p>
-
-<p>而你搭乘Uber所做的付款行為則是未來幾年最重要的兩項議題，資訊安全跟行動支付</p>
-
-<h3>2015資安與行動支付</h3>
-
-<p>行動支付在中國發展的最好，左岸同胞都很習慣用手機轉錢給其他人了，台灣礙於法規最近pchome才推出一款pi，創新敢做值得肯定，但在資安方面實在出太多包了，但沒關係，這也凸顯台灣資訊安全人才還沒有被擺道對的位置，也很有發展淺力。資安我focus在pki應用，我在過去曾今待過一家做pki應用的公司，對於資料傳輸過程中如何用非對稱金鑰搭配對稱金鑰保護資料不被竊取，如何做加解密有相關認識與實作，這也是因為當初偷連yahoo news原文api發現是明文之後覺得資安真的非常重要才把一些時間花在這個領域上面（yahoo news原文api現在有加密了）。這是我認為在技術上我有做對的事情。</p>
-
-<p>行動支付在台灣分成傳統電子票證如悠遊卡陣營，與新興的電信與銀行陣營，其中電信與銀行聯合的陣營因為利益非配步履蹣跚，這是身為工程師我所看到的機會，未來一定很多領域想做支付也正在做，而做支付真的不外乎就是把資安搞好。我相信等Apple pay一開放來台灣，悠遊卡的優勢就需要注意，越來越多店家有paypass跟paywave，為了很潮與少帶一張悠遊卡，用手機付款是很吸引人的。未來還可以順便記帳呢。未來也很多如星巴克做自己的錢包，對於配合一家公司做一個錢包練功我也是很有興趣的。</p>
-
-<p>在國外有paypal跟stripe，兩者都是service provider，差異很明顯stripe對開發者太友善，就像一家超有sence的網路公司，提供你一個簡單易用的SDK，甚至你在conslol就可以call post去call一個example交易範例，等於就告訴你我post也行，超簡單易用。未來設計Oauth等供其他人用的服務，提供很好用api與方便開發者的make sence SDK是未來幾年我有興趣想嘗試的大方向，scope夠大，牽連的技術應用範圍夠廣如scable，資安，data分析與挖掘（uber例子），這些都是符合我興趣的project的特性。</p>
-
-<p>支付（含網銀與下單），通訊與社群，遊戲，新聞，串線下服務是我認為未來app五本柱，不脫離這些範疇，下次我會挑選我認為在這領域我欣賞的app與他得對手來寫出我的看法。</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/2">&larr; Older</a>
@@ -1715,6 +1918,10 @@ UIModalPresentationStyle
     <section>
   <h1>Recent Posts</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2016/08/24/iap-payment-model-design/">In-App-Purchase交易模組設計</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2016/08/11/ios-view-advanced/">從零到穩固的基礎 - 談iOS刻畫UI</a>
@@ -1750,10 +1957,6 @@ UIModalPresentationStyle
     
       <li class="post">
         <a href="/blog/2015/12/10/adjust-status-bar-style/">iOS 在不同ViewController指定Status Bar</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2015/08/24/past-three-year-mobile-trend/">回看行動趨勢與我這三年</a>
       </li>
     
   </ul>
