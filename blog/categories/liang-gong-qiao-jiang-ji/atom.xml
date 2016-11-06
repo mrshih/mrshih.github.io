@@ -4,7 +4,7 @@
   <title><![CDATA[Category: 良工巧匠集 | MR SHIH]]></title>
   <link href="http://sah.tw/blog/categories/liang-gong-qiao-jiang-ji/atom.xml" rel="self"/>
   <link href="http://sah.tw/"/>
-  <updated>2016-08-26T00:02:41+08:00</updated>
+  <updated>2016-11-07T01:14:52+08:00</updated>
   <id>http://sah.tw/</id>
   <author>
     <name><![CDATA[施安宏]]></name>
@@ -18,7 +18,7 @@
     <link href="http://sah.tw/blog/2016/01/08/first-presentation-flow/"/>
     <updated>2016-01-08T18:10:00+08:00</updated>
     <id>http://sah.tw/blog/2016/01/08/first-presentation-flow</id>
-    <content type="html"><![CDATA[<p><img src="{{ root_url }}/images/2016-01-08-first-presentation-flow.jpg" />
+    <content type="html"><![CDATA[<p><img src="/images/2016-01-08-first-presentation-flow.jpg" />
 所有關於ViewController切換的行為基本稱做為Model，Navegation特有的Push等等也是Model的分支。 在iOS7裡面把制定切換ViewController的行為拆分成許多Class，目的是為了要降低耦合，讓Code重用度提高，比如Coustom一個切換Animation物件可以用在好幾個ViewController之間。</p>
 
 <p>要切換ViewController你要告訴UIKit兩件事情，顯示成怎樣<code>
