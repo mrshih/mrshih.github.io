@@ -77,4 +77,4 @@ Merge Sort有分Recursive跟For loop兩種，但看完影片直覺就是用Recur
 
 當然，不要過度強調DRY，這關係到切架構與抽象化整體的規劃能力，但至少在這個Case裡Merge Sort做成Method絕對是好的。
 
-這裡可以練習把Merge Sort用`Category`的方式做成`NSArray`的Method喔。考驗的是基礎OOP，把一些地方改成`Self`就可以。
+這裡可以練習把Merge Sort用`Category`的方式做成`NSArray`的Method喔。考驗的是基礎OOP，把一些地方改成`Self`就可以了。
