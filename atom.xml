@@ -4,7 +4,7 @@
   <title><![CDATA[MR SHIH]]></title>
   <link href="http://sah.tw/atom.xml" rel="self"/>
   <link href="http://sah.tw/"/>
-  <updated>2016-11-07T01:14:52+08:00</updated>
+  <updated>2016-11-07T01:23:09+08:00</updated>
   <id>http://sah.tw/</id>
   <author>
     <name><![CDATA[施安宏]]></name>
@@ -140,7 +140,7 @@
 
 <p>當然，不要過度強調DRY，這關係到切架構與抽象化整體的規劃能力，但至少在這個Case裡Merge Sort做成Method絕對是好的。</p>
 
-<p>這裡可以練習把Merge Sort用<code>Category</code>的方式做成<code>NSArray</code>的Method喔。考驗的是基礎OOP，把一些地方改成<code>Self</code>就可以。</p>
+<p>這裡可以練習把Merge Sort用<code>Category</code>的方式做成<code>NSArray</code>的Method喔。考驗的是基礎OOP，把一些地方改成<code>Self</code>就可以了。</p>
 ]]></content>
   </entry>
   
