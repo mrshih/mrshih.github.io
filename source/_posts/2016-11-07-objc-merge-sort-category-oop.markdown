@@ -1,6 +1,6 @@
 ---
 layout: post
-title: MergeSort與Obj-c外加Category與OOP
+title: MergeSort與Obj-C外加Category與OOP
 date: 2016-11-07 00:18:53 +0800
 comments: true
 categories: 
@@ -71,10 +71,10 @@ Merge Sort有分Recursive跟For loop兩種，但看完影片直覺就是用Recur
 ```
 
 ## Do more - Free Function與Method
-可以看到`mergeSortWithData`是一個Function，但通常實務上如果一個Function的Input有指定要是某個Class，比如這裡就是指定`NSArray`，那這時候採用Method較好。
+可以看到`mergeSortWithData`是一個Function，但我自己Obj-C軟體實作的Coding style上如果一個Function的Input有指定要是某個Class，比如這裡就是指定`NSArray`，那這時候採用Method較好。
 
-但通常很少情況會不指定Input的Clsas，所以通常實務上很少Best Practice會用Free Function，這也可以減少一堆Function散落在專案裡面，與DRY精神。
+但通常很少情況會不指定Input的Clsas，所以實務上會盡量少用Free Function，附帶的好處是可以減少一堆Function散落在專案裡面，也可以盡量DRY（Don't repeat yourself）。
 
-當然，不要過度強調DRY，這關係到切架構與抽象化整體的規劃能力，但至少在這個Case裡Merge Sort做成Method絕對是好的。
+當然，不要過度強調DRY，因為這關係到切架構與抽象化整體的規劃能力，抽象的不好那是會用弄越糟的，但至少在這個簡單的Case裡Merge Sort做成Method絕對是make sense的。
 
-這裡可以練習把Merge Sort用`Category`的方式做成`NSArray`的Method喔。考驗的是基礎OOP，把一些地方改成`Self`就可以了。
+這裡可以練習把Merge Sort用`Category`的方式做成`NSArray`的Method。基礎OOP，把一些地方改成`Self`就可以了。
