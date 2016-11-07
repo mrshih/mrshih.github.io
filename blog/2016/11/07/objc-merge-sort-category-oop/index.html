@@ -5,7 +5,7 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>MergeSort與Obj-c外加Category與OOP - MR SHIH</title>
+  <title>MergeSort與Obj-C外加Category與OOP - MR SHIH</title>
   <meta name="author" content="施安宏">
 
   
@@ -80,7 +80,7 @@
   
   <header>
     
-      <h1 class="entry-title">MergeSort與Obj-c外加Category與OOP</h1>
+      <h1 class="entry-title">MergeSort與Obj-C外加Category與OOP</h1>
     
     
       <p class="meta">
@@ -222,13 +222,13 @@
 
 <h2>Do more &ndash; Free Function與Method</h2>
 
-<p>可以看到<code>mergeSortWithData</code>是一個Function，但通常實務上如果一個Function的Input有指定要是某個Class，比如這裡就是指定<code>NSArray</code>，那這時候採用Method較好。</p>
+<p>可以看到<code>mergeSortWithData</code>是一個Function，但我自己Obj-C軟體實作的Coding style上如果一個Function的Input有指定要是某個Class，比如這裡就是指定<code>NSArray</code>，那這時候採用Method較好。</p>
 
-<p>但通常很少情況會不指定Input的Clsas，所以通常實務上很少Best Practice會用Free Function，這也可以減少一堆Function散落在專案裡面，與DRY精神。</p>
+<p>但通常很少情況會不指定Input的Clsas，所以實務上會盡量少用Free Function，附帶的好處是可以減少一堆Function散落在專案裡面，也可以盡量DRY（Don&rsquo;t repeat yourself）。</p>
 
-<p>當然，不要過度強調DRY，這關係到切架構與抽象化整體的規劃能力，但至少在這個Case裡Merge Sort做成Method絕對是好的。</p>
+<p>當然，不要過度強調DRY，因為這關係到切架構與抽象化整體的規劃能力，抽象的不好那是會用弄越糟的，但至少在這個簡單的Case裡Merge Sort做成Method絕對是make sense的。</p>
 
-<p>這裡可以練習把Merge Sort用<code>Category</code>的方式做成<code>NSArray</code>的Method喔。考驗的是基礎OOP，把一些地方改成<code>Self</code>就可以了。</p>
+<p>這裡可以練習把Merge Sort用<code>Category</code>的方式做成<code>NSArray</code>的Method。基礎OOP，把一些地方改成<code>Self</code>就可以了。</p>
 </div>
 
 
@@ -294,7 +294,7 @@
   <ul id="recent_posts">
     
       <li class="post">
-        <a href="/blog/2016/11/07/objc-merge-sort-category-oop/">MergeSort與Obj-c外加Category與OOP</a>
+        <a href="/blog/2016/11/07/objc-merge-sort-category-oop/">MergeSort與Obj-C外加Category與OOP</a>
       </li>
     
       <li class="post">
