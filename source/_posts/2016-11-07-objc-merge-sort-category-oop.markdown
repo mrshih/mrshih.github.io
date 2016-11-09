@@ -13,7 +13,7 @@ categories:
 在懂了Merge Sort概念之後，如果對於如何把想法轉換成程式碼沒什麼感覺，可以看一段[影片](https://www.youtube.com/watch?v=es2T6KY45cA&index=3&list=PL2aHrV9pFqNRS2b2XX2BvgQIPKh72xREP)，這段影片大概就是程式碼影片化後實際運作的樣子。
 
 Merge Sort有分Recursive跟For loop兩種，但看完影片直覺就是用Recursive比較好做。這是因為你看Merge Sort其實是把一個大問題分成小問題，小問題再分成更小的問題，直到把問題切割成最小單元，再返回來把前一次的結果餵給上一層，之後一層一層的解回去。這是很典型的遞迴場景。
-
+NSMutableArray
 上面的問題解決思路在演算法裡面叫做Divide and Conquer，蠻傳神的解釋，把問題分解後在各個擊破。
 
 ## Objective-c Implement

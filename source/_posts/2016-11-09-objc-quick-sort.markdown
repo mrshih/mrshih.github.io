@@ -41,9 +41,9 @@ categories:
 }
 ```
 
-如果常寫有支援記憶體管理語言比如Java或ARC版Obj-C的人可能會直覺寫出這個版本，因為在這幾個語言裡其實常常不用太管記憶體使用量太多這個問題，除非是UIImage等大型物件沒有釋放，不然常常遇到比如NSArray分割其實也就是再開兩個NSArray去存就好了。
+如果常寫有支援記憶體管理語言比如Java或ARC版Obj-C的人可能會直覺寫出這個版本，因為在這幾個語言裡其實常常不用太管記憶體使用量太多這個問題，除非是`UIImage`等大型物件沒有釋放，不然常常遇到比如`NSArray`分割其實也就是再開兩個NSArray去存就好了。
 
-上面這個實作方法每次都新開NSArray去存放分割後的子Array，而Quick Sort比Merge Sort好的地方在於它可以改用稱作In-Place的方法，只在同一個陣列做交換，可以避免運用消耗多餘的記憶體空間，參考文獻也寫說實務上也可以增加演算法的效率。
+上面這個實作方法每次都新開`NSArray`去存放分割後的子Array，而Quick Sort比Merge Sort好的地方在於它可以改用稱作In-Place的方法，只在同一個陣列做交換，可以避免運用消耗多餘的記憶體空間，參考文獻也寫說實務上也可以增加演算法的效率。
 
 ## Qucik Sort In-Place 版本
 ```
@@ -73,5 +73,16 @@ categories:
     [self quickSortInPlaceWithData:data leftIndex:processIndexAKAWall + 1 rightIndex:right];
     
     return data;
+}
+```
+## 更好用的呼叫方式
+平均空間複雜度更好的In-Place版本，因為只有`NSMutableArray`可以交換item，所以如果傳入值是是`NSArray`則呼叫的時候要寫成以下方式：
+```
+NSMutableArray *result = [self quickSortInPlaceWithData:[data mutableCopy] leftIndex:0 rightIndex:data.count-1];
+```
+而為了可以讓`NSArray`可以使用，也方便之後做成`NSArray`的`Category`，就可以改寫成以下這種較為方便別人使用的方式，因為別人不一定知道Left與Right，也不需要懂實作細節情況下：
+```
+- (NSArray *)quickSort:(NSArray *)data {
+    return [self quickSortInPlaceWithData:[data mutableCopy]  leftIndex:0 rightIndex:data.count-1];
 }
 ```
