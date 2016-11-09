@@ -171,9 +171,9 @@
 </span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
 
 
-<p>如果常寫有支援記憶體管理語言比如Java或ARC版Obj-C的人可能會直覺寫出這個版本，因為在這幾個語言裡其實常常不用太管記憶體使用量太多這個問題，除非是UIImage等大型物件沒有釋放，不然常常遇到比如NSArray分割其實也就是再開兩個NSArray去存就好了。</p>
+<p>如果常寫有支援記憶體管理語言比如Java或ARC版Obj-C的人可能會直覺寫出這個版本，因為在這幾個語言裡其實常常不用太管記憶體使用量太多這個問題，除非是<code>UIImage</code>等大型物件沒有釋放，不然常常遇到比如<code>NSArray</code>分割其實也就是再開兩個NSArray去存就好了。</p>
 
-<p>上面這個實作方法每次都新開NSArray去存放分割後的子Array，而Quick Sort比Merge Sort好的地方在於它可以改用稱作In-Place的方法，只在同一個陣列做交換，可以避免運用消耗多餘的記憶體空間，參考文獻也寫說實務上也可以增加演算法的效率。</p>
+<p>上面這個實作方法每次都新開<code>NSArray</code>去存放分割後的子Array，而Quick Sort比Merge Sort好的地方在於它可以改用稱作In-Place的方法，只在同一個陣列做交換，可以避免運用消耗多餘的記憶體空間，參考文獻也寫說實務上也可以增加演算法的效率。</p>
 
 <h2>Qucik Sort In-Place 版本</h2>
 
@@ -232,6 +232,24 @@
 </span><span class='line'>    return data;
 </span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
 
+
+<h2>更好用的呼叫方式</h2>
+
+<p>平均空間複雜度更好的In-Place版本，因為只有<code>NSMutableArray</code>可以交換item，所以如果傳入值是是<code>NSArray</code>則呼叫的時候要寫成以下方式：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>NSMutableArray *result = [self quickSortInPlaceWithData:[data mutableCopy] leftIndex:0 rightIndex:data.count-1];</span></code></pre></td></tr></table></div></figure>
+
+
+<p>而為了可以讓<code>NSArray</code>可以使用，也方便之後做成<code>NSArray</code>的<code>Category</code>，就可以改寫成以下這種較為方便別人使用的方式，因為別人不一定知道Left與Right，也不需要懂實作細節情況下：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>- (NSArray *)quickSort:(NSArray *)data {
+</span><span class='line'>    return [self quickSortInPlaceWithData:[data mutableCopy]  leftIndex:0 rightIndex:data.count-1];
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
 </div>
   
   
@@ -278,9 +296,9 @@
 
 <p>在懂了Merge Sort概念之後，如果對於如何把想法轉換成程式碼沒什麼感覺，可以看一段<a href="https://www.youtube.com/watch?v=es2T6KY45cA&amp;index=3&amp;list=PL2aHrV9pFqNRS2b2XX2BvgQIPKh72xREP">影片</a>，這段影片大概就是程式碼影片化後實際運作的樣子。</p>
 
-<p>Merge Sort有分Recursive跟For loop兩種，但看完影片直覺就是用Recursive比較好做。這是因為你看Merge Sort其實是把一個大問題分成小問題，小問題再分成更小的問題，直到把問題切割成最小單元，再返回來把前一次的結果餵給上一層，之後一層一層的解回去。這是很典型的遞迴場景。</p>
-
-<p>上面的問題解決思路在演算法裡面叫做Divide and Conquer，蠻傳神的解釋，把問題分解後在各個擊破。</p>
+<p>Merge Sort有分Recursive跟For loop兩種，但看完影片直覺就是用Recursive比較好做。這是因為你看Merge Sort其實是把一個大問題分成小問題，小問題再分成更小的問題，直到把問題切割成最小單元，再返回來把前一次的結果餵給上一層，之後一層一層的解回去。這是很典型的遞迴場景。
+NSMutableArray
+上面的問題解決思路在演算法裡面叫做Divide and Conquer，蠻傳神的解釋，把問題分解後在各個擊破。</p>
 
 <h2>Objective-c Implement</h2>
 
