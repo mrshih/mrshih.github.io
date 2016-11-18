@@ -4,7 +4,7 @@
   <title><![CDATA[MR SHIH]]></title>
   <link href="http://sah.tw/atom.xml" rel="self"/>
   <link href="http://sah.tw/"/>
-  <updated>2016-11-10T00:25:33+08:00</updated>
+  <updated>2016-11-18T17:01:42+08:00</updated>
   <id>http://sah.tw/</id>
   <author>
     <name><![CDATA[施安宏]]></name>
@@ -12,6 +12,67 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Binary search與Obj-C]]></title>
+    <link href="http://sah.tw/blog/2016/11/18/binary-searchyu-obj-c/"/>
+    <updated>2016-11-18T16:41:19+08:00</updated>
+    <id>http://sah.tw/blog/2016/11/18/binary-searchyu-obj-c</id>
+    <content type="html"><![CDATA[<h2>Binary search概念</h2>
+
+<p>Binary search概念其實很簡單，recursive版本實際寫起來很像<a href="http://sah.tw/blog/2016/11/09/objc-quick-sort/">Quick sort in-place</a>版本前面divide的味道。每次的遞迴都把排序後的數列對切一半然後去其中一半來繼續處理，詳細可以看<a href="https://zh.wikipedia.org/wiki/%E4%BA%8C%E5%88%86%E6%90%9C%E7%B4%A2%E7%AE%97%E6%B3%95">Wiki</a>的介紹。</p>
+
+<h2>Binary search概念轉換成Code</h2>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>/**
+</span><span class='line'> * @return Retrun index of number in array.
+</span><span class='line'> * If number not found in array return false.
+</span><span class='line'> */
+</span><span class='line'>- (NSNumber *)binarySearchIndexInArray:(NSArray &lt;NSNumber *&gt;*)array forNumber:(NSNumber *)number leftRange:(NSInteger)left rightRange:(NSInteger)right {
+</span><span class='line'>    
+</span><span class='line'>    if (left &gt; right) {
+</span><span class='line'>        return [NSNumber numberWithBool:false];
+</span><span class='line'>    }
+</span><span class='line'>    
+</span><span class='line'>    NSInteger midIndex = (left+right)/2;
+</span><span class='line'>    NSNumber* mid = array[midIndex];
+</span><span class='line'>    
+</span><span class='line'>    if (number.floatValue &gt; mid.floatValue) { // 對切的右邊
+</span><span class='line'>        return [self binarySearchIndexInArray:array forNumber:number leftRange:midIndex+1 rightRange:right];
+</span><span class='line'>    }else if (number.floatValue &lt; mid.floatValue){ // 對切的左邊
+</span><span class='line'>        return [self binarySearchIndexInArray:array forNumber:number leftRange:left rightRange:midIndex-1];
+</span><span class='line'>    }else{ // equal，找到了
+</span><span class='line'>        return  [NSNumber numberWithInteger:midIndex];
+</span><span class='line'>    }
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>關於搜尋</h2>
+
+<p>這個搜尋法的前提是你的數列要幾經排序好了。這個前置條件才讓我發現我之前一直以為搜尋是有什麼神奇的方法，能夠在一個大數列裡面找到target的位置，現在接觸演算法就理解現實運作方法是先排序之後再用方法搜尋的。</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[QuickSort與Obj-C]]></title>
