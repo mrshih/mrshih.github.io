@@ -4,7 +4,7 @@
   <title><![CDATA[MR SHIH]]></title>
   <link href="http://sah.tw/atom.xml" rel="self"/>
   <link href="http://sah.tw/"/>
-  <updated>2016-11-18T17:01:42+08:00</updated>
+  <updated>2016-11-20T01:51:54+08:00</updated>
   <id>http://sah.tw/</id>
   <author>
     <name><![CDATA[施安宏]]></name>
@@ -12,6 +12,31 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[從Youtube使用Tabbar討論逐漸被棄用的側邊欄]]></title>
+    <link href="http://sah.tw/blog/2016/11/20/youtubeshi-yong-tabbar/"/>
+    <updated>2016-11-20T11:56:52+08:00</updated>
+    <id>http://sah.tw/blog/2016/11/20/youtubeshi-yong-tabbar</id>
+    <content type="html"><![CDATA[<h2>側邊欄逐漸被棄用的原因</h2>
+
+<p>iOS版YouTube把Tabbar加上去了。前陣子流行的各種想取代Tabbar導航方式的方案又改回來了。</p>
+
+<p><img src="http://mrshih.github.io/images/2016-11-20-youtubeshi-yong-tabbar.jpeg" alt="image" /></p>
+
+<p>Tabbar是固定出現在下面的（除了播放影片時）。而看了些文章，最主要還是用戶真的太太太太懶，多一丁點步驟都懶得按，所以就乾脆固定在那裡。這樣努力做的各種功能的使用率比較高！</p>
+
+<p>不過Uber是個有趣的例子！Uber用漢堡是因為其他功能的點擊率高不是goal，所以可以用Hamburger menu。</p>
+
+<h2>如何決定要用哪種設計？A/B Testing</h2>
+
+<p>Youtube跟Spotify決定從原本側邊欄轉移到Tabbar都是因為測過A/B Testing，用結果數字來說話。</p>
+
+<p>這其實也牽扯到如何設計A/B Testing？一個APP最關鍵的不是他介面看起來炫不炫，而是最終用戶能不能持續地用你想讓他用的功能。記住If<strong><strong> ,Then</strong></strong> ,Because___.</p>
+
+<p>如果你的變因錯誤的把畫面好看當成目標，那你甚至會覺得隨著畫面滾動把Tabbar隱藏起來是好的。那這樣一來或許畫面變好看，可是面積變多，但你APP整體功能使用率是下降的。</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Binary search與Obj-C]]></title>
