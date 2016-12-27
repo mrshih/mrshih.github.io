@@ -9,7 +9,7 @@
   <meta name="author" content="施安宏">
 
   
-  <meta name="description" content="所有關於ViewController切換的行為基本稱做為Model，Navegation特有的Push等等也是Model的分支。 在iOS7裡面把制定切換ViewController的行為拆分成許多Class，目的是為了要降低耦合，讓Code重用度提高， &hellip;">
+  <meta name="description" content="主題：要刪除某張照片? - Beat Practice 應該要由Model做發起去通知資料已變化。比如刪除照片： 1. 由某個UIButton觸發Model的Delete方法 2. Model做處理，處理完之後去通知相關連的ViewModel去更新（Notification） 3. &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -77,6 +77,53 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2016/02/05/ios-camera-design-pattern-review/">iOS Camera Design Pattern 回顧</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-02-05T15:00:00+08:00" pubdate data-updated="true">Feb 5<sup>th</sup>, 2016</time>
+        
+           | <a href="/blog/2016/02/05/ios-camera-design-pattern-review/#disqus_thread"
+             data-disqus-identifier="http://sah.tw/blog/2016/02/05/ios-camera-design-pattern-review/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h2>主題：要刪除某張照片?</h2>
+
+<pre><code>- Beat Practice 應該要由Model做發起去通知資料已變化。比如刪除照片： 
+    1.  由某個UIButton觸發Model的Delete方法
+    2.  Model做處理，處理完之後去通知相關連的ViewModel去更新（Notification）
+    3.  ViewModel收到needUpdate通知，去Fetch並整理資料，最後通知View Reload
+</code></pre>
+
+<p>未完&hellip;</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1291,64 +1338,9 @@ UIModalPresentationStyle
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2014/07/09/what-different-between-programmer-and-manufacturing/">你確定寫程式跟製造業不一樣？</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2014-07-09T02:36:59+08:00" pubdate data-updated="true">Jul 9<sup>th</sup>, 2014</time>
-        
-           | <a href="/blog/2014/07/09/what-different-between-programmer-and-manufacturing/#disqus_thread"
-             data-disqus-identifier="http://sah.tw/blog/2014/07/09/what-different-between-programmer-and-manufacturing/">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><img src="http://mrshih.github.io/images/what-different-between-programmer-and-manufacturing1.jpg" alt="image" /></p>
-
-<p>台灣從過去製造業的思維延伸很喜歡做/教一件事，就是coustom development顧客開發的相反叫product development產品開發。而事實上創意特別是網路，一定是顧客開發，因為沒有什麼產品好做阿！我們又沒有什麼很厲害的晶片，很神奇的電路什麼的，引用一位網路業的前輩大師在他的FB上寫的這段話：</p>
-
-<blockquote><p><em>台灣培養出一堆癡狂幫別人做產品的公司和人才，做完交差就認為大功告成。國外公司則是拼命想把做產品的時間縮短，花大量時間資源在做行銷、銷售和品牌。格局和野心，決定了這世界誰主宰，誰血汗。Alex，EZTABLE Co-Founder＆CEO</em></p></blockquote>
-
-<p>舉個例子來講，所有人都在講說鴻海多厲害多厲害，鴻海很偉大，搶下訂單幫apple做出一隻隻iphone很了不起，tpk 宸鴻做出面板超屌，然後每天台灣人就在自爽台灣之光台灣之光。我問大家，請問做一隻iphone比較難還是今年要賣出8000萬隻iphpne比較難？</p>
-
-<p>當然是賣阿！</p>
-
-<p>所以這個毛利的分配是很正常很合理的，當台灣一天到晚哀號iphone毛利台灣只分到0.6%~0.7%，因為做的價值就只有到那裡阿，你看賈伯斯還要上台講個發表會演說，用那麼漂亮的廣告，還有那麼棒的文宣，還要在世界各地蓋都可以當旅遊景點的apple store！那些東西很難耶！那比待在實驗室，不用接觸消費者，每天關在實驗室做事情寫code這個最簡單。</p>
-
-<p>只是這個東西為什麼最簡單，因為他只是要勞力去換回來，勞力還有肝！可是我跟你講肝跟勞力就是最廉價的東西，誰沒有勞力誰沒有肝誰不會砸？腦袋和知識產業才是最難的。要消費者買你的帳要想多久？你的壓力多大？所以為什麼你看到台灣的工程師常常都是乾乾癟癟瘦瘦的，因為肝不好麻，為什麼那些apple的工程師（還有你常在國外網站電影上看到的工程師）每次來鴻海富士康巡場的時候每個都吃的肥肥的，可是都禿頭？</p>
-
-<p>因為他們一天到晚都在想完蛋了賈伯斯要叫我賣8000萬隻，我去哪裡找來8000萬個人來買iphpne？所以這些壓力都在腦袋裡，他必須要靜下來想，這不只是做什麼事情的問題，他還要想怎樣來賣。可是台灣的我不用想，我就是做，別人交代什麼就做什麼就對了，趕快想，雖然是想可是就是想著怎麼把它做出來，做出來也不是你的東西，後續產出的價值也跟你無關，所以是做白工，又是浪費勞力，跟製造業差在哪裡？</p>
-
-<p>在這個知識產業凌駕一切的時代上，所以我希望跟我一樣是7、8年級的，真的希望台灣脫離製造業思維，把自己從別人影子後面推出來。舉個例子，奇美面板一開廠就賠20億，那沒有意義阿，台灣有很多這種很奇怪的事，這代表說台灣真的需要走出來，我們需要把東西直接推出來面對消費者，而不是躲在後面。講難聽一點，就是要做鴻海，好歹談判的時候要在iphone後面要印個produced by foxconn吧，好歹做一點品牌吧！懂我意思嘛？</p>
-
-<p>不要一天到晚幫人家做事，然後交差就覺得很了不起這樣，沒有用。幫別人代工未來都賺不到什麼錢。</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
+    
+      <a class="prev" href="/posts/3">&larr; Older</a>
     
     <a href="/blog/archives">Blog Archives</a>
     
@@ -1361,6 +1353,10 @@ UIModalPresentationStyle
     <section>
   <h1>Recent Posts</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2016/12/27/airpods/">AirPods個人使用評測：『能夠預知下一步的真智慧型耳機』</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2016/11/20/youtubeshi-yong-tabbar/">從Youtube使用Tabbar討論逐漸被棄用的側邊欄</a>
@@ -1396,10 +1392,6 @@ UIModalPresentationStyle
     
       <li class="post">
         <a href="/blog/2016/04/27/why-to-be-a-cs-engineer/">為什麼要當個CS工程師</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2016/02/05/ios-camera-design-pattern-review/">iOS Camera Design Pattern 回顧</a>
       </li>
     
   </ul>
