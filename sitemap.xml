@@ -3,6 +3,12 @@
   
   
   <url>
+    <loc>http://sah.tw/blog/2017/01/01/ai/</loc>
+    <lastmod>2017-01-01T18:56:12+08:00</lastmod>
+    <priority>0.8</priority>
+  </url>
+  
+  <url>
     <loc>http://sah.tw/blog/2016/12/27/airpods/</loc>
     <lastmod>2016-12-27T17:19:23+08:00</lastmod>
     <priority>0.8</priority>
@@ -131,28 +137,28 @@
   
   <url>
     <loc>http://sah.tw/blog/archives/</loc>
-    <lastmod>2016-12-27T19:04:43+08:00</lastmod>
+    <lastmod>2017-01-03T01:40:08+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   
   <url>
     <loc>http://sah.tw/archives/</loc>
-    <lastmod>2016-12-27T19:04:43+08:00</lastmod>
+    <lastmod>2017-01-03T01:40:08+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   
   <url>
     <loc>http://sah.tw/blog/</loc>
-    <lastmod>2016-12-27T19:04:43+08:00</lastmod>
+    <lastmod>2017-01-03T01:40:08+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   
   <url>
     <loc>http://sah.tw/</loc>
-    <lastmod>2016-12-27T19:04:43+08:00</lastmod>
+    <lastmod>2017-01-03T01:40:08+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
