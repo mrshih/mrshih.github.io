@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "超級智能時代-人工智慧趨勢的不可擋與社會動盪"
+title: "超級智能時代-人工智慧的不可擋與半世紀影響"
 date: 2017-01-01 18:56:12 +0800
 comments: true
 categories: 
