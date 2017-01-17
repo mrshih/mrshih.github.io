@@ -9,7 +9,7 @@
   <meta name="author" content="施安宏">
 
   
-  <meta name="description" content="在電腦科學的領域裡面打滾這幾年發現一件事，當你能夠橫向操縱越多領域的工具，組合出來東西往往價值會很高。比如要組合一個APP開門鎖系統橫向需要連結PHP, Pthon, Objective-C, HTML約四種語言，其實每一種都不用太深入，單組合出來的系統往往一般人一時半刻不了解， &hellip;">
+  <meta name="description" content="為何寫這篇 前幾篇有寫到如何製作SlideMenu，大概講了cocoa framework在客製化UIView動畫的世界觀，這裡則寫一個手把手的詳細步驟，這樣搭配比較有感覺，不然Apple把class之間解構的這麼徹底，實在是東一個西一個的，一時之間不好下手。 手把手開始 0. &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -77,6 +77,388 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2016/05/01/detail-custom-ios-model-animation/">有關製作iOS客製化Animation的詳細過程</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-05-01T03:05:19+08:00" pubdate data-updated="true">May 1<sup>st</sup>, 2016</time>
+        
+           | <a href="/blog/2016/05/01/detail-custom-ios-model-animation/#disqus_thread"
+             data-disqus-identifier="http://sah.tw/blog/2016/05/01/detail-custom-ios-model-animation/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h2>為何寫這篇</h2>
+
+<p>前幾篇有寫到如何<a href="http://mrshih.github.io/blog/2016/01/08/first-presentation-flow/">製作SlideMenu</a>，大概講了cocoa framework在客製化<code>UIView</code>動畫的世界觀，這裡則寫一個手把手的詳細步驟，這樣搭配比較有感覺，不然Apple把class之間解構的這麼徹底，實在是東一個西一個的，一時之間不好下手。</p>
+
+<h2>手把手開始</h2>
+
+<p>0.建segue並且設立id<br/>
+1.segue kind選custom<br/>
+2.建立subclass(UIStoryboardSegue)<br/>
+3.override perform function</p>
+
+<blockquote><p>how to override perform function</p></blockquote>
+
+<p>1.取得self.sourceViewController<br/>
+2.取得self.destinationViewController<br/>
+3.set destVC 的setModalPresentationStyle = UIModalPresentationCustom//顯示面積客製化<br/>
+4.誰提供客製化的資訊呢？在這裡！ 建立一格subclass UIViewControllerTransitioningDelegate class(裡面怎麼實作請看段A)<br/>
+5.set第四步的步驟為destVC的TransitioningDelegate<br/>
+6.srcVC presentViewController destVC，動畫animated設置為YES</p>
+
+<h2>段A</h2>
+
+<blockquote><p>hwo to create a subclass <code>UIViewControllerTransitioningDelegate</code> 的object。</p>
+
+<p>這裡就是實作perform跟dismiss的時候動畫要怎麼走的地方，還有系統要<code>UIPresentationController</code>的地方，簡單來說就是系統從這邊獲取怎麼客製化顯示範圍與顯示動畫的資訊。</p></blockquote>
+
+<ul>
+<li>1.提供override下面方法</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>- (UIPresentationController *)presentationControllerForPresentedViewController:(UIViewController *)presented presentingViewController:(UIViewController *)presenting sourceViewController:(UIViewController *)source{
+</span><span class='line'>
+</span><span class='line'>1.透過if ([presented isKindOfClass:AlbumMenuViewController class])來分別要提供對應PresentationController{
+</span><span class='line'>2.建立一個subclass UIPresentationController的class。(怎麼建請看段B)
+</span><span class='line'>3.透過UIPresentationController的父方法initWithPresentedViewController...(略)去instance這個PresentationController object。
+</span><span class='line'>}
+</span><span class='line'>
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>2.override下面方法來提供prestedVC顯示時的動畫物件animator(從哪裡移動到哪裡，所以其實最後prestedVC的x,y是由這裡提供的動畫物件決定)</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>- (id&lt;UIViewControllerAnimatedTransitioning&gt; _Nullable)animationControllerForPresentedController:(UIViewController * _Nonnull)presented presentingController:(UIViewController * _Nonnull)presenting sourceController:(UIViewController * _Nonnull)source{
+</span><span class='line'>
+</span><span class='line'>1.用if去知道你等等要回傳那個對應的animator
+</span><span class='line'>if([presented isKindOfClass:[HelperTableViewController class]]){
+</span><span class='line'>2.SlideMenuAnimator *animator = [[SlideMenuAnimator alloc]init];//製作一個實作UIViewControllerAnimatedTransitioning協議的animator class，怎麼做看段C
+</span><span class='line'>3.[animator setPresenting:YES];// 我設計的animator可以同時包含出場與離場的動畫，這樣就不用寫兩個animator了，所以裡面有個參數可以選擇要回傳哪種動畫，這裡是出場就設定YES。
+</span><span class='line'>}
+</span><span class='line'>
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>3.override下面方法來提供prestedVC dismiss時的動畫，功能如上，決定哪裡到哪裡</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>- (id&lt;UIViewControllerAnimatedTransitioning&gt; _Nullable)animationControllerForDismissedController:(UIViewController * _Nonnull)dismissed{
+</span><span class='line'>1.用if去知道你等等要回傳那個對應的animator
+</span><span class='line'>if([presented isKindOfClass:[HelperTableViewController class]]){
+</span><span class='line'>2.SlideMenuAnimator *animator = [[SlideMenuAnimator alloc]init];//前面解釋過
+</span><span class='line'>3.[animator setPresenting:NO];//前面解釋過
+</span><span class='line'>}
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>段B</h2>
+
+<ul>
+<li>1.override &ndash; <code>frameOfPresentedViewInContainerView</code>這個方法來指定prestenVC要顯示的&#8221;大小&#8221;，注意不包含位置(x,y)喔</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>(CGRect)frameOfPresentedViewInContainerView
+</span><span class='line'>{
+</span><span class='line'>CGRect presentedViewFrame = CGRectZero;//我們要回傳的數值
+</span><span class='line'>CGRect containerBounds = [[self containerView] bounds];//得到prestingVC的bounds
+</span><span class='line'>// 到這裡你已經可以運加減乘除算出你要顯示的VC的大小，下面示範的是要根據ipad跟iphone做特別處理的做法
+</span><span class='line'>
+</span><span class='line'>if (self.traitCollection.userInterfaceIdiom == UIUserInterfaceIdiomPhone) {
+</span><span class='line'>presentedViewFrame.size = CGSizeMake(floorf(containerBounds.size.width * 0.75),
+</span><span class='line'>containerBounds.size.height);
+</span><span class='line'>}else if(self.traitCollection.userInterfaceIdiom == UIUserInterfaceIdiomPad){
+</span><span class='line'>presentedViewFrame.size = CGSizeMake(floorf(300),
+</span><span class='line'>containerBounds.size.height);
+</span><span class='line'>}
+</span><span class='line'>
+</span><span class='line'>return presentedViewFrame;//最後當然是回傳
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<blockquote><p>補充：<br/>
+除了override上面的方法去指定顯示大小外，你還可以override一些方法動態的去新增或拿掉view，比如切換VC時，prested如果沒有蓋滿presting，則剩下的地方可以放上一層黑色半透明的view來做區別。<br/>
+下面是範例:</p></blockquote>
+
+<ul>
+<li>2.新增<code>property @property (nonatomic) UIView *dimmingView;</code></li>
+<li>3.複寫下面兩個方法，一個是當要切換時做什麼，另一個是當要隱藏時做什麼。搭配起來就可以動態新增刪除陰影view</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>- (void)presentationTransitionWillBegin {
+</span><span class='line'>
+</span><span class='line'>self.dimmingView = [[UIView alloc]init];
+</span><span class='line'>[self.dimmingView setFrame:self.containerView.frame];
+</span><span class='line'>[self.dimmingView setBackgroundColor:[UIColor blackColor]];
+</span><span class='line'>[self.dimmingView setAlpha:0.3f];
+</span><span class='line'>
+</span><span class='line'>// Add a custom dimming view behind the presented view controller's view
+</span><span class='line'>[[self containerView] addSubview:self.dimmingView];
+</span><span class='line'>[self.dimmingView addSubview:[[self presentedViewController] view]];
+</span><span class='line'>
+</span><span class='line'>#pragma clang diagnostic push
+</span><span class='line'>#pragma clang diagnostic ignored "-Wundeclared-selector"
+</span><span class='line'>UITapGestureRecognizer *dimmingViewSingleTap =
+</span><span class='line'>[[UITapGestureRecognizer alloc] initWithTarget:self.presentingViewController
+</span><span class='line'>action:@selector(handleDimmingViewSingleTap)];
+</span><span class='line'>#pragma clang diagnostic pop
+</span><span class='line'>[self.dimmingView addGestureRecognizer:dimmingViewSingleTap];
+</span><span class='line'>
+</span><span class='line'>// Fade in the dimming view during the transition.
+</span><span class='line'>[self.dimmingView setAlpha:0.0];
+</span><span class='line'>// Use the transition coordinator to set up the animations.
+</span><span class='line'>[[[self presentingViewController] transitionCoordinator] animateAlongsideTransition:^(id&lt;UIViewControllerTransitionCoordinatorContext&gt;  _Nonnull context) {
+</span><span class='line'>[self.dimmingView setAlpha:0.55];
+</span><span class='line'>} completion:^(id&lt;UIViewControllerTransitionCoordinatorContext&gt;  _Nonnull context) {
+</span><span class='line'>
+</span><span class='line'>}];
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<blockquote><p>在dismiss做一些額外coustom的事情，在這裡用讓dimmingView淡出來當例子</p></blockquote>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>- (void)dismissalTransitionWillBegin {
+</span><span class='line'>[[[self presentingViewController] transitionCoordinator] animateAlongsideTransition:^(id&lt;UIViewControllerTransitionCoordinatorContext&gt;  _Nonnull context) {
+</span><span class='line'>[self.dimmingView setAlpha:0.0];
+</span><span class='line'>} completion:^(id&lt;UIViewControllerTransitionCoordinatorContext&gt;  _Nonnull context) {
+</span><span class='line'>
+</span><span class='line'>}];
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>段C</h2>
+
+<ul>
+<li>4.override下面方法，可以拿來改變一些基於class size變化的改變。</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>- (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id&lt;UIViewControllerTransitionCoordinator&gt;)coordinator 
+</span><span class='line'>
+</span><span class='line'>//製作實作UIViewControllerAnimatedTransitioning協議的animator，系統會去這裡要VC的初始位置跟Final位置，系統再去補齊動畫。
+</span><span class='line'>//1 override 下面function來提供動畫內容（兩個位置）
+</span><span class='line'>- (void)animateTransition:(id&lt;UIViewControllerContextTransitioning&gt; _Nonnull)transitionContext {
+</span><span class='line'>1.// 主畫布
+</span><span class='line'>UIView *containerView = [transitionContext containerView];
+</span><span class='line'>
+</span><span class='line'>2.// 對進場來說（toVC是prestedVC），拿到後可以再去拿VC的view
+</span><span class='line'>UIViewController *toVC   = [transitionContext
+</span><span class='line'>viewControllerForKey:UITransitionContextToViewControllerKey];
+</span><span class='line'>
+</span><span class='line'>3.// 對進場來說（fromVC是prestingVC)，拿到後可以再去拿VC的view
+</span><span class='line'>UIViewController *fromVC = [transitionContext
+</span><span class='line'>viewControllerForKey:UITransitionContextFromViewControllerKey];
+</span><span class='line'>
+</span><span class='line'>4.//取得view，後面動畫主要就是都在操作這裡
+</span><span class='line'>UIView *toView = [transitionContext viewForKey:UITransitionContextToViewKey];
+</span><span class='line'>UIView *fromView = [transitionContext viewForKey:UITransitionContextFromViewKey];
+</span><span class='line'>
+</span><span class='line'>5.//取得兩個VC的最終大小，大小是在frameOfPresentedViewInContainerView決定。
+</span><span class='line'>// Set up some variables for the animation.
+</span><span class='line'>CGRect containerFrame = containerView.frame;
+</span><span class='line'>CGRect toViewStartFrame = [transitionContext initialFrameForViewController:toVC];
+</span><span class='line'>CGRect fromViewStartFrame = [transitionContext initialFrameForViewController:fromVC];
+</span><span class='line'>CGRect toViewFinalFrame = [transitionContext finalFrameForViewController:toVC];
+</span><span class='line'>CGRect fromViewFinalFrame = [transitionContext finalFrameForViewController:fromVC];
+</span><span class='line'>
+</span><span class='line'>6.// 開始作畫 Add toVC's view to containerView
+</span><span class='line'>// 把toView加進來
+</span><span class='line'>[containerView addSubview:toView];
+</span><span class='line'>
+</span><span class='line'>7.//決定一開始的frame
+</span><span class='line'>if (self.presenting) {
+</span><span class='line'>//這邊直接用預設的
+</span><span class='line'>CGSize size = toViewFinalFrame.size;
+</span><span class='line'>[toView setFrame:CGRectMake(0, containerFrame.size.height+toViewFinalFrame.size.height, size.width, size.height)];//size一樣。x=0,y=總高度+toView的高
+</span><span class='line'>}
+</span><span class='line'>
+</span><span class='line'>//決定最終的frame
+</span><span class='line'>if (self.presenting) {
+</span><span class='line'>[UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
+</span><span class='line'>//大小一樣。位置就只要到x=0, y=總高度-toView高度
+</span><span class='line'>CGSize size = toViewFinalFrame.size;
+</span><span class='line'>CGPoint point = CGPointMake(0, containerFrame.size.height-toViewFinalFrame.size.height);
+</span><span class='line'>[toView setFrame:CGRectMake(point.x, point.y, size.width, size.height)];
+</span><span class='line'>}completion:^(BOOL finished) {
+</span><span class='line'>// 3.Cleaning up and completing the transition.
+</span><span class='line'>[transitionContext completeTransition:YES];
+</span><span class='line'>}];
+</span><span class='line'>}
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>5.override來提供動畫時間</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>- (NSTimeInterval)transitionDuration:(id&lt;UIViewControllerContextTransitioning&gt; _Nullable)transitionContext {
+</span><span class='line'>return 0.2f;
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1305,61 +1687,6 @@ UIModalPresentationStyle
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2014/07/23/pivot/">小技術大問題—救小狗Pivot到省百億</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2014-07-23T20:22:58+08:00" pubdate data-updated="true">Jul 23<sup>rd</sup>, 2014</time>
-        
-           | <a href="/blog/2014/07/23/pivot/#disqus_thread"
-             data-disqus-identifier="http://sah.tw/blog/2014/07/23/pivot/">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><img src="http://mrshih.github.io/images/pivot1.jpg" alt="image" /></p>
-
-<p>一種解決問題的作法套用在不同的情境上，產生的效益就可能相差數萬倍。我們專題一開始看到路邊有受傷流浪狗兒，如果冷眼旁觀實在是不忍心，但第一個你不知道該找誰幫忙？找市立收容所？電話是幾號？更別提還要花許多時間在通報，通報了也可能只是安樂死。第二個可以找當地流浪動物協會，但一般人根本不會知道有哪些協會可以幫忙！現代人很忙碌，很費工夫的事實在是心有餘而力不足。所以我們想利用智慧型手機結合當地相關協會標準化通報流程，就能快速定外拍照上傳通報一次搞定，解決通報麻煩的問題，也就是流浪動物通報系統。</p>
-
-<p>但找到問題並想方法解決每個人都會，但重點是找到的問題到底有多重要？好比上面的例子，一個人一年當中有多少機會碰到一隻需要救援的流浪狗，又有多少可能你真的會想要通報而身邊剛好帶著智慧型手機又知道我們的程式？這樣算下來我們當初設想的使用情境幾乎根本不會發生，所以其實是沒有解決到任何人的問題，效益等於零。</p>
-
-<p>但當時我們整個通報系統都做出來了，但是卻因為效益等於零被迫重新想一個。但最寶貴的資源就是時間，豈容你從頭開始再試。以前實驗室老師有一句話說得好：「跌倒了先別急著站起來，看看地上有沒有東西可以撿起來」。所以只能在既有的系統上想一個新的應用，試著去提高帶給別人的效益—Pivot。於是流浪貓狗通報系統就搖身一變改成雲端路平專案通報系統。</p>
-
-<p>Pivot的重點就是試著在不打掉根基的情況下，試著轉個情境找出新效益，而提高效益從問題面著手。路不有多嚴重？每年造成上百人傷亡、相關國賠高達上億，而每年花好幾百億就是改善不了，納稅人的錢都不知道被A到哪裡去，於上把通報系統應用在這麼大的問題上，帶來的效益就很可觀，畢竟這關乎到全用路人的權益。問題夠大也是後來全國專題競賽此系統能脫穎而出的關鍵。從來技術方法就不是重點，重點要有狼心、問題問大、問的讓人心有戚戚焉。</p>
-
-<p>我們從舊有的方式去發現問題。傳統上人工報案曠日廢時又麻煩，就利用時下流行的智慧型手機標準化整個通報流程來解決，接著將資料上傳到我們在東京AWS的雲端伺服器做資料彙整。而常有部會首長要靠報紙才知道某個地方發生哪些問題，就彙整資料利用商業智慧的概念結合Google Map在上面標註圖案，首長透過視覺化圖表一眼就能了解全貌。而最重要的莫過於多年來花大錢路始終修不好，我們就把歷年資料全部公開，結合Facebook讓大家針對你不爽的事件來按讚分享，根據這些民怨做成熱門旁行榜，讓記者、議員來挖他們感興趣的資料，現在很多網友都利用這樣的模式來串連社群的力量幫自己來發聲，共同來監督公共工程。</p>
-
-<p>路不平問題關乎到上百條人命、上千億的金錢，就算解決方法很爛效益只有5％，算一算還是5條人命50億，怎樣都打死一票小問題的最大效益。</p>
-
-<p>一切都要回到『你到底要解決什麼問題？』</p>
-
-<p>你要解決的問題很大很嚴重，別人根本就不會關心你用了什麼技術。悠游卡解決了你我不必每天辛苦找零錢的問題，但有人關心它使用的技術叫NFC嗎？除非你今天根本沒有解決別人真正關心的問題，才會需要拿絢麗的技術來拼命說來班門弄斧。所以一開始就選擇大問題去想方法，不要系統開發出來才發現沒人在意。</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/3">&larr; Older</a>
@@ -1375,6 +1702,10 @@ UIModalPresentationStyle
     <section>
   <h1>Recent Posts</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2017/01/17/why-love-mma-gym/">為何愛成吉思汗健身房</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2017/01/01/ai/">超級智能時代-人工智慧的不可擋與半世紀影響</a>
@@ -1410,10 +1741,6 @@ UIModalPresentationStyle
     
       <li class="post">
         <a href="/blog/2016/05/03/ios-fastlane/">運用iOS Fastlane自動化部署TestFlight</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2016/05/01/detail-custom-ios-model-animation/">有關製作iOS客製化Animation的詳細過程</a>
       </li>
     
   </ul>
