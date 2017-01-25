@@ -1,0 +1,82 @@
+---
+layout: post
+title: "iOS Search應用初探"
+date: 2017-01-25 18:18:02 +0800
+comments: true
+categories: 
+---
+iOS 8之後搭配`UISearchController`，只要把屬性`searchResultsUpdater`指定物件在`updateSearchResultsForSearchController`這個方法中實作filtering and updating就可以了。非常方便。
+
+### Fetch data
+從Server抓取資料，這裡我們用`originalDatas`這個instace variable存JSON陣列資料。注意Retain Cycle即可。
+
+```
+	// Feth data from server and reload.
+    __weak MemberListTableViewController *weakSelf = self;
+    [TNUserManager logInAccountInBackgroundWithAccount:@"andy" password:@"12344321" success:^{
+        [TNUserManager getContactbookWithSuccess:^(NSDictionary *responseObject) {
+            weakSelf.originalDatas = (NSArray*)responseObject;
+            [weakSelf.tableView reloadData];
+        } failure:^(ResultInfo *resultInfo) {
+            NSLog(@"get data fail");
+        }];
+    } failure:^(ResultInfo *resultInfo) {
+        NSLog(@"login fail");
+    }];
+```
+
+### Filtering and Updating
+
+利用`NSPredicate`制定陣列搜尋規則，這裡是指定陣列內有包涵`searchString`。
+
+```
+	/** Filtering **/
+	// 搜尋規則
+    NSPredicate *preicate = [NSPredicate predicateWithFormat:@"SELF CONTAINS[c] %@",searchString];
+    
+	// 搜尋
+    NSMutableArray *reslut = [[NSMutableArray alloc]init];
+    // loop each people
+    for (NSDictionary *each in self.originalDatas) {
+        Boolean isMatch = false;
+        
+        // list all value of people
+        NSMutableArray *values = [NSMutableArray arrayWithArray:[each allValues]];
+        
+        // 把property的屬性為array的提取出來
+        for (id proerty in values) {
+            if ([proerty isKindOfClass:[NSArray class]]) {
+                if ([proerty filteredArrayUsingPredicate:preicate].count > 0) {
+                    // show
+                    isMatch = true;
+                }
+            }
+        }
+        
+        // 找剩下property的屬性為string的
+        if (isMatch == false) {
+            if ([values filteredArrayUsingPredicate:preicate].count > 0) {
+                // show
+                isMatch = true;
+            }
+        }
+        
+        if (isMatch) {
+            [reslut addObject:each];
+        }
+    }
+    
+    /** Updateing **/
+    self.showDatas = [reslut mutableCopy];
+    [self.tableView reloadData];
+```
+
+### 後續優化idea
+
+這個APP是做公司內部通訊錄的，而如果陣列裡面包涵員工ID，或到職日期等數字資料，就可以在`NSPredicate`字串比對完之後，搭配[Sorting](http://sah.tw/blog/2016/11/09/objc-quick-sort/)來對數字做排序。
+
+潮一點的搞個數據應用，可以把搜尋歷史用SQLite記錄下來，把`搜尋後而且點擊`這個元素加入到Sorting的條件中。這樣一來使用者越長搜尋的排序就會越前面囉。
+
+最後也可以做成[讓iOS系統搜尋Bar也可以找到APP內的資訊](https://developer.apple.com/library/content/documentation/General/Conceptual/AppSearch/index.html#//apple_ref/doc/uid/TP40016308)，不過這樣就要把通訊錄存在本地端DB，而不能只是In-Memory JSON處理了。
+
+
