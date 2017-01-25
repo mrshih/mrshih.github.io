@@ -4,7 +4,7 @@
   <title><![CDATA[MR SHIH]]></title>
   <link href="http://sah.tw/atom.xml" rel="self"/>
   <link href="http://sah.tw/"/>
-  <updated>2017-01-19T14:50:11+08:00</updated>
+  <updated>2017-01-26T02:01:21+08:00</updated>
   <id>http://sah.tw/</id>
   <author>
     <name><![CDATA[施安宏]]></name>
@@ -12,6 +12,137 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[iOS Search應用初探]]></title>
+    <link href="http://sah.tw/blog/2017/01/25/search/"/>
+    <updated>2017-01-25T18:18:02+08:00</updated>
+    <id>http://sah.tw/blog/2017/01/25/search</id>
+    <content type="html"><![CDATA[<p>iOS 8之後搭配<code>UISearchController</code>，只要把屬性<code>searchResultsUpdater</code>指定物件在<code>updateSearchResultsForSearchController</code>這個方法中實作filtering and updating就可以了。非常方便。</p>
+
+<h3>Fetch data</h3>
+
+<p>從Server抓取資料，這裡我們用<code>originalDatas</code>這個instace variable存JSON陣列資料。注意Retain Cycle即可。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>// Feth data from server and reload.
+</span><span class='line'>__weak MemberListTableViewController *weakSelf = self;
+</span><span class='line'>[TNUserManager logInAccountInBackgroundWithAccount:@"andy" password:@"12344321" success:^{
+</span><span class='line'>    [TNUserManager getContactbookWithSuccess:^(NSDictionary *responseObject) {
+</span><span class='line'>        weakSelf.originalDatas = (NSArray*)responseObject;
+</span><span class='line'>        [weakSelf.tableView reloadData];
+</span><span class='line'>    } failure:^(ResultInfo *resultInfo) {
+</span><span class='line'>        NSLog(@"get data fail");
+</span><span class='line'>    }];
+</span><span class='line'>} failure:^(ResultInfo *resultInfo) {
+</span><span class='line'>    NSLog(@"login fail");
+</span><span class='line'>}];</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Filtering and Updating</h3>
+
+<p>利用<code>NSPredicate</code>制定陣列搜尋規則，這裡是指定陣列內有包涵<code>searchString</code>。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>/** Filtering **/
+</span><span class='line'>// 搜尋規則
+</span><span class='line'>NSPredicate *preicate = [NSPredicate predicateWithFormat:@"SELF CONTAINS[c] %@",searchString];
+</span><span class='line'>
+</span><span class='line'>// 搜尋
+</span><span class='line'>NSMutableArray *reslut = [[NSMutableArray alloc]init];
+</span><span class='line'>// loop each people
+</span><span class='line'>for (NSDictionary *each in self.originalDatas) {
+</span><span class='line'>    Boolean isMatch = false;
+</span><span class='line'>    
+</span><span class='line'>    // list all value of people
+</span><span class='line'>    NSMutableArray *values = [NSMutableArray arrayWithArray:[each allValues]];
+</span><span class='line'>    
+</span><span class='line'>    // 把property的屬性為array的提取出來
+</span><span class='line'>    for (id proerty in values) {
+</span><span class='line'>        if ([proerty isKindOfClass:[NSArray class]]) {
+</span><span class='line'>            if ([proerty filteredArrayUsingPredicate:preicate].count &gt; 0) {
+</span><span class='line'>                // show
+</span><span class='line'>                isMatch = true;
+</span><span class='line'>            }
+</span><span class='line'>        }
+</span><span class='line'>    }
+</span><span class='line'>    
+</span><span class='line'>    // 找剩下property的屬性為string的
+</span><span class='line'>    if (isMatch == false) {
+</span><span class='line'>        if ([values filteredArrayUsingPredicate:preicate].count &gt; 0) {
+</span><span class='line'>            // show
+</span><span class='line'>            isMatch = true;
+</span><span class='line'>        }
+</span><span class='line'>    }
+</span><span class='line'>    
+</span><span class='line'>    if (isMatch) {
+</span><span class='line'>        [reslut addObject:each];
+</span><span class='line'>    }
+</span><span class='line'>}
+</span><span class='line'>
+</span><span class='line'>/** Updateing **/
+</span><span class='line'>self.showDatas = [reslut mutableCopy];
+</span><span class='line'>[self.tableView reloadData];</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>後續優化idea</h3>
+
+<p>這個APP是做公司內部通訊錄的，而如果陣列裡面包涵員工ID，或到職日期等數字資料，就可以在<code>NSPredicate</code>字串比對完之後，搭配<a href="http://sah.tw/blog/2016/11/09/objc-quick-sort/">Sorting</a>來對數字做排序。</p>
+
+<p>潮一點的搞個數據應用，可以把搜尋歷史用SQLite記錄下來，把<code>搜尋後而且點擊</code>這個元素加入到Sorting的條件中。這樣一來使用者越長搜尋的排序就會越前面囉。</p>
+
+<p>最後也可以做成<a href="https://developer.apple.com/library/content/documentation/General/Conceptual/AppSearch/index.html#//apple_ref/doc/uid/TP40016308">讓iOS系統搜尋Bar也可以找到APP內的資訊</a>，不過這樣就要把通訊錄存在本地端DB，而不能只是In-Memory JSON處理了。</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[為何愛成吉思汗健身房]]></title>
@@ -2242,52 +2373,6 @@ UIModalPresentationStyle
 <p>整個流程是由ViewModel要發現source資料變化了，更新自己的property，接著通知Contorller根據ViewModel做更新UI的動作。這個通知學問就大了，可以有很多種方法。</p>
 
 <p>很明顯我們可以只要修改ViewModel就指定Controller做刷新的動作，更大範圍來說這可以用KVO來時做追蹤View Model裡面的直有無變化來做畫面的更新。但這裡推薦最近發現的框架ReactiveCocoa，這個框架也是用來做數值追蹤，但本質上與之前的KVO, NSNotificationCenter都是截然不同的東西，我們在後續文章再來討論。</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[為何又開始寫文章?]]></title>
-    <link href="http://sah.tw/blog/2015/05/20/why-start-write-article/"/>
-    <updated>2015-05-20T18:23:22+08:00</updated>
-    <id>http://sah.tw/blog/2015/05/20/why-start-write-article</id>
-    <content type="html"><![CDATA[<p><img src="http://mrshih.github.io/images/sandglass-of-text.jpg" alt="image" /></p>
-
-<h2>比履歷強多了</h2>
-
-<p>寫blog真的是很好推薦自己的方式。當你寫履歷的時候如果可以丟出一個個人網站，你馬上就像坐上噴射機一樣把其他人甩在後面！網站上面有你長期對產業或專業的獨特見解，這比光看履歷表更加分。</p>
-
-<p>因為履歷表有可能是騙人的，大量美化的！但一個長期經營的部落格不僅可以快速令人信服你是某方面的專家，是別人想要的人才，也可以證明你是一個對此有熱情而且具備耐信與毅力等特質的人才，因為長期寫這些真得不容易。以上都是討喜而且履歷表線不出的特質。</p>
-
-<h2>少數可以累積的資產</h2>
-
-<p>好比複利，寫文章是你少數可以累積的資產，你花在這上面的時間是不會白費，久了你就可以端出別人拿不出來的好東西，你專業有深度的blog，這是你的絕對壓倒性優勢，因為這需要時間累積。</p>
-
-<p>我很尊敬的謝老師說過：</p>
-
-<blockquote><p>時間是你最好的朋友。</p></blockquote>
-
-<h2>不打烊廣告與找到志同道合好朋友</h2>
-
-<p>當你寫出有用的文章時，那些文章就像24小時不停放送的廣告，一直在幫你對外結緣。</p>
-
-<p>在這個小眾化的時代，每個人都透過google去找尋自己有興趣的事物，而你的文章將可以媒合你與那些跟你志同道合的朋友。</p>
-
-<h2>強迫自己吸收新知</h2>
-
-<p>還有一點，如果一段時間你寫不出文章，那要麻你真的很忙，就像創業中的CEO，不然就是你的腦袋長時間沒有填入有用的知識，沒有新的觀念去衝擊既有知識。這能強迫你去取得有用的知識。</p>
-
-<h2>訓練口語表達</h2>
-
-<p>最後寫文章的好處在於整理思考。寫文章之所以比動嘴巴累是在於文章需要結構，需要起承轉合，需要腦袋思考反芻之後想辦法讓人易於理解。長期寫下來對於文字表達絕對具有巨大幫助。</p>
-
-<p>對於口頭表達是否有幫助？絕對有！很多人會苦惱也時候就是表達不出自己的意思給別人，自己講得很高興但別人完全不理解。這中間差別就是你有沒有思考你到底要講什麼。任何觀點如果你寫成文章，你就可以通篇先在腦內整理一遍，你會知道重點，而當你之後用口頭跟別人講述，你自然而然可以吸引到聽者，並清楚表達你想講的事情。</p>
-
-<h2>對於Developer</h2>
-
-<p>如果你剛好是寫程式的，我想你真的要去好好去架一個blog並寫文章。你可以累積100篇你的解bug心得，技術新知，工作雜談。用LAMP或者Github網頁託管讓你免成本就有穩定page。有了平時準備，找工作時必然無往不利。有這麼豐富的參考資料證明你走過哪些路，還需要面試嗎？這跟現在很流行coder履歷要附上github帳號是一樣的道理，就是要看你平時做過哪些事情不是嗎？</p>
-
-<p>我目前實在找不出經營一個自己的blog，持續寫有用的文章有任何壞處。
-如果有，可以留言分享你的看法。</p>
 ]]></content>
   </entry>
   

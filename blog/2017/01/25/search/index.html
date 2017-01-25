@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>MergeSort與Obj-C外加Category與OOP - MR SHIH</title>
+  <title>iOS Search應用初探 - MR SHIH</title>
   <meta name="author" content="施安宏">
 
   
-  <meta name="description" content="Merge Sort概念 跟我一樣原本不知道Merge Sort是什麼碗糕的可以去這個影片，這裡有可愛北一女的實際示範，中文的呦。如果英文好那我也是更推薦去看英文的，那資源又更多了。 Merge Sort概念轉換成Code 在懂了Merge Sort概念之後， &hellip;">
+  <meta name="description" content="iOS 8之後搭配UISearchController，只要把屬性searchResultsUpdater指定物件在updateSearchResultsForSearchController這個方法中實作filtering and updating就可以了。非常方便。 Fetch data &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://sah.tw/blog/2016/11/07/objc-merge-sort-category-oop">
+  <link rel="canonical" href="http://sah.tw/blog/2017/01/25/search">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="MR SHIH" type="application/atom+xml">
@@ -81,7 +81,7 @@
   
   <header>
     
-      <h1 class="entry-title">MergeSort與Obj-C外加Category與OOP</h1>
+      <h1 class="entry-title">iOS Search應用初探</h1>
     
     
       <p class="meta">
@@ -97,7 +97,7 @@
   
 
 
-<time datetime="2016-11-07T00:18:53+08:00" pubdate data-updated="true">Nov 7<sup>th</sup>, 2016</time>
+<time datetime="2017-01-25T18:18:02+08:00" pubdate data-updated="true">Jan 25<sup>th</sup>, 2017</time>
         
            | <a href="#disqus_thread"
              data-disqus-identifier="http://sah.tw">Comments</a>
@@ -107,25 +107,41 @@
   </header>
 
 
-<div class="entry-content"><h2>Merge Sort概念</h2>
+<div class="entry-content"><p>iOS 8之後搭配<code>UISearchController</code>，只要把屬性<code>searchResultsUpdater</code>指定物件在<code>updateSearchResultsForSearchController</code>這個方法中實作filtering and updating就可以了。非常方便。</p>
 
-<p>跟我一樣原本不知道Merge Sort是什麼碗糕的可以去這個<a href="https://www.youtube.com/watch?v=mzjjRPdH9Jw">影片</a>，這裡有可愛北一女的實際示範，中文的呦。如果英文好那我也是更推薦去看英文的，那資源又更多了。</p>
+<h3>Fetch data</h3>
 
-<h2>Merge Sort概念轉換成Code</h2>
+<p>從Server抓取資料，這裡我們用<code>originalDatas</code>這個instace variable存JSON陣列資料。注意Retain Cycle即可。</p>
 
-<p>在懂了Merge Sort概念之後，如果對於如何把想法轉換成程式碼沒什麼感覺，可以看一段<a href="https://www.youtube.com/watch?v=es2T6KY45cA&amp;index=3&amp;list=PL2aHrV9pFqNRS2b2XX2BvgQIPKh72xREP">影片</a>，這段影片大概就是程式碼影片化後實際運作的樣子。</p>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>// Feth data from server and reload.
+</span><span class='line'>__weak MemberListTableViewController *weakSelf = self;
+</span><span class='line'>[TNUserManager logInAccountInBackgroundWithAccount:@"andy" password:@"12344321" success:^{
+</span><span class='line'>    [TNUserManager getContactbookWithSuccess:^(NSDictionary *responseObject) {
+</span><span class='line'>        weakSelf.originalDatas = (NSArray*)responseObject;
+</span><span class='line'>        [weakSelf.tableView reloadData];
+</span><span class='line'>    } failure:^(ResultInfo *resultInfo) {
+</span><span class='line'>        NSLog(@"get data fail");
+</span><span class='line'>    }];
+</span><span class='line'>} failure:^(ResultInfo *resultInfo) {
+</span><span class='line'>    NSLog(@"login fail");
+</span><span class='line'>}];</span></code></pre></td></tr></table></div></figure>
 
-<p>Merge Sort有分Recursive跟For loop兩種，但看完影片直覺就是用Recursive比較好做。這是因為你看Merge Sort其實是把一個大問題分成小問題，小問題再分成更小的問題，直到把問題切割成最小單元，再返回來把前一次的結果餵給上一層，之後一層一層的解回去。這是很典型的遞迴場景。
-NSMutableArray
-上面的問題解決思路在演算法裡面叫做Divide and Conquer，蠻傳神的解釋，把問題分解後在各個擊破。</p>
 
-<h2>Objective-c Implement</h2>
+<h3>Filtering and Updating</h3>
 
-<ul>
-<li>Input為一個NSArray，裡面包含N個NSNumber，NSNumber可以為Int或Flot。</li>
-<li>Output為一個把Input Array裡面的N個NSNumber由小排序到大的NSArray。</li>
-</ul>
-
+<p>利用<code>NSPredicate</code>制定陣列搜尋規則，這裡是指定陣列內有包涵<code>searchString</code>。</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -166,70 +182,54 @@ NSMutableArray
 <span class='line-number'>37</span>
 <span class='line-number'>38</span>
 <span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-<span class='line-number'>45</span>
-<span class='line-number'>46</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>- (NSArray *)mergeSortWithData:(NSArray *)data {
+</pre></td><td class='code'><pre><code class=''><span class='line'>/** Filtering **/
+</span><span class='line'>// 搜尋規則
+</span><span class='line'>NSPredicate *preicate = [NSPredicate predicateWithFormat:@"SELF CONTAINS[c] %@",searchString];
+</span><span class='line'>
+</span><span class='line'>// 搜尋
+</span><span class='line'>NSMutableArray *reslut = [[NSMutableArray alloc]init];
+</span><span class='line'>// loop each people
+</span><span class='line'>for (NSDictionary *each in self.originalDatas) {
+</span><span class='line'>    Boolean isMatch = false;
 </span><span class='line'>    
-</span><span class='line'>    if (data.count == 1) {
-</span><span class='line'>        // div done here
-</span><span class='line'>        // 這裡已經把問題分解成最小單位了，所以就告一段落
-</span><span class='line'>        return data;
-</span><span class='line'>    }
+</span><span class='line'>    // list all value of people
+</span><span class='line'>    NSMutableArray *values = [NSMutableArray arrayWithArray:[each allValues]];
 </span><span class='line'>    
-</span><span class='line'>    NSInteger divLength = data.count/2;
-</span><span class='line'>    NSArray *left = [data subarrayWithRange:NSMakeRange(0, divLength)];
-</span><span class='line'>    NSArray *rigth = [data subarrayWithRange:NSMakeRange(divLength, data.count-divLength)];
-</span><span class='line'>    
-</span><span class='line'>    NSArray&lt;NSNumber*&gt; *mergeArrayA = [self mergeSortWithData:left];
-</span><span class='line'>    NSArray&lt;NSNumber*&gt; *mergeArrayB = [self mergeSortWithData:rigth];
-</span><span class='line'>    
-</span><span class='line'>    NSInteger headOfMergeArrayA = 0;
-</span><span class='line'>    NSInteger headOfMergeArrayB = 0;
-</span><span class='line'>    
-</span><span class='line'>    NSMutableArray *resultArray = [[NSMutableArray alloc]initWithCapacity:mergeArrayA.count+mergeArrayB.count];
-</span><span class='line'>    
-</span><span class='line'>    Boolean control = true;
-</span><span class='line'>    while (control) {
-</span><span class='line'>        
-</span><span class='line'>        if (headOfMergeArrayA == mergeArrayA.count) {
-</span><span class='line'>            //MergeArrayA沒東西了
-</span><span class='line'>            //把剩餘的MergeArrayB直接append到resultArray後面
-</span><span class='line'>            [resultArray addObjectsFromArray:[mergeArrayB subarrayWithRange:NSMakeRange(headOfMergeArrayB, mergeArrayB.count-headOfMergeArrayB)]];
-</span><span class='line'>            control = false;
-</span><span class='line'>            break;
-</span><span class='line'>        }else if(headOfMergeArrayB == mergeArrayB.count){
-</span><span class='line'>            [resultArray addObjectsFromArray:[mergeArrayA subarrayWithRange:NSMakeRange(headOfMergeArrayA, mergeArrayA.count-headOfMergeArrayA)]];
-</span><span class='line'>            control = false;
-</span><span class='line'>            break;
-</span><span class='line'>        }
-</span><span class='line'>        
-</span><span class='line'>        if ([mergeArrayA[headOfMergeArrayA]floatValue] &gt; [mergeArrayB[headOfMergeArrayB]floatValue]) {
-</span><span class='line'>            [resultArray addObject:mergeArrayB[headOfMergeArrayB]];
-</span><span class='line'>            headOfMergeArrayB = headOfMergeArrayB + 1;
-</span><span class='line'>        }else{
-</span><span class='line'>            [resultArray addObject:mergeArrayA[headOfMergeArrayA]];
-</span><span class='line'>            headOfMergeArrayA = headOfMergeArrayA + 1;
+</span><span class='line'>    // 把property的屬性為array的提取出來
+</span><span class='line'>    for (id proerty in values) {
+</span><span class='line'>        if ([proerty isKindOfClass:[NSArray class]]) {
+</span><span class='line'>            if ([proerty filteredArrayUsingPredicate:preicate].count &gt; 0) {
+</span><span class='line'>                // show
+</span><span class='line'>                isMatch = true;
+</span><span class='line'>            }
 </span><span class='line'>        }
 </span><span class='line'>    }
 </span><span class='line'>    
-</span><span class='line'>    return resultArray;
-</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+</span><span class='line'>    // 找剩下property的屬性為string的
+</span><span class='line'>    if (isMatch == false) {
+</span><span class='line'>        if ([values filteredArrayUsingPredicate:preicate].count &gt; 0) {
+</span><span class='line'>            // show
+</span><span class='line'>            isMatch = true;
+</span><span class='line'>        }
+</span><span class='line'>    }
+</span><span class='line'>    
+</span><span class='line'>    if (isMatch) {
+</span><span class='line'>        [reslut addObject:each];
+</span><span class='line'>    }
+</span><span class='line'>}
+</span><span class='line'>
+</span><span class='line'>/** Updateing **/
+</span><span class='line'>self.showDatas = [reslut mutableCopy];
+</span><span class='line'>[self.tableView reloadData];</span></code></pre></td></tr></table></div></figure>
 
 
-<h2>Do more &ndash; Free Function與Method</h2>
+<h3>後續優化idea</h3>
 
-<p>可以看到<code>mergeSortWithData</code>是一個Function，但我自己Obj-C軟體實作的Coding style上如果一個Function的Input有指定要是某個Class，比如這裡就是指定<code>NSArray</code>，那這時候採用Method較好。</p>
+<p>這個APP是做公司內部通訊錄的，而如果陣列裡面包涵員工ID，或到職日期等數字資料，就可以在<code>NSPredicate</code>字串比對完之後，搭配<a href="http://sah.tw/blog/2016/11/09/objc-quick-sort/">Sorting</a>來對數字做排序。</p>
 
-<p>但通常很少情況會不指定Input的Clsas，所以實務上會盡量少用Free Function，附帶的好處是可以減少一堆Function散落在專案裡面，也可以盡量DRY（Don&rsquo;t repeat yourself）。</p>
+<p>潮一點的搞個數據應用，可以把搜尋歷史用SQLite記錄下來，把<code>搜尋後而且點擊</code>這個元素加入到Sorting的條件中。這樣一來使用者越長搜尋的排序就會越前面囉。</p>
 
-<p>當然，不要過度強調DRY，因為這關係到切架構與抽象化整體的規劃能力，抽象的不好那是會用弄越糟的，但至少在這個簡單的Case裡Merge Sort做成Method絕對是make sense的。</p>
-
-<p>這裡可以練習把Merge Sort用<code>Category</code>的方式做成<code>NSArray</code>的Method。基礎OOP，把一些地方改成<code>Self</code>就可以了。</p>
+<p>最後也可以做成<a href="https://developer.apple.com/library/content/documentation/General/Conceptual/AppSearch/index.html#//apple_ref/doc/uid/TP40016308">讓iOS系統搜尋Bar也可以找到APP內的資訊</a>，不過這樣就要把通訊錄存在本地端DB，而不能只是In-Memory JSON處理了。</p>
 </div>
 
 
@@ -252,7 +252,7 @@ NSMutableArray
   
 
 
-<time datetime="2016-11-07T00:18:53+08:00" pubdate data-updated="true">Nov 7<sup>th</sup>, 2016</time>
+<time datetime="2017-01-25T18:18:02+08:00" pubdate data-updated="true">Jan 25<sup>th</sup>, 2017</time>
       
 
 
@@ -260,7 +260,7 @@ NSMutableArray
     
       <div class="sharing">
   
-  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://sah.tw/blog/2016/11/07/objc-merge-sort-category-oop/" data-via="DaanSHIH" data-counturl="http://sah.tw/blog/2016/11/07/objc-merge-sort-category-oop/" >Tweet</a>
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://sah.tw/blog/2017/01/25/search/" data-via="DaanSHIH" data-counturl="http://sah.tw/blog/2017/01/25/search/" >Tweet</a>
   
   
   <div class="g-plusone" data-size="medium"></div>
@@ -273,10 +273,8 @@ NSMutableArray
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/blog/2016/08/24/iap-payment-model-design/" title="Previous Post: In-App-Purchase交易模組設計">&laquo; In-App-Purchase交易模組設計</a>
+        <a class="basic-alignment left" href="/blog/2017/01/17/why-love-mma-gym/" title="Previous Post: 為何愛成吉思汗健身房">&laquo; 為何愛成吉思汗健身房</a>
       
-      
-        <a class="basic-alignment right" href="/blog/2016/11/09/objc-quick-sort/" title="Next Post: QuickSort與Obj-C">QuickSort與Obj-C &raquo;</a>
       
     </p>
   </footer>
@@ -312,8 +310,8 @@ NSMutableArray
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://sah.tw/blog/2016/11/07/objc-merge-sort-category-oop/';
-        var disqus_url = 'http://sah.tw/blog/2016/11/07/objc-merge-sort-category-oop/';
+        var disqus_identifier = 'http://sah.tw/blog/2017/01/25/search/';
+        var disqus_url = 'http://sah.tw/blog/2017/01/25/search/';
         var disqus_script = 'embed.js';
       
     (function () {
