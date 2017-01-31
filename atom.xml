@@ -4,7 +4,7 @@
   <title><![CDATA[MR SHIH]]></title>
   <link href="http://sah.tw/atom.xml" rel="self"/>
   <link href="http://sah.tw/"/>
-  <updated>2017-01-26T12:11:14+08:00</updated>
+  <updated>2017-02-01T01:01:46+08:00</updated>
   <id>http://sah.tw/</id>
   <author>
     <name><![CDATA[施安宏]]></name>
@@ -12,6 +12,35 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[期末報告如何才能拿最高分？讓教授幫你做報告]]></title>
+    <link href="http://sah.tw/blog/2017/02/01/independent-study-get-good-grades/"/>
+    <updated>2017-02-01T00:50:13+08:00</updated>
+    <id>http://sah.tw/blog/2017/02/01/independent-study-get-good-grades</id>
+    <content type="html"><![CDATA[<p><img src="http://mrshih.github.io/images/2017-02-01-independent-study-get-good-grades.jpg" alt="image" /></p>
+
+<p>大家都有這樣的經驗：辛辛苦苦絞盡腦汁，經歷無數夜晚暴肝打word，期末滿懷信心交出報告後，換來的是又一次的失望。</p>
+
+<h2>不斷更新</h2>
+
+<p>如果說一般考試把時間與心力砸下去結果就會好，皇天不負苦心人，那期末報告真的是一件令人頭大的事，時間心力砸下去只怕教授也不領情。那有沒有什麼方法保證最高分？有！很簡單，就是你不能只是把報告做完，你要做到一半就把報告拿給教授看，甚至要拿最高分你有必要寫個一兩頁就傳給教授看。</p>
+
+<p>一開始比如說：「我想要從這家公司他們幾個創辦人的背景開始介紹，你覺得好不好？」，教授可能會說：「我覺得不好，因為xxx是個無趣的人，你不需要介紹他&hellip;.」，這時候你就改麻，然後再問他：「這樣好不好，那你覺得我哪裡可以再加強？」，教授如果說：「那我覺得你可以再focus在這上面&hellip;」，那就再回去加加加，增加篇幅之後再問&hellip;這樣一路反覆執行，到學期末，保證你絕對最高分！但是為什麼呢？</p>
+
+<h2>不是教你諂媚</h2>
+
+<p>注意！答案不是&#8221;最常跟教授接觸&#8221;，那比較像是諂媚，這裡絕對不是教你諂媚。這背後有一個原因為什麼會最高分，因為你這個報告等於是老師幫你做的阿，如果你真的定期跟老師update一些東西，這東西根本就是老師幫你做的阿。那讓老師幫你做這件事情是什麼意思？</p>
+
+<p>剛舉的例子，老師就是那個消費者，你一直去推這個產品、一直去測試消費者，一直修改，直到消費者買單為止麻！你可以一直測試一直測試、一直修改一直修改，不要悶著頭一直寫、不要怕被指出錯誤，這個過程，不管是做報告也好，或是做事情也好，是你最該擁有得一種態度。</p>
+
+<p>不要把所有的事情都堵住到一擲上面，如果你在最後一個禮拜要發表的時候才讓教授知道你的全部想法，看到你的全部東西，你仔細想想，這不是一件在賭樂透的事情嗎？你之前完全都沒有回應耶！也都完全不知道教授對你報告的想法，猜牌算牌都不想做，就在最後一刻突然翻出你的底牌，你根本就是在賭樂透。</p>
+
+<p>跟老師溝通，肯定你的作品，這中間要懂得清楚跟老師表達你做了什麼、清楚理解並記下老師希望你做些什麼、配合老師時間、反覆溝通記錄、鍥而不捨的修改、抓到老師口味、持續的update&hellip;這些都很難耶，這也都是你真正的價值。這些東西比你待在家裡、不用接觸老師、照著自己意思做，那樣最簡單！</p>
+
+<p>不只&#8221;完成報告&#8221;，運用這個來回溝通的方法&#8221;完成老師滿意的報告&#8221;。而出了社會以後，面對上頭交辦下來的事情，別人埋頭苦幹而你會善加利用這點完成事情，成果老闆上司都滿意，你跟別人自然就立分高下。</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[iOS Search應用初探]]></title>
@@ -2223,156 +2252,6 @@ UIModalPresentationStyle
 <p>在國外有paypal跟stripe，兩者都是service provider，差異很明顯stripe對開發者太友善，就像一家超有sence的網路公司，提供你一個簡單易用的SDK，甚至你在conslol就可以call post去call一個example交易範例，等於就告訴你我post也行，超簡單易用。未來設計Oauth等供其他人用的服務，提供很好用api與方便開發者的make sence SDK是未來幾年我有興趣想嘗試的大方向，scope夠大，牽連的技術應用範圍夠廣如scable，資安，data分析與挖掘（uber例子），這些都是符合我興趣的project的特性。</p>
 
 <p>支付（含網銀與下單），通訊與社群，遊戲，新聞，串線下服務是我認為未來app五本柱，不脫離這些範疇，下次我會挑選我認為在這領域我欣賞的app與他得對手來寫出我的看法。</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[iOS Model-View-ViewModel 實作]]></title>
-    <link href="http://sah.tw/blog/2015/07/02/ios-model-view-viewmodel-shi-zuo/"/>
-    <updated>2015-07-02T16:30:05+08:00</updated>
-    <id>http://sah.tw/blog/2015/07/02/ios-model-view-viewmodel-shi-zuo</id>
-    <content type="html"><![CDATA[<h2>MVC架構遭遇困境</h2>
-
-<p>在iOS SDK的設計下開發者都會走向apple安排好的MVC架構，即便你不知道MVC但SDK早幫你切好view controller，很自然你也會走向類似架構。但隨著開發時間越長有幾個MVC框架問題越來越不可忽視。本文會先討論遇到的問題，並介紹最近我實作過覺得很棒的另一套架構MVVM，可以輕易讓程式碼彼此耦合降低，進而增加可維護性與易開發性，可以說是替代MVC更先進好用的架構。</p>
-
-<p>在Model裡可能是Core data，也可能是sqlite，其中往往是提供幾個API回傳需要的資料，並且用NSArray等等簡單的包裝好後就丟給Controller去轉換成View需要的格式，在這裡Model的某些工作被丟給了Controller。</p>
-
-<p>在View層就是xib，或是storyboard。用上面兩種起碼在排版上跟Controller分離，但如果沒有用Auto-layout就會需要設定freme，在這裡View該自己做的事丟給了Controller。還有一個狀況是透過IBAction直接在Controller裡面操作Model取得狀態，比如登入按鈕！這會讓登入邏輯落在許多不同地方，本身也增加了View跟登入功能細節的耦合，很明顯View不該接觸Model。</p>
-
-<p>最大的問題是Controller負擔的工作實在太多，要從Model去轉換資料來更新管理的View，還要協調View與Model之間的互動，還有Loading狀態，各式各樣的Delegate與NSNotification，這引出了MVC的大問題</p>
-
-<ul>
-<li>過於肥大的Controller，動輒數千行</li>
-<li>無論如何View跟Controller會互相交錯，最後牽一髮動全身</li>
-</ul>
-
-
-<h2>用MVVM架構優化</h2>
-
-<p>MVVM是從MVC基礎上改進而來，所以可以很容易從現有MVC去做改進，以下範例就可以看到整合進MVVM是非常容易的
-把所有資料轉換的邏輯寫到View Model</p>
-
-<p>下面是一個範例的Calendar model還有配合得View Controller</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>@interface Calendar : NSObject
-</span><span class='line'>
-</span><span class='line'>- (instancetype)initwithToday:(NSDate *)today;
-</span><span class='line'>
-</span><span class='line'>@property (nonatomic, readonly) NSString *month;
-</span><span class='line'>@property (nonatomic, readonly) NSString *day;
-</span><span class='line'>@property (nonatomic, readonly) NSString *year;
-</span><span class='line'>@property (nonatomic, readonly) NSDate    *today;
-</span><span class='line'>
-</span><span class='line'>@end</span></code></pre></td></tr></table></div></figure>
-
-
-<p>假設我們單純把Calendar裡面的日期印在cell上</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-</span><span class='line'>
-</span><span class='line'>  NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-</span><span class='line'>    dateFormatter.dateFormat = @"yyyyMMdd";
-</span><span class='line'>  NSString *date = [[dateFormatter stringFromDate:today] capitalizedString];
-</span><span class='line'>  
-</span><span class='line'>  [cell.todayLabel date];
-</span><span class='line'>  
-</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
-
-
-<p>以上是標準MVC普遍寫法。現在看看MVVM如何改進。以下使一個CalendarViewModel</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>@interface CalendarViewModel : NSObject
-</span><span class='line'>
-</span><span class='line'>- (instancetype)initWithCalendar:(Calendar *)calendar;
-</span><span class='line'>@property (nonatomic, readonly) Calendar *calendar;
-</span><span class='line'>@property (nonatomic, readonly) NSString *today;
-</span><span class='line'>
-</span><span class='line'>@end</span></code></pre></td></tr></table></div></figure>
-
-
-<p>CalendarViewModel.m我們大致這樣實作</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>@implementation PersonViewModel
-</span><span class='line'>
-</span><span class='line'>- (instancetype)initWithCalendar:(Calendar *)calendar
-</span><span class='line'>{
-</span><span class='line'>  self = [super init];
-</span><span class='line'>    if (!self) return nil;
-</span><span class='line'>    
-</span><span class='line'>    _calendar = calendar;
-</span><span class='line'>    
-</span><span class='line'>  NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-</span><span class='line'>    dateFormatter.dateFormat = @"yyyyMMdd";
-</span><span class='line'>  NSString *date = [[dateFormatter stringFromDate:today] capitalizedString];
-</span><span class='line'>  
-</span><span class='line'>  return self;
-</span><span class='line'>}
-</span><span class='line'>
-</span><span class='line'>@end</span></code></pre></td></tr></table></div></figure>
-
-
-<p>現在我們已經把資料轉換邏輯放到View Model裡面了，這時候我們table view controller就會非常輕量</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-</span><span class='line'>
-</span><span class='line'>  [cell.todayLabel     setText:viewModel.today];
-</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
-
-
-<p>這樣一來並沒有改動太多架構，但透過我們把資料產生邏輯從Controller抽出來，獨立放到View Model，很明顯看到程式可維護性提高許多，整個架構耦合性降低更易於測試除錯修改。</p>
-
-<h2>And then &hellip;資料的更新與VIEW的刷新</h2>
-
-<p>整個流程是由ViewModel要發現source資料變化了，更新自己的property，接著通知Contorller根據ViewModel做更新UI的動作。這個通知學問就大了，可以有很多種方法。</p>
-
-<p>很明顯我們可以只要修改ViewModel就指定Controller做刷新的動作，更大範圍來說這可以用KVO來時做追蹤View Model裡面的直有無變化來做畫面的更新。但這裡推薦最近發現的框架ReactiveCocoa，這個框架也是用來做數值追蹤，但本質上與之前的KVO, NSNotificationCenter都是截然不同的東西，我們在後續文章再來討論。</p>
 ]]></content>
   </entry>
   
