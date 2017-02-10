@@ -4,7 +4,7 @@
   <title><![CDATA[MR SHIH]]></title>
   <link href="http://sah.tw/atom.xml" rel="self"/>
   <link href="http://sah.tw/"/>
-  <updated>2017-02-10T11:50:22+08:00</updated>
+  <updated>2017-02-10T14:11:18+08:00</updated>
   <id>http://sah.tw/</id>
   <author>
     <name><![CDATA[施安宏]]></name>
@@ -145,13 +145,13 @@
 
 <h3>部署在另一台機器上</h3>
 
-<p>把control-center這個Image匯出</p>
+<p>把control-center這個Image用<code>save</code>指令匯出成.tar檔</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 </pre></td><td class='code'><pre><code class=''><span class='line'>docker save control-center &gt; ./control-center.tar</span></code></pre></td></tr></table></div></figure>
 
 
-<p>接著在另一台的Dokcer instance上指定要tar檔案的位置並Import</p>
+<p>接著在另一台的Dokcer instance上用<code>load</code>指令，指定tar檔路徑匯入成image</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 </pre></td><td class='code'><pre><code class=''><span class='line'>docker load &lt; /path/to/control-center.tar</span></code></pre></td></tr></table></div></figure>
