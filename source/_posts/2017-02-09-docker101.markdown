@@ -23,7 +23,7 @@ Docker對比傳統VM優點在於所消耗資源很小，啟動速度很快，並
 
 這篇文章主要就以上面幾點依序從包含如何製作Image，產生Container，利用Container啟動我們要的Service，最後如何匯出部署到另一台機器等一系列記錄下來。
 
-### Dockerfile與Base Image
+## Dockerfile與Base Image
 要導入的Service是由三個部分組成
 
 1. Node.js專案，用Express作為Route Framework，為業務邏輯層負責API JSON的輸出
@@ -56,7 +56,7 @@ docker tag [Image ID] npm-ready
 ```
 
 現在打`docker images`應該可以看到類似`npm-ready               latest              43c671f848fd        22 hours ago        405.6 MB`的資訊
-### 以Base Image為底，加入express專案檔
+## 以Base Image為底，加入express專案檔
 這時候我們已經有一個Image檔，包含npm與必須的tools，只缺express專案檔。所以接下來就以`FROM`指令，指定以`npm-ready:latest`為底，用`COPY`指令把我們需要的專案檔複製到Image中。
 
 這裡要注意第三行的`PSControlCenter/`這個目錄必須與Dockerfile同一個目錄（`docker build`後面會加上的path我們是打./），不然會出現找不到此目錄。
@@ -98,7 +98,7 @@ docker exec -it [container-id] bash
 ```
 exec指令就是對該運行中的container下達指令。
 
-### Run Service
+## Run Service
 到這裡我們已經利用Image去產生Container，並起啟動了Container，指定了Port的映射關係，最後取得該Container的Shell。這時環境已經建立起來，我們就可利用PM2把service給run起來：
 
 ```
@@ -106,7 +106,7 @@ pm2 start ./bin/www --watch --name "www"
 ```
 然後在Host瀏覽器訪問127.0.0.9453，就可以看到服務啟動了。
 
-### 部署在另一台機器上
+## 部署在另一台機器上
 把control-center這個Image用`save`指令匯出成.tar檔
 
 ```
