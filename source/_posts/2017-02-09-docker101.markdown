@@ -107,12 +107,12 @@ pm2 start ./bin/www --watch --name "www"
 然後在Host瀏覽器訪問127.0.0.9453，就可以看到服務啟動了。
 
 ### 部署在另一台機器上
-把control-center這個Image匯出
+把control-center這個Image用`save`指令匯出成.tar檔
 
 ```
 docker save control-center > ./control-center.tar
 ```
-接著在另一台的Dokcer instance上指定要tar檔案的位置並Import
+接著在另一台的Dokcer instance上用`load`指令，指定tar檔路徑匯入成image
 
 ```
 docker load < /path/to/control-center.tar
