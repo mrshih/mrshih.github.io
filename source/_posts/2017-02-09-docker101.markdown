@@ -99,7 +99,7 @@ docker exec -it [container-id] bash
 exec指令就是對該運行中的container下達指令。
 
 ### Run Service
-到這裡我們已經利用Image去產生Container，並起啟動了Container，指定了Port的映射關係，最後取得該Container的Shell。這時環境已經建立起來，我們就可利用PM2把service給run起來。
+到這裡我們已經利用Image去產生Container，並起啟動了Container，指定了Port的映射關係，最後取得該Container的Shell。這時環境已經建立起來，我們就可利用PM2把service給run起來：
 
 ```
 pm2 start ./bin/www --watch --name "www"
