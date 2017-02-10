@@ -111,7 +111,7 @@
 
 <p>但要獲得這些好處，軟體在最初開始設計架構的階段就要拆分服務，一開始設計不好之後就算有docker工具那也只是把所有服務丟到同一個Container上，沒有辦法發揮docker切割服務的優勢。</p>
 
-<p>所以想成為架構師，當然不能不了解這個工具。而從程師開發上來看，能夠把CI Keep in mind，有新Commit Push到develop branch，CI Server就自動執行下面步驟</p>
+<p>所以想成為架構師，當然不能不了解這個工具。而從程式開發上來看，能夠把CI Keep in mind，有新Commit Push到develop branch，CI Server就自動執行下面步驟</p>
 
 <ol>
 <li>打包新的Image</li>
@@ -121,11 +121,11 @@
 </ol>
 
 
-<p>也能夠協助開發者確保最終程式碼在Production環境是可以正常運行，有問題可以立即發現與處理。</p>
+<p>能夠協助開發者確保最終程式碼在Production環境是可以正常運行，有問題可以立即發現與處理。</p>
 
 <p>Docker對比傳統VM優點在於所消耗資源很小，啟動速度很快，並且兼具傳統VM打包成Image擋可以Anywhere都快速建立起一樣的Service等優點。</p>
 
-<p>這篇文章主要就以上面幾點依序從包含如何從零製作Image，並產生Container，最後利用Container啟動我們要的Service一系列記錄下來。</p>
+<p>這篇文章主要就以上面幾點依序從包含如何製作Image，產生Container，利用Container啟動我們要的Service，最後如何匯出部署到另一台機器等一系列記錄下來。</p>
 
 <h3>Dockerfile與Base Image</h3>
 
@@ -138,9 +138,9 @@
 </ol>
 
 
-<p>之前做法是把Node.js專案都放在同台Server，但因爲HA需要，所以也有一台Hot standby的實體機並排在HAProxy下。這裡帶來第一個問題是當要重新build環境時靠Install Guide手動安裝很不科學與方便，解決方法便是用<code>Dockerfile</code>，把Install Guide所需的環境與步驟打包成一個Image。</p>
+<p>之前做法是把Node.js專案都放在同台Server，但因爲HA需要，所以也有一台Hot standby的實體機並排在HAProxy下。這裡帶來第一個問題是當要重新build環境時靠Install Guide手動安裝很不方便，解決方法便是用<code>Dockerfile</code>，把Install Guide所需的環境與步驟打包成一個Image。</p>
 
-<p>1&amp;2專案相同部分是<code>Node.js專案，用Express作為Route Framework</code>，所以可以Build一個Base Image來當基底環境，之後只要分別把<code>/var/www</code>置換成對應的專案擋即可。</p>
+<p>1&amp;2專案相同部分是<code>Node.js專案，用Express作為Route Framework</code>，所以可以Build一個Base Image來當基底環境，之後只要分別把<code>/var/www</code>置換成對應的專案檔即可。</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -176,7 +176,7 @@
 
 <h3>以Base Image為底，加入express專案檔</h3>
 
-<p>這時候我們已經有一個Image檔，有npm加上必須的tools，只缺express專案檔，所以就需要以<code>FROM</code>指令指定以<code>npm-ready:latest</code>為底，用<code>COPY</code>指令把我們需要的專案檔複製到Image中。</p>
+<p>這時候我們已經有一個Image檔，包含npm與必須的tools，只缺express專案檔。所以接下來就以<code>FROM</code>指令，指定以<code>npm-ready:latest</code>為底，用<code>COPY</code>指令把我們需要的專案檔複製到Image中。</p>
 
 <p>這裡要注意第三行的<code>PSControlCenter/</code>這個目錄必須與Dockerfile同一個目錄（<code>docker build</code>後面會加上的path我們是打./），不然會出現找不到此目錄。</p>
 
@@ -208,13 +208,13 @@
 
 <p>這個例子裡我們在host輸入127.0.0.1:9453就會訪問到container的3000 port。</p>
 
-<p>這時候可以透過下面指令拿到Container ID</p>
+<p>建立完container後，這時可以透過下面指令拿到Container ID</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 </pre></td><td class='code'><pre><code class=''><span class='line'>docker ps -a // -a會列出所有container(包含停止)</span></code></pre></td></tr></table></div></figure>
 
 
-<p>之後想再得到運行狀態中的container的bash shell可執行</p>
+<p>運行container後，想再得到運行狀態中的container的bash shell可執行</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 </pre></td><td class='code'><pre><code class=''><span class='line'>docker exec -it [container-id] bash</span></code></pre></td></tr></table></div></figure>
@@ -224,9 +224,7 @@
 
 <h3>Run Service</h3>
 
-<p>到這裡我們已經利用Image去產生Container，並起啟動了Container，指定了Port的映射關係，最後取得該Container的Shell。</p>
-
-<p>環境已經建立起來，這時候我們利用PM2把Service run起來</p>
+<p>到這裡我們已經利用Image去產生Container，並起啟動了Container，指定了Port的映射關係，最後取得該Container的Shell。這時環境已經建立起來，我們就可利用PM2把service給run起來。</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 </pre></td><td class='code'><pre><code class=''><span class='line'>pm2 start ./bin/www --watch --name "www"</span></code></pre></td></tr></table></div></figure>
