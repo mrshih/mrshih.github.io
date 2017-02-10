@@ -4,7 +4,7 @@
   <title><![CDATA[MR SHIH]]></title>
   <link href="http://sah.tw/atom.xml" rel="self"/>
   <link href="http://sah.tw/"/>
-  <updated>2017-02-10T11:23:16+08:00</updated>
+  <updated>2017-02-10T11:25:43+08:00</updated>
   <id>http://sah.tw/</id>
   <author>
     <name><![CDATA[施安宏]]></name>
@@ -135,7 +135,7 @@
 
 <h3>Run Service</h3>
 
-<p>到這裡我們已經利用Image去產生Container，並起啟動了Container，指定了Port的映射關係，最後取得該Container的Shell。這時環境已經建立起來，我們就可利用PM2把service給run起來。</p>
+<p>到這裡我們已經利用Image去產生Container，並起啟動了Container，指定了Port的映射關係，最後取得該Container的Shell。這時環境已經建立起來，我們就可利用PM2把service給run起來：</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 </pre></td><td class='code'><pre><code class=''><span class='line'>pm2 start ./bin/www --watch --name "www"</span></code></pre></td></tr></table></div></figure>
