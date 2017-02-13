@@ -153,6 +153,12 @@
 </pre></td><td class='code'><pre><code class=''><span class='line'>-v absolute/path/to/host/web/dir/project:/var/www/project</span></code></pre></td></tr></table></div></figure>
 
 
+<p>比如以下指令就是啟動一個已經安裝所需運行環境的image（npm-ready），然後指定Host資料夾（/Users/shih/Desktop/lab/PSControlCenter）掛載到Container的/var/www上。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>docker run -i -t --name center -p 9453:3001 -v /Users/shih/Desktop/lab/PSControlCenter:/var/www npm-ready</span></code></pre></td></tr></table></div></figure>
+
+
 <h2>FYI</h2>
 
 <ul>
