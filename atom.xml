@@ -4,7 +4,7 @@
   <title><![CDATA[MR SHIH]]></title>
   <link href="http://sah.tw/atom.xml" rel="self"/>
   <link href="http://sah.tw/"/>
-  <updated>2017-02-13T15:36:23+08:00</updated>
+  <updated>2017-02-13T16:12:13+08:00</updated>
   <id>http://sah.tw/</id>
   <author>
     <name><![CDATA[施安宏]]></name>
@@ -79,7 +79,9 @@
     <link href="http://sah.tw/blog/2017/02/09/docker101/"/>
     <updated>2017-02-09T13:22:36+08:00</updated>
     <id>http://sah.tw/blog/2017/02/09/docker101</id>
-    <content type="html"><![CDATA[<p>本身工作偏開發，為何要了解Docker呢？最近Micro service火紅，大型服務被切成一個一個小模組，減少彼此耦合，個別跑在各自container上，方便重複部署，且彼此互相用Rest API或socket溝通。這樣帶來的好處在於可以在開發上減少後續迭代的困難，減少維運的難度，增加系統穩定性。</p>
+    <content type="html"><![CDATA[<h2>本身工作偏開發，為何要了解Docker？</h2>
+
+<p>最近Micro service火紅，大型服務被切成一個一個小模組，減少彼此耦合，個別跑在各自container上，方便重複部署，且彼此互相用Rest API或socket溝通。這樣帶來的好處在於可以在開發上減少後續迭代的困難，減少維運的難度，增加系統穩定性。</p>
 
 <p>但要獲得這些好處，軟體在最初開始設計架構的階段就要拆分服務，一開始設計不好之後就算有docker工具那也只是把所有服務丟到同一個Container上，沒有辦法發揮docker切割服務的優勢。</p>
 
