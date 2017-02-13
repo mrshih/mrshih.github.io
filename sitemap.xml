@@ -3,6 +3,12 @@
   
   
   <url>
+    <loc>http://sah.tw/blog/2017/02/13/docker-containers-communicate/</loc>
+    <lastmod>2017-02-13T23:53:23+08:00</lastmod>
+    <priority>0.8</priority>
+  </url>
+  
+  <url>
     <loc>http://sah.tw/blog/2017/02/13/docker-volume/</loc>
     <lastmod>2017-02-13T14:23:05+08:00</lastmod>
     <priority>0.8</priority>
@@ -167,35 +173,35 @@
   
   <url>
     <loc>http://sah.tw/blog/</loc>
-    <lastmod>2017-02-13T23:52:29+08:00</lastmod>
+    <lastmod>2017-02-13T23:56:42+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   
   <url>
     <loc>http://sah.tw/archives/</loc>
-    <lastmod>2017-02-13T23:52:29+08:00</lastmod>
+    <lastmod>2017-02-13T23:56:42+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   
   <url>
     <loc>http://sah.tw/</loc>
-    <lastmod>2017-02-13T23:52:29+08:00</lastmod>
+    <lastmod>2017-02-13T23:56:42+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   
   <url>
     <loc>http://sah.tw/blog/archives/</loc>
-    <lastmod>2017-02-13T23:52:29+08:00</lastmod>
+    <lastmod>2017-02-13T23:56:42+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   
   <url>
     <loc>http://sah.tw/about/</loc>
-    <lastmod>2017-02-13T23:52:29+08:00</lastmod>
+    <lastmod>2017-02-13T23:56:42+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
