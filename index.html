@@ -9,7 +9,7 @@
   <meta name="author" content="施安宏">
 
   
-  <meta name="description" content="本身工作偏開發，為何要了解Docker呢？最近Micro service火紅，大型服務被切成一個一個小模組，減少彼此耦合，個別跑在各自container上，方便重複部署，且彼此互相用Rest API或socket溝通。這樣帶來的好處在於可以在開發上減少後續迭代的困難，減少維運的難度，增加系統穩定性 &hellip;">
+  <meta name="description" content="為什麼要用volume？ Docker的Container有個重要的原則是不儲存資料。為什麼呢？比如你做一個Web Service的Image，你把NPM,前端分流Nginx等軟體都安裝好了，這時候要把網頁的檔案放進去，一種做法是在Dockerfile裡面用COPY把網頁檔給複製進Image裡面， &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -78,6 +78,97 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2017/02/13/docker-volume/">Docker 運用Volume達成資料分離</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2017-02-13T14:23:05+08:00" pubdate data-updated="true">Feb 13<sup>th</sup>, 2017</time>
+        
+           | <a href="/blog/2017/02/13/docker-volume/#disqus_thread"
+             data-disqus-identifier="http://sah.tw/blog/2017/02/13/docker-volume/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h2>為什麼要用volume？</h2>
+
+<p>Docker的Container有個重要的原則是不儲存資料。為什麼呢？比如你做一個Web Service的Image，你把NPM,前端分流Nginx等軟體都安裝好了，這時候要把網頁的檔案放進去，一種做法是在<code>Dockerfile</code>裡面用<code>COPY</code>把網頁檔給複製進Image裡面，然後再Run起來。</p>
+
+<p>可是這種把<code>資料</code>存在Image裡的做法會帶來許多問題，我如果改一行Code我不就要重新Build或新Commit一個Image嗎？我如果有好多個網站要跑在不同的Container上，我不就要做好多個Image？如果是DB的Image，把<code>資料</code>放在Image裡面，那不就隨著時間過去Image就要一直更新了?</p>
+
+<p>所以在製作Image上，常見的best practice是把執行環境打包成Image，而時常會修改的檔案比如網頁檔案或資料庫檔案這些<code>資料</code>就與Image分開，放在外掛上去的volume，與Image分離。這樣就可解決上面所提及的問題。</p>
+
+<p>底下我們就以網頁服務常見的/var/www資料夾與資料庫常見的/var/lib/mysql為例，說明怎麼把這兩個存<code>資料</code>的地方給另外存在volume上。</p>
+
+<h2>製作data volume container</h2>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>docker create -v absolute/path/to/host/dir:/var/lib/mysql --name dbdata mysql   //產生一個container, 掛載host資料夾(absolute/path/to/host/dir)到container的/var/lib/mysql</span></code></pre></td></tr></table></div></figure>
+
+
+<p>這裡的-v用法就是用來掛載volume的，去mount一個host資料夾為container的data volume。並且把這個container指名為dbdata，這種container又稱作為<code>data volume container</code>。</p>
+
+<p>這種container特別在於本身只是用來記載那個host資料夾對應mount到container的那個資料夾，所以container本身是不用啟動(run)的。</p>
+
+<p>PS. 如果Host的dir沒有指定，則docker會在系統的某個陰暗角落建立一個新的資料夾。可以用<code>docker inspect container-id</code>指令回傳結果裡key<code>Mounts</code>的Dictionary裡找到那個陰暗角落。</p>
+
+<h2>使用data volume container</h2>
+
+<p>有了data volume container後，只要以後在run container時透過<code>--volumes-from</code>參數，就可以直接把指定的<code>data volume container</code>的volume給掛載進來。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>docker run --name=mysqldb -d -p 3306:3306 --volumes-from= dbdata mysql</span></code></pre></td></tr></table></div></figure>
+
+
+<p>這時候新產生名為mysqldb的container，cd到<code>/var/lib/mysql</code>就會發現與host的<code>absolute/path/to/host/dir</code>資料夾是連動的，也就是mount再一起了。</p>
+
+<p>舉個實用情境，假如資料庫版本要升級，只要在<code>Dockerfile</code>裡面升級資料庫版本，然後把新的container啟動時掛載dbdata，資料就還是一樣。而如果當初沒有把<code>資料</code>從Image分離出來，是要不原本DB的資料給匯出，再匯入新Image，非常麻煩，而不這麼做DB的紀錄就消失不見囉。</p>
+
+<p>這裡的效果也就是<a href="https://docs.docker.com/engine/tutorials/dockervolumes/">官方介紹</a>的volume主要用途，把<code>資料</code>與container分開，達到data persistence的目的。</p>
+
+<p><code>Data volumes are designed to persist data, independent of the container’s life cycle.</code></p>
+
+<h2>同理可證的Web Service</h2>
+
+<p>一但建構好基本環境，比如NPM, PM2, Nginx&hellip;etc，打包成一個Image後創建Container，以後Run這個Container只要搭配以下參數，就可以在本地修改，然後在container裡面實際測試了。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>-v absolute/path/to/host/web/dir/project:/var/www/project</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>FYI</h2>
+
+<ul>
+<li><a href="https://docs.docker.com/engine/tutorials/dockervolumes/">https://docs.docker.com/engine/tutorials/dockervolumes/</a></li>
+<li><a href="https://jiajially.gitbooks.io/dockerguide/content/chapter_fastlearn/docker_run/data_manager.html">https://jiajially.gitbooks.io/dockerguide/content/chapter_fastlearn/docker_run/data_manager.html</a></li>
+</ul>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1046,167 +1137,6 @@
 </span><span class='line'>    return [self quickSortInPlaceWithData:[data mutableCopy]  leftIndex:0 rightIndex:data.count-1];
 </span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
 
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2016/11/07/objc-merge-sort-category-oop/">MergeSort與Obj-C外加Category與OOP</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2016-11-07T00:18:53+08:00" pubdate data-updated="true">Nov 7<sup>th</sup>, 2016</time>
-        
-           | <a href="/blog/2016/11/07/objc-merge-sort-category-oop/#disqus_thread"
-             data-disqus-identifier="http://sah.tw/blog/2016/11/07/objc-merge-sort-category-oop/">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h2>Merge Sort概念</h2>
-
-<p>跟我一樣原本不知道Merge Sort是什麼碗糕的可以去這個<a href="https://www.youtube.com/watch?v=mzjjRPdH9Jw">影片</a>，這裡有可愛北一女的實際示範，中文的呦。如果英文好那我也是更推薦去看英文的，那資源又更多了。</p>
-
-<h2>Merge Sort概念轉換成Code</h2>
-
-<p>在懂了Merge Sort概念之後，如果對於如何把想法轉換成程式碼沒什麼感覺，可以看一段<a href="https://www.youtube.com/watch?v=es2T6KY45cA&amp;index=3&amp;list=PL2aHrV9pFqNRS2b2XX2BvgQIPKh72xREP">影片</a>，這段影片大概就是程式碼影片化後實際運作的樣子。</p>
-
-<p>Merge Sort有分Recursive跟For loop兩種，但看完影片直覺就是用Recursive比較好做。這是因為你看Merge Sort其實是把一個大問題分成小問題，小問題再分成更小的問題，直到把問題切割成最小單元，再返回來把前一次的結果餵給上一層，之後一層一層的解回去。這是很典型的遞迴場景。
-NSMutableArray
-上面的問題解決思路在演算法裡面叫做Divide and Conquer，蠻傳神的解釋，把問題分解後在各個擊破。</p>
-
-<h2>Objective-c Implement</h2>
-
-<ul>
-<li>Input為一個NSArray，裡面包含N個NSNumber，NSNumber可以為Int或Flot。</li>
-<li>Output為一個把Input Array裡面的N個NSNumber由小排序到大的NSArray。</li>
-</ul>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-<span class='line-number'>45</span>
-<span class='line-number'>46</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>- (NSArray *)mergeSortWithData:(NSArray *)data {
-</span><span class='line'>    
-</span><span class='line'>    if (data.count == 1) {
-</span><span class='line'>        // div done here
-</span><span class='line'>        // 這裡已經把問題分解成最小單位了，所以就告一段落
-</span><span class='line'>        return data;
-</span><span class='line'>    }
-</span><span class='line'>    
-</span><span class='line'>    NSInteger divLength = data.count/2;
-</span><span class='line'>    NSArray *left = [data subarrayWithRange:NSMakeRange(0, divLength)];
-</span><span class='line'>    NSArray *rigth = [data subarrayWithRange:NSMakeRange(divLength, data.count-divLength)];
-</span><span class='line'>    
-</span><span class='line'>    NSArray&lt;NSNumber*&gt; *mergeArrayA = [self mergeSortWithData:left];
-</span><span class='line'>    NSArray&lt;NSNumber*&gt; *mergeArrayB = [self mergeSortWithData:rigth];
-</span><span class='line'>    
-</span><span class='line'>    NSInteger headOfMergeArrayA = 0;
-</span><span class='line'>    NSInteger headOfMergeArrayB = 0;
-</span><span class='line'>    
-</span><span class='line'>    NSMutableArray *resultArray = [[NSMutableArray alloc]initWithCapacity:mergeArrayA.count+mergeArrayB.count];
-</span><span class='line'>    
-</span><span class='line'>    Boolean control = true;
-</span><span class='line'>    while (control) {
-</span><span class='line'>        
-</span><span class='line'>        if (headOfMergeArrayA == mergeArrayA.count) {
-</span><span class='line'>            //MergeArrayA沒東西了
-</span><span class='line'>            //把剩餘的MergeArrayB直接append到resultArray後面
-</span><span class='line'>            [resultArray addObjectsFromArray:[mergeArrayB subarrayWithRange:NSMakeRange(headOfMergeArrayB, mergeArrayB.count-headOfMergeArrayB)]];
-</span><span class='line'>            control = false;
-</span><span class='line'>            break;
-</span><span class='line'>        }else if(headOfMergeArrayB == mergeArrayB.count){
-</span><span class='line'>            [resultArray addObjectsFromArray:[mergeArrayA subarrayWithRange:NSMakeRange(headOfMergeArrayA, mergeArrayA.count-headOfMergeArrayA)]];
-</span><span class='line'>            control = false;
-</span><span class='line'>            break;
-</span><span class='line'>        }
-</span><span class='line'>        
-</span><span class='line'>        if ([mergeArrayA[headOfMergeArrayA]floatValue] &gt; [mergeArrayB[headOfMergeArrayB]floatValue]) {
-</span><span class='line'>            [resultArray addObject:mergeArrayB[headOfMergeArrayB]];
-</span><span class='line'>            headOfMergeArrayB = headOfMergeArrayB + 1;
-</span><span class='line'>        }else{
-</span><span class='line'>            [resultArray addObject:mergeArrayA[headOfMergeArrayA]];
-</span><span class='line'>            headOfMergeArrayA = headOfMergeArrayA + 1;
-</span><span class='line'>        }
-</span><span class='line'>    }
-</span><span class='line'>    
-</span><span class='line'>    return resultArray;
-</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>Do more &ndash; Free Function與Method</h2>
-
-<p>可以看到<code>mergeSortWithData</code>是一個Function，但我自己Obj-C軟體實作的Coding style上如果一個Function的Input有指定要是某個Class，比如這裡就是指定<code>NSArray</code>，那這時候採用Method較好。</p>
-
-<p>但通常很少情況會不指定Input的Clsas，所以實務上會盡量少用Free Function，附帶的好處是可以減少一堆Function散落在專案裡面，也可以盡量DRY（Don&rsquo;t repeat yourself）。</p>
-
-<p>當然，不要過度強調DRY，因為這關係到切架構與抽象化整體的規劃能力，抽象的不好那是會用弄越糟的，但至少在這個簡單的Case裡Merge Sort做成Method絕對是make sense的。</p>
-
-<p>這裡可以練習把Merge Sort用<code>Category</code>的方式做成<code>NSArray</code>的Method。基礎OOP，把一些地方改成<code>Self</code>就可以了。</p>
 </div>
   
   
