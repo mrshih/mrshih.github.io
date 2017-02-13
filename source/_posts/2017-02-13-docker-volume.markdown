@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Docker 運用Volume達成資料分離"
+title: "Docker系列2 - 運用Volume儲存資料"
 date: 2017-02-13 14:23:05 +0800
 comments: true
 categories: 
@@ -8,11 +8,11 @@ categories:
 ##為什麼要用volume？
 Docker的Container有個重要的原則是不儲存資料。為什麼呢？比如你做一個Web Service的Image，你把NPM,前端分流Nginx等軟體都安裝好了，這時候要把網頁的檔案放進去，一種做法是在`Dockerfile`裡面用`COPY`把網頁檔給複製進Image裡面，然後再Run起來。
 
-可是這種把`資料`存在Image裡的做法會帶來許多問題，我如果改一行Code我不就要重新Build或新Commit一個Image嗎？我如果有好多個網站要跑在不同的Container上，我不就要做好多個Image？如果是DB的Image，把`資料`放在Image裡面，那不就隨著時間過去Image就要一直更新了?
+可是這種把不斷變動的資料檔案存在Image裡的做法會帶來許多問題，我如果改一行Code我不就要重新Build或新Commit一個Image嗎？我如果有好多個網站要跑在不同的Container上，我不就要做好多個Image？如果是DB的Image，把DB File放在Image裡面，那不就隨著時間過去Image就要一直更新了?
 
-所以在製作Image上，常見的best practice是把執行環境打包成Image，而時常會修改的檔案比如網頁檔案或資料庫檔案這些`資料`就與Image分開，放在外掛上去的volume，與Image分離。這樣就可解決上面所提及的問題。
+所以在製作Image上，常見的best practice是把執行環境打包成Image，而時常會修改的檔案比如網頁檔案或資料庫檔案這些`資料`就另外掛載在Volume上，也就是Mount在Host機上的資料夾。這樣就可解決上面所提及的問題。
 
-底下我們就以網頁服務常見的/var/www資料夾與資料庫常見的/var/lib/mysql為例，說明怎麼把這兩個存`資料`的地方給另外存在volume上。
+底下我們就以網頁服務常見的/var/www資料夾與資料庫常見的/var/lib/mysql為例，操作如何把這兩個存`資料`的地方給另外存在volume上。
 
 ##製作data volume container
 
