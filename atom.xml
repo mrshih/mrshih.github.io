@@ -4,7 +4,7 @@
   <title><![CDATA[MR SHIH]]></title>
   <link href="http://sah.tw/atom.xml" rel="self"/>
   <link href="http://sah.tw/"/>
-  <updated>2017-02-13T23:50:38+08:00</updated>
+  <updated>2017-02-13T23:52:29+08:00</updated>
   <id>http://sah.tw/</id>
   <author>
     <name><![CDATA[施安宏]]></name>
@@ -14,7 +14,7 @@
 
   
   <entry>
-    <title type="html"><![CDATA[Docker系列2 - 運用Volume儲存資料]]></title>
+    <title type="html"><![CDATA[Docker系列2 - 運用Volume分離資料]]></title>
     <link href="http://sah.tw/blog/2017/02/13/docker-volume/"/>
     <updated>2017-02-13T14:23:05+08:00</updated>
     <id>http://sah.tw/blog/2017/02/13/docker-volume</id>
