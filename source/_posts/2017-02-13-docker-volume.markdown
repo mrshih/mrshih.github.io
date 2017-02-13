@@ -45,6 +45,11 @@ docker run --name=mysqldb -d -p 3306:3306 --volumes-from= dbdata mysql
 ```
 -v absolute/path/to/host/web/dir/project:/var/www/project
 ```
+比如以下指令就是啟動一個已經安裝所需運行環境的image（npm-ready），然後指定Host資料夾（/Users/shih/Desktop/lab/PSControlCenter）掛載到Container的/var/www上。
+
+```
+docker run -i -t --name center -p 9453:3001 -v /Users/shih/Desktop/lab/PSControlCenter:/var/www npm-ready
+```
 
 ##FYI
 
