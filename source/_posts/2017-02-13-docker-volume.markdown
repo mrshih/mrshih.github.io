@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Docker系列2 - 運用Volume儲存資料"
+title: "Docker系列2 - 運用Volume分離資料"
 date: 2017-02-13 14:23:05 +0800
 comments: true
 categories: 
