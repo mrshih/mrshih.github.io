@@ -9,7 +9,7 @@
   <meta name="author" content="施安宏">
 
   
-  <meta name="description" content="為什麼要用volume？ Docker的Container有個重要的原則是不儲存資料。為什麼呢？比如你做一個Web Service的Image，你把NPM,前端分流Nginx等軟體都安裝好了，這時候要把網頁的檔案放進去，一種做法是在Dockerfile裡面用COPY把網頁檔給複製進Image裡面， &hellip;">
+  <meta name="description" content="這系列文章從建立Container，建立Volume，至此我們已經可以去建立提供不同的服務Micro Service了，而剩下的議題變是如何讓Micro Service之間彼此溝通。 不同Host間的Containers彼此溝通 如果Micro Service在不同的實體機器中， &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -78,6 +78,73 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2017/02/14/docker-containers-communicate/">Docker系列3 - Container間的溝通</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2017-02-14T15:53:23+08:00" pubdate data-updated="true">Feb 14<sup>th</sup>, 2017</time>
+        
+           | <a href="/blog/2017/02/14/docker-containers-communicate/#disqus_thread"
+             data-disqus-identifier="http://sah.tw/blog/2017/02/14/docker-containers-communicate/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>這系列文章從建立Container，建立Volume，至此我們已經可以去建立提供不同的服務Micro Service了，而剩下的議題變是如何讓Micro Service之間彼此溝通。</p>
+
+<h2>不同Host間的Containers彼此溝通</h2>
+
+<p>如果Micro Service在不同的實體機器中，則可以透過<code>run</code>指令裡的<code>-p</code>來把Container與Host的特定給對應起來。</p>
+
+<p>比如以下指令就是啟動一個Web Container並且把Host的Port 3000與Container的Port 80給串連起來</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>docker run -p 3000:80 web</span></code></pre></td></tr></table></div></figure>
+
+
+<p>那接下來就可以在Host用127.0.0.1:3000來訪問Web Container的Port 80。</p>
+
+<h2>同Host間的Containers彼此溝通</h2>
+
+<p>而當Containers都在同一個Host，比如一個是Web一個是DB，Web要如何連上DB呢？其實每個Container在run的時候預設都是走bridge模式，這裡就是docker會創建一個veth interfaces，讓該host的Containers都跑在同一個network。</p>
+
+<p>只要用<code>inspect</code>指令就可以查到該Container的詳細資訊，而裡面的Key<code>IPAddress</code>就會有IP資訊。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>docker inspect [Container-ID]</span></code></pre></td></tr></table></div></figure>
+
+
+<p>在同個veth環境下，有了IP，Container之間就可以彼此溝通了。</p>
+
+<h2>FYI</h2>
+
+<p><a href="https://docs.docker.com/engine/reference/run/#/network-settings">https://docs.docker.com/engine/reference/run/#/network-settings</a></p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -966,185 +1033,6 @@
 <h2>關於搜尋</h2>
 
 <p>這個搜尋法的前提是你的數列要幾經排序好了。這個前置條件才讓我發現我之前一直以為搜尋是有什麼神奇的方法，能夠在一個大數列裡面找到target的位置，現在接觸演算法就理解現實運作方法是先排序之後再用方法搜尋的。</p>
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2016/11/09/objc-quick-sort/">QuickSort與Obj-C</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2016-11-09T10:24:20+08:00" pubdate data-updated="true">Nov 9<sup>th</sup>, 2016</time>
-        
-           | <a href="/blog/2016/11/09/objc-quick-sort/#disqus_thread"
-             data-disqus-identifier="http://sah.tw/blog/2016/11/09/objc-quick-sort/">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h2>Qucik Sort概念</h2>
-
-<p>第一次看到快速排序的許多介紹，可能第一時間腦袋轉不太過來，因為網路介紹常常把虛擬碼翻成步驟，直接敘述，所以腦袋普通像我就會沒辦法意會為什麼要做這個動作。比如後面會提到的In-Place版本交換這個動作就常常不知為何而做。這裡有個<a href="https://www.youtube.com/watch?v=aQiWF4E8flQ">影片</a>是從很高層次想法上去解釋Quick Sort，個人看了之後再想想虛擬碼，也就豁然開朗了。</p>
-
-<h2>Qucik Sort概念轉換成Code</h2>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>- (NSArray *)quickSortUseExtraMemoryWithData:(NSArray *)data {
-</span><span class='line'>
-</span><span class='line'>    if (data.count &lt;= 1) { // 到底部了, 不需要排序, 直接回傳
-</span><span class='line'>        return data;
-</span><span class='line'>    }
-</span><span class='line'>    
-</span><span class='line'>    int random = arc4random() % data.count;  // 隨機取用某index當pivot，避免比如排序已經排好的陣列，每次都取index0，會造成時間複雜度O(N^2)，worst case
-</span><span class='line'>    NSNumber *pivot = data[random];
-</span><span class='line'>    
-</span><span class='line'>    NSMutableArray *less = [[NSMutableArray alloc]init];
-</span><span class='line'>    NSMutableArray *greater = [[NSMutableArray alloc]init];
-</span><span class='line'>    
-</span><span class='line'>    for (int i=1; i&lt;=data.count-1; i++ ) {
-</span><span class='line'>        if ([(NSNumber *)data[i]floatValue] &gt;= [pivot floatValue]) {
-</span><span class='line'>            [greater addObject:data[i]];
-</span><span class='line'>        }else {
-</span><span class='line'>            [less addObject:data[i]];
-</span><span class='line'>        }
-</span><span class='line'>    }
-</span><span class='line'>    
-</span><span class='line'>    NSMutableArray *result = [[NSMutableArray alloc]init];
-</span><span class='line'>    [result addObjectsFromArray:[self quickSortUseExtraMemoryWithData:less]];
-</span><span class='line'>    [result addObject:pivot];
-</span><span class='line'>    [result addObjectsFromArray:[self quickSortUseExtraMemoryWithData:greater]];
-</span><span class='line'>    
-</span><span class='line'>    return result;
-</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
-
-
-<p>如果常寫有支援記憶體管理語言比如Java或ARC版Obj-C的人可能會直覺寫出這個版本，因為在這幾個語言裡其實常常不用太管記憶體使用量太多這個問題，除非是<code>UIImage</code>等大型物件沒有釋放，不然常常遇到比如<code>NSArray</code>分割其實也就是再開兩個NSArray去存就好了。</p>
-
-<p>上面這個實作方法每次都新開<code>NSArray</code>去存放分割後的子Array，而Quick Sort比Merge Sort好的地方在於它可以改用稱作In-Place的方法，只在同一個陣列做交換，可以避免運用消耗多餘的記憶體空間，參考文獻也寫說實務上也可以增加演算法的效率。</p>
-
-<h2>Qucik Sort In-Place 版本</h2>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>- (NSMutableArray *)quickSortInPlaceWithData:(NSMutableArray &lt;NSNumber *&gt;*)data leftIndex:(NSInteger)left rightIndex:(NSInteger)right{
-</span><span class='line'>    // 使用in-place法，操作同一個陣列，避免額外消耗多餘記憶體，硬體限制嚴格的環境下使用
-</span><span class='line'>    
-</span><span class='line'>    if (left &gt; right) { // 底部。代表上一層遞迴切出來，這個sub-array已經只有一個元素，就不用排列了，'這個元素也會是已經就定位的'。
-</span><span class='line'>        return nil;
-</span><span class='line'>    }
-</span><span class='line'>    
-</span><span class='line'>    NSNumber *pivot = data[right];
-</span><span class='line'>    
-</span><span class='line'>    NSInteger processIndexAKAWall = left;
-</span><span class='line'>    [data exchangeObjectAtIndex:right withObjectAtIndex:right];// 把pivot移到最後面
-</span><span class='line'>    for (int i=(int)left; i&lt;right; i++ ) { // left ... right-1
-</span><span class='line'>        if ([data[i]floatValue] &lt; [pivot floatValue]) {
-</span><span class='line'>            [data exchangeObjectAtIndex:processIndexAKAWall withObjectAtIndex:i];// 擺到牆的右邊
-</span><span class='line'>            processIndexAKAWall = processIndexAKAWall + 1;// 牆往前
-</span><span class='line'>        }
-</span><span class='line'>    }
-</span><span class='line'>    [data exchangeObjectAtIndex:processIndexAKAWall withObjectAtIndex:right];// 把pivot移到牆的右邊。這個pivot目前已經在正確的index上了。
-</span><span class='line'>    
-</span><span class='line'>    // 切兩段
-</span><span class='line'>    // start by left, end by processIndexAKAWall - 1
-</span><span class='line'>    // start by processIndexAKAWall + 1, end by right
-</span><span class='line'>    [self quickSortInPlaceWithData:data leftIndex:left rightIndex:processIndexAKAWall - 1];
-</span><span class='line'>    [self quickSortInPlaceWithData:data leftIndex:processIndexAKAWall + 1 rightIndex:right];
-</span><span class='line'>    
-</span><span class='line'>    return data;
-</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>更好用的呼叫方式</h2>
-
-<p>平均空間複雜度更好的In-Place版本，因為只有<code>NSMutableArray</code>可以交換item，所以如果傳入值是是<code>NSArray</code>則呼叫的時候要寫成以下方式：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>NSMutableArray *result = [self quickSortInPlaceWithData:[data mutableCopy] leftIndex:0 rightIndex:data.count-1];</span></code></pre></td></tr></table></div></figure>
-
-
-<p>而為了可以讓<code>NSArray</code>可以使用，也方便之後做成<code>NSArray</code>的<code>Category</code>，就可以改寫成以下這種較為方便別人使用的方式，因為別人不一定知道Left與Right，也不需要懂實作細節情況下：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>- (NSArray *)quickSort:(NSArray *)data {
-</span><span class='line'>    return [self quickSortInPlaceWithData:[data mutableCopy]  leftIndex:0 rightIndex:data.count-1];
-</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
-
 </div>
   
   
