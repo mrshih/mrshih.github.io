@@ -4,7 +4,7 @@
   <title><![CDATA[MR SHIH]]></title>
   <link href="http://sah.tw/atom.xml" rel="self"/>
   <link href="http://sah.tw/"/>
-  <updated>2017-02-28T21:09:57+08:00</updated>
+  <updated>2017-04-12T15:02:16+08:00</updated>
   <id>http://sah.tw/</id>
   <author>
     <name><![CDATA[施安宏]]></name>
@@ -12,6 +12,132 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Letsencrypt在nginx與centos環境下實作tips]]></title>
+    <link href="http://sah.tw/blog/2017/04/12/letsencrypt-nginx-centos/"/>
+    <updated>2017-04-12T14:20:09+08:00</updated>
+    <id>http://sah.tw/blog/2017/04/12/letsencrypt-nginx-centos</id>
+    <content type="html"><![CDATA[<p>基本上我認為現在<a href="https://lynn1205.wordpress.com/2017/01/18/%E4%BB%80%E9%BA%BC%E6%98%AF%E4%BC%BA%E6%9C%8D%E5%99%A8%E6%86%91%E8%AD%89ssl/">HTTPS</a>的功用只是用來加密連線，在CA亂發或誤發的時代，不能指望CA這樣的盈利民間機構能盡責的做到驗證申請者的角色。
+但然而能做到加密Server與Clint之間的通訊內容其實也就已經足夠了。</p>
+
+<p>與其繳錢給盈利CA，現在你有更好的選擇-<a href="https://letsencrypt.org">letsencrypt</a>，免費開源自動化更新的CA。</p>
+
+<p>網路上的教學文章不少，而我這邊整理幾個好用的tip，主旨在於自動化與降低維運的難度。</p>
+
+<h2>Step0. CentOS+Nginx</h2>
+
+<p>因為自己的Server是用這樣的環境，加上這個環境也非常普遍可靠穩定，所以本文章就以這個環境當做基底。</p>
+
+<h2>Step1. Nginx強制指定/.well-known/acme-challenge/檔案路徑</h2>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>/etc/nginx/nginx.conf
+</span><span class='line'>
+</span><span class='line'>server {
+</span><span class='line'>  listen       80;
+</span><span class='line'>  
+</span><span class='line'>  location ^~ /.well-known/acme-challenge/ {
+</span><span class='line'>      default_type    "text/plain";
+</span><span class='line'>      root    /var/www/letsencrypt;
+</span><span class='line'>  }
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>你必須向letsencrypt證明DNS指向的這台server是你host的，等等letsencrypt會去你domain下的<code>/.well-known/acme-challenge/</code>path查找文件，如果找得到就能證明是你host，也才能簽發證書給你。</p>
+
+<p>而這裡統一指向<code>/var/www/letsencrypt</code>是因為有可能你現在用單純的html環境，有可能之後換成<code>proxy_pass</code>反向代理到node.js等，這都會使得<code>/.well-known/acme-challenge/</code>這個url路徑指向的檔案在你host的server上產生變動，這種業務上變動跟HTTPS是無關且可以切開來降低兩邊的耦合度，而隨著日後的domain變多，統一指定路徑這樣的做法也能夠降低後續維運的難度。</p>
+
+<h2>Step2. 申請憑證</h2>
+
+<p>去下載官方的驗證tool <a href="https://certbot.eff.org">certbot</a>並安裝，下面例子自行把abc代換成你的domain</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>certbot certonly --webroot -w /var/www/letsencrypt/ -d abc.com.tw -d www.abc.com.tw</span></code></pre></td></tr></table></div></figure>
+
+
+<p>成功的話會出現包含Congratulations!一大段話，憑證會被存在<code>/etc/letsencrypt/live/abc下</code>。</p>
+
+<h2>Step3. 安裝憑證到Nginx</h2>
+
+<p>/etc/nginx/conf.d/abc.conf</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>listen       443 ssl;
+</span><span class='line'>server_name  www.abc.com.tw;
+</span><span class='line'>
+</span><span class='line'>ssl_certificate      /etc/letsencrypt/live/abc/fullchain.pem;
+</span><span class='line'>ssl_certificate_key  /etc/letsencrypt/live/abc/privkey.pem;</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Step4. 強制導流HTTP連線到HTTPS</h2>
+
+<p>/etc/nginx/nginx.conf</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>server {
+</span><span class='line'>  listen 80;
+</span><span class='line'>  server_name _;
+</span><span class='line'>  return 301 https://$host$request_uri;
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Step5. 把更新任務加入crontab自動化更新憑證</h2>
+
+<p>以下為更新腳本，我是命名為renewCerts.sh，並存放在/etc/letsencrypt/下</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>#!/bin/sh
+</span><span class='line'># This script renews all the Let's Encrypt certificates with a validity &lt; 30 days
+</span><span class='line'>
+</span><span class='line'>if ! /usr/bin/certbot renew &gt; /var/log/letsencrypt/renew.log 2&gt;&1 ; then
+</span><span class='line'>    echo Automated renewal failed:
+</span><span class='line'>    cat /var/log/letsencrypt/renew.log
+</span><span class='line'>    exit 1
+</span><span class='line'>fi
+</span><span class='line'>nginx -t && nginx -s reload</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Step6. 把sh加入crobtab</h2>
+
+<p>打開crontab設定檔</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>sudo crontab -e</span></code></pre></td></tr></table></div></figure>
+
+
+<p>加入sh設定每日自動執行然後儲存</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>@daily sh /etc/letsencrypt/renewCerts.sh</span></code></pre></td></tr></table></div></figure>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Docker系列3 - Container間的溝通]]></title>
@@ -2219,178 +2345,6 @@ UIModalPresentationStyle
 <p> <a href="https://developer.apple.com/videos/play/wwdc2014-228/">https://developer.apple.com/videos/play/wwdc2014-228/</a>
 &ndash; <a href="http://onevcat.com/2013/10/vc-transition-in-ios7/">http://onevcat.com/2013/10/vc-transition-in-ios7/</a>
 &ndash; <a href="https://developer.apple.com/library/ios/featuredarticles/ViewControllerPGforiPhoneOS/DefiningCustomPresentations.html#//apple_ref/doc/uid/TP40007457-CH25-SW1">https://developer.apple.com/library/ios/featuredarticles/ViewControllerPGforiPhoneOS/DefiningCustomPresentations.html#//apple_ref/doc/uid/TP40007457-CH25-SW1</a></p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[iOS 大量網路與硬碟I/0處理]]></title>
-    <link href="http://sah.tw/blog/2016/01/04/ios-serial-queue-run-async-background-job/"/>
-    <updated>2016-01-04T15:00:00+08:00</updated>
-    <id>http://sah.tw/blog/2016/01/04/ios-serial-queue-run-async-background-job</id>
-    <content type="html"><![CDATA[<p>很多時候操作網路或者Disk的I/O，我們都會把工作丟到背景去執行，避免凍結使用者的畫面。但是這造成一個問題是一下子太多背景任務同時執行有可能導致APP崩潰。</p>
-
-<p>比如影音APP使用者見獵心喜，一下子選了許多部影片要下載，如果現在把下載任務一股腦兒丟到背景，因為現在大部分下載需求都直接使用知名框架<code>AFNetworking</code>，而裡面的方法通常也都直接在背景運行，造成這些下載任務用Concurrent的方式併發執行，這下子產生大量的網路還有Disk I/O Request同時在背景跑。</p>
-
-<p>UI是不會被凍結沒錯，但很有可能背景操作網路或Disk I/O的量太多（通常是Disk），導致APP崩潰。</p>
-
-<h2>以Serial思維執行背景任務</h2>
-
-<p>這時候就非常建議一次下載並儲存一部影片就好。也就是確保上個任務執行完畢，Queue在推送下一個任務去執行。</p>
-
-<h2>混亂的完成順序</h2>
-
-<p>直觀的實作方式就是建立一個Serial Queue，把需要列隊執行的任務用<code>dispatch_async</code>加入進去，就像以下方法：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="sr">//</span> <span class="err">建立一個唯一的</span><span class="no">Serial</span> <span class="no">Queue</span>
-</span><span class='line'><span class="n">dispatch_queue_t</span> <span class="n">_uploadToParseInBackgroundQueue</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="n">static</span> <span class="n">dispatch_once_t</span> <span class="n">queueCreationGuard</span><span class="p">;</span>
-</span><span class='line'>    <span class="n">static</span> <span class="n">dispatch_queue_t</span> <span class="n">queue</span><span class="p">;</span>
-</span><span class='line'>    <span class="n">dispatch_once</span><span class="p">(</span><span class="o">&amp;</span><span class="n">queueCreationGuard</span><span class="p">,</span> <span class="o">^</span><span class="p">{</span>
-</span><span class='line'>        <span class="n">queue</span> <span class="o">=</span> <span class="n">dispatch_queue_create</span><span class="p">(</span><span class="s2">&quot;com.shih.secureMedia.uploadToParseInBackgroundQueue&quot;</span><span class="p">,</span> <span class="no">DISPATCH_QUEUE_SERIAL</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">});</span>
-</span><span class='line'>    <span class="k">return</span> <span class="n">queue</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="sr">//</span> <span class="err">包含一個異步方法的</span><span class="no">Method</span>
-</span><span class='line'><span class="p">(</span><span class="n">void</span><span class="p">)</span><span class="n">addTaskUploadMovie</span><span class="p">(</span><span class="no">NSDate</span> <span class="o">*</span><span class="p">)</span><span class="n">movie</span>
-</span><span class='line'><span class="n">dispatch_async</span><span class="p">(</span><span class="n">_uploadToParseInBackgroundQueue</span><span class="p">(),</span> <span class="o">^</span><span class="p">{</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="no">NSLog</span><span class="p">(</span><span class="err">@</span><span class="s2">&quot;%@上傳Start.......&quot;</span><span class="p">,</span><span class="n">movie</span><span class="o">.</span><span class="n">name</span><span class="p">);</span>
-</span><span class='line'>    <span class="sr">//</span> <span class="err">某個很花時間，但本身已經是丟到背景處理的方法</span>
-</span><span class='line'>    <span class="o">[</span><span class="nb">self</span> <span class="ss">uploadMovieInBackground</span><span class="p">:</span><span class="n">movie</span> <span class="ss">withCompleteBlock</span><span class="p">:</span><span class="o">^</span><span class="p">(</span><span class="no">BOOL</span> <span class="n">succeeded</span><span class="p">,</span> <span class="no">NSError</span> <span class="o">*</span> <span class="n">_Nullable</span> <span class="n">error</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="no">NSLog</span><span class="p">(</span><span class="err">@</span><span class="s2">&quot;%@上傳Done&quot;</span><span class="p">,</span><span class="n">movie</span><span class="o">.</span><span class="n">name</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">}</span><span class="o">]</span><span class="p">;</span>
-</span><span class='line'><span class="p">});</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>實際執行：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="o">[</span><span class="nb">self</span> <span class="ss">addTaskUploadMovie</span><span class="p">:</span><span class="n">a</span><span class="o">]</span><span class="p">;</span>
-</span><span class='line'><span class="o">[</span><span class="nb">self</span> <span class="ss">addTaskUploadMovie</span><span class="p">:</span><span class="n">b</span><span class="o">]</span><span class="p">;</span>
-</span><span class='line'><span class="o">[</span><span class="nb">self</span> <span class="ss">addTaskUploadMovie</span><span class="p">:</span><span class="n">c</span><span class="o">]</span><span class="p">;</span>
-</span><span class='line'><span class="o">[</span><span class="nb">self</span> <span class="ss">addTaskUploadMovie</span><span class="p">:</span><span class="n">d</span><span class="o">]</span><span class="p">;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>這裡有個大問題是<code>uploadMovieInBackground</code>本身已經是跑在背景，所以四個上傳任務實際上在後台是以併發Concurrent/Parallel的方式執行。</p>
-
-<p>而多個高I/0負載任務被同時執行就有可能造成APP崩潰。</p>
-
-<p>實際執行結果會像這樣，但實際上不可預測，因為不能知道哪個會先完成：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">a</span><span class="err">上傳</span><span class="no">Start</span><span class="o">.</span><span class="n">.</span><span class="o">.</span><span class="n">.</span><span class="o">.</span><span class="n">.</span><span class="o">.</span>
-</span><span class='line'><span class="n">b</span><span class="err">上傳</span><span class="no">Start</span><span class="o">.</span><span class="n">.</span><span class="o">.</span><span class="n">.</span><span class="o">.</span><span class="n">.</span><span class="o">.</span>
-</span><span class='line'><span class="n">a</span><span class="err">上傳</span><span class="no">Done</span>
-</span><span class='line'><span class="n">c</span><span class="err">上傳</span><span class="no">Start</span><span class="o">.</span><span class="n">.</span><span class="o">.</span><span class="n">.</span><span class="o">.</span><span class="n">.</span><span class="o">.</span>
-</span><span class='line'><span class="n">c</span><span class="err">上傳</span><span class="no">Done</span>
-</span><span class='line'><span class="n">d</span><span class="err">上傳</span><span class="no">Start</span><span class="o">.</span><span class="n">.</span><span class="o">.</span><span class="n">.</span><span class="o">.</span><span class="n">.</span><span class="o">.</span>
-</span><span class='line'><span class="n">d</span><span class="err">上傳</span><span class="no">Done</span>
-</span><span class='line'><span class="n">b</span><span class="err">上傳</span><span class="no">Done</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>可控制的完成順序</h2>
-
-<p>而如果你希望上傳程序按照以下Serial的邏輯去跑:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">a</span><span class="err">上傳</span><span class="no">Start</span><span class="o">.</span><span class="n">.</span><span class="o">.</span><span class="n">.</span><span class="o">.</span><span class="n">.</span><span class="o">.</span>
-</span><span class='line'><span class="n">a</span><span class="err">上傳</span><span class="no">Done</span>
-</span><span class='line'><span class="n">b</span><span class="err">上傳</span><span class="no">Start</span><span class="o">.</span><span class="n">.</span><span class="o">.</span><span class="n">.</span><span class="o">.</span><span class="n">.</span><span class="o">.</span>
-</span><span class='line'><span class="n">b</span><span class="err">上傳</span><span class="no">Done</span>
-</span><span class='line'><span class="n">c</span><span class="err">上傳</span><span class="no">Start</span><span class="o">.</span><span class="n">.</span><span class="o">.</span><span class="n">.</span><span class="o">.</span><span class="n">.</span><span class="o">.</span>
-</span><span class='line'><span class="n">c</span><span class="err">上傳</span><span class="no">Done</span>
-</span><span class='line'><span class="n">d</span><span class="err">上傳</span><span class="no">Start</span><span class="o">.</span><span class="n">.</span><span class="o">.</span><span class="n">.</span><span class="o">.</span><span class="n">.</span><span class="o">.</span>
-</span><span class='line'><span class="n">d</span><span class="err">上傳</span><span class="no">Done</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>加入<code>dispatch_suspend</code>與<code>dispatch_resume</code></h3>
-
-<p>加入這兩個操控Queue的方法就是做兩個目的：</p>
-
-<ul>
-<li><p>當某個在Serial Queue的上傳任務Block被執行的時候，此任務在Block內馬上呼叫Queue的Suspend方法，來暫停這個Queue繼續執行下個上傳任務</p></li>
-<li><p>而當前上傳任務執行完成之後，在該任務的call back block裡面馬上呼叫Queue的Resume，來讓下個上傳任務被執行</p></li>
-</ul>
-
-
-<p>反覆上述行為就達到我們要的一次在背景做一件事情的效果了。</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="p">(</span><span class="n">void</span><span class="p">)</span><span class="n">addTaskUploadMovie</span><span class="p">(</span><span class="no">NSDate</span> <span class="o">*</span><span class="p">)</span><span class="n">movie</span>
-</span><span class='line'><span class="n">dispatch_async</span><span class="p">(</span><span class="n">_uploadToParseInBackgroundQueue</span><span class="p">(),</span> <span class="o">^</span><span class="p">{</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="no">NSLog</span><span class="p">(</span><span class="err">@</span><span class="s2">&quot;%@上傳Start.......&quot;</span><span class="p">,</span><span class="n">movie</span><span class="o">.</span><span class="n">name</span><span class="p">);</span>
-</span><span class='line'>    <span class="sr">//</span> <span class="err">某個很花時間，但本身已經是丟到背景處理的</span><span class="n">metod</span>
-</span><span class='line'>    <span class="o">[</span><span class="nb">self</span> <span class="ss">uploadMovieInBackground</span><span class="p">:</span><span class="n">movie</span> <span class="ss">withCompleteBlock</span><span class="p">:</span><span class="o">^</span><span class="p">(</span><span class="no">BOOL</span> <span class="n">succeeded</span><span class="p">,</span> <span class="no">NSError</span> <span class="o">*</span> <span class="n">_Nullable</span> <span class="n">error</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="no">NSLog</span><span class="p">(</span><span class="err">@</span><span class="s2">&quot;%@上傳Done&quot;</span><span class="p">,</span><span class="n">movie</span><span class="o">.</span><span class="n">name</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="sr">//</span> <span class="err">這個</span><span class="no">Task</span><span class="err">執行完了，讓</span><span class="no">Queue</span> <span class="n">resume</span><span class="err">，讓排在下一個的</span><span class="no">Task</span><span class="err">可以被執行</span>
-</span><span class='line'>        <span class="n">dispatch_resume</span><span class="p">(</span><span class="n">_uploadToParseInBackgroundQueue</span><span class="p">());</span>
-</span><span class='line'>    <span class="p">}</span><span class="o">]</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="sr">//</span> <span class="err">上面的</span><span class="n">uploadMovieInBackground</span><span class="err">開始後，就暫停這個</span><span class="no">Queue</span><span class="err">，不再執行</span><span class="no">Task</span><span class="p">(</span><span class="err">外部依然可以隨時用</span><span class="n">dispatch_async</span> <span class="no">Passing</span> <span class="no">Task</span><span class="p">)</span>
-</span><span class='line'>    <span class="n">dispatch_suspend</span><span class="p">(</span><span class="n">_uploadToParseInBackgroundQueue</span><span class="p">());</span>
-</span><span class='line'><span class="p">});</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p><a href="https://developer.apple.com/library/ios/documentation/General/Conceptual/ConcurrencyProgrammingGuide/OperationQueues/OperationQueues.html#//apple_ref/doc/uid/TP40008091-CH102-SW14">dispatch_resume與dispatch_suspend的官方參考文件</a></p>
 ]]></content>
   </entry>
   

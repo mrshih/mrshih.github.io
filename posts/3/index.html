@@ -9,7 +9,7 @@
   <meta name="author" content="施安宏">
 
   
-  <meta name="description" content="試想一個情境是相簿APP在後台收到伺服器傳來愛人分享的最新照片，但使用者興沖沖的打開之後面對轉阿轉不停的Loading indicator圓圈圈，多麼令人掃興。 動通知但被動下載資料顯然不是一個好方法。 這個時候可以透過推播通知APP，並在背景讓程式預載相片，載好之後再通知使用者點開APP， &hellip;">
+  <meta name="description" content="很多時候操作網路或者Disk的I/O，我們都會把工作丟到背景去執行，避免凍結使用者的畫面。但是這造成一個問題是一下子太多背景任務同時執行有可能導致APP崩潰。 比如影音APP使用者見獵心喜，一下子選了許多部影片要下載，如果現在把下載任務一股腦兒丟到背景， &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -78,6 +78,208 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2016/01/04/ios-serial-queue-run-async-background-job/">iOS 大量網路與硬碟I/0處理</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-01-04T15:00:00+08:00" pubdate data-updated="true">Jan 4<sup>th</sup>, 2016</time>
+        
+           | <a href="/blog/2016/01/04/ios-serial-queue-run-async-background-job/#disqus_thread"
+             data-disqus-identifier="http://sah.tw/blog/2016/01/04/ios-serial-queue-run-async-background-job/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>很多時候操作網路或者Disk的I/O，我們都會把工作丟到背景去執行，避免凍結使用者的畫面。但是這造成一個問題是一下子太多背景任務同時執行有可能導致APP崩潰。</p>
+
+<p>比如影音APP使用者見獵心喜，一下子選了許多部影片要下載，如果現在把下載任務一股腦兒丟到背景，因為現在大部分下載需求都直接使用知名框架<code>AFNetworking</code>，而裡面的方法通常也都直接在背景運行，造成這些下載任務用Concurrent的方式併發執行，這下子產生大量的網路還有Disk I/O Request同時在背景跑。</p>
+
+<p>UI是不會被凍結沒錯，但很有可能背景操作網路或Disk I/O的量太多（通常是Disk），導致APP崩潰。</p>
+
+<h2>以Serial思維執行背景任務</h2>
+
+<p>這時候就非常建議一次下載並儲存一部影片就好。也就是確保上個任務執行完畢，Queue在推送下一個任務去執行。</p>
+
+<h2>混亂的完成順序</h2>
+
+<p>直觀的實作方式就是建立一個Serial Queue，把需要列隊執行的任務用<code>dispatch_async</code>加入進去，就像以下方法：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="sr">//</span> <span class="err">建立一個唯一的</span><span class="no">Serial</span> <span class="no">Queue</span>
+</span><span class='line'><span class="n">dispatch_queue_t</span> <span class="n">_uploadToParseInBackgroundQueue</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="n">static</span> <span class="n">dispatch_once_t</span> <span class="n">queueCreationGuard</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">static</span> <span class="n">dispatch_queue_t</span> <span class="n">queue</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">dispatch_once</span><span class="p">(</span><span class="o">&amp;</span><span class="n">queueCreationGuard</span><span class="p">,</span> <span class="o">^</span><span class="p">{</span>
+</span><span class='line'>        <span class="n">queue</span> <span class="o">=</span> <span class="n">dispatch_queue_create</span><span class="p">(</span><span class="s2">&quot;com.shih.secureMedia.uploadToParseInBackgroundQueue&quot;</span><span class="p">,</span> <span class="no">DISPATCH_QUEUE_SERIAL</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">});</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">queue</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">//</span> <span class="err">包含一個異步方法的</span><span class="no">Method</span>
+</span><span class='line'><span class="p">(</span><span class="n">void</span><span class="p">)</span><span class="n">addTaskUploadMovie</span><span class="p">(</span><span class="no">NSDate</span> <span class="o">*</span><span class="p">)</span><span class="n">movie</span>
+</span><span class='line'><span class="n">dispatch_async</span><span class="p">(</span><span class="n">_uploadToParseInBackgroundQueue</span><span class="p">(),</span> <span class="o">^</span><span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="no">NSLog</span><span class="p">(</span><span class="err">@</span><span class="s2">&quot;%@上傳Start.......&quot;</span><span class="p">,</span><span class="n">movie</span><span class="o">.</span><span class="n">name</span><span class="p">);</span>
+</span><span class='line'>    <span class="sr">//</span> <span class="err">某個很花時間，但本身已經是丟到背景處理的方法</span>
+</span><span class='line'>    <span class="o">[</span><span class="nb">self</span> <span class="ss">uploadMovieInBackground</span><span class="p">:</span><span class="n">movie</span> <span class="ss">withCompleteBlock</span><span class="p">:</span><span class="o">^</span><span class="p">(</span><span class="no">BOOL</span> <span class="n">succeeded</span><span class="p">,</span> <span class="no">NSError</span> <span class="o">*</span> <span class="n">_Nullable</span> <span class="n">error</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="no">NSLog</span><span class="p">(</span><span class="err">@</span><span class="s2">&quot;%@上傳Done&quot;</span><span class="p">,</span><span class="n">movie</span><span class="o">.</span><span class="n">name</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span><span class="o">]</span><span class="p">;</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>實際執行：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="o">[</span><span class="nb">self</span> <span class="ss">addTaskUploadMovie</span><span class="p">:</span><span class="n">a</span><span class="o">]</span><span class="p">;</span>
+</span><span class='line'><span class="o">[</span><span class="nb">self</span> <span class="ss">addTaskUploadMovie</span><span class="p">:</span><span class="n">b</span><span class="o">]</span><span class="p">;</span>
+</span><span class='line'><span class="o">[</span><span class="nb">self</span> <span class="ss">addTaskUploadMovie</span><span class="p">:</span><span class="n">c</span><span class="o">]</span><span class="p">;</span>
+</span><span class='line'><span class="o">[</span><span class="nb">self</span> <span class="ss">addTaskUploadMovie</span><span class="p">:</span><span class="n">d</span><span class="o">]</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>這裡有個大問題是<code>uploadMovieInBackground</code>本身已經是跑在背景，所以四個上傳任務實際上在後台是以併發Concurrent/Parallel的方式執行。</p>
+
+<p>而多個高I/0負載任務被同時執行就有可能造成APP崩潰。</p>
+
+<p>實際執行結果會像這樣，但實際上不可預測，因為不能知道哪個會先完成：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">a</span><span class="err">上傳</span><span class="no">Start</span><span class="o">.</span><span class="n">.</span><span class="o">.</span><span class="n">.</span><span class="o">.</span><span class="n">.</span><span class="o">.</span>
+</span><span class='line'><span class="n">b</span><span class="err">上傳</span><span class="no">Start</span><span class="o">.</span><span class="n">.</span><span class="o">.</span><span class="n">.</span><span class="o">.</span><span class="n">.</span><span class="o">.</span>
+</span><span class='line'><span class="n">a</span><span class="err">上傳</span><span class="no">Done</span>
+</span><span class='line'><span class="n">c</span><span class="err">上傳</span><span class="no">Start</span><span class="o">.</span><span class="n">.</span><span class="o">.</span><span class="n">.</span><span class="o">.</span><span class="n">.</span><span class="o">.</span>
+</span><span class='line'><span class="n">c</span><span class="err">上傳</span><span class="no">Done</span>
+</span><span class='line'><span class="n">d</span><span class="err">上傳</span><span class="no">Start</span><span class="o">.</span><span class="n">.</span><span class="o">.</span><span class="n">.</span><span class="o">.</span><span class="n">.</span><span class="o">.</span>
+</span><span class='line'><span class="n">d</span><span class="err">上傳</span><span class="no">Done</span>
+</span><span class='line'><span class="n">b</span><span class="err">上傳</span><span class="no">Done</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>可控制的完成順序</h2>
+
+<p>而如果你希望上傳程序按照以下Serial的邏輯去跑:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">a</span><span class="err">上傳</span><span class="no">Start</span><span class="o">.</span><span class="n">.</span><span class="o">.</span><span class="n">.</span><span class="o">.</span><span class="n">.</span><span class="o">.</span>
+</span><span class='line'><span class="n">a</span><span class="err">上傳</span><span class="no">Done</span>
+</span><span class='line'><span class="n">b</span><span class="err">上傳</span><span class="no">Start</span><span class="o">.</span><span class="n">.</span><span class="o">.</span><span class="n">.</span><span class="o">.</span><span class="n">.</span><span class="o">.</span>
+</span><span class='line'><span class="n">b</span><span class="err">上傳</span><span class="no">Done</span>
+</span><span class='line'><span class="n">c</span><span class="err">上傳</span><span class="no">Start</span><span class="o">.</span><span class="n">.</span><span class="o">.</span><span class="n">.</span><span class="o">.</span><span class="n">.</span><span class="o">.</span>
+</span><span class='line'><span class="n">c</span><span class="err">上傳</span><span class="no">Done</span>
+</span><span class='line'><span class="n">d</span><span class="err">上傳</span><span class="no">Start</span><span class="o">.</span><span class="n">.</span><span class="o">.</span><span class="n">.</span><span class="o">.</span><span class="n">.</span><span class="o">.</span>
+</span><span class='line'><span class="n">d</span><span class="err">上傳</span><span class="no">Done</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>加入<code>dispatch_suspend</code>與<code>dispatch_resume</code></h3>
+
+<p>加入這兩個操控Queue的方法就是做兩個目的：</p>
+
+<ul>
+<li><p>當某個在Serial Queue的上傳任務Block被執行的時候，此任務在Block內馬上呼叫Queue的Suspend方法，來暫停這個Queue繼續執行下個上傳任務</p></li>
+<li><p>而當前上傳任務執行完成之後，在該任務的call back block裡面馬上呼叫Queue的Resume，來讓下個上傳任務被執行</p></li>
+</ul>
+
+
+<p>反覆上述行為就達到我們要的一次在背景做一件事情的效果了。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="p">(</span><span class="n">void</span><span class="p">)</span><span class="n">addTaskUploadMovie</span><span class="p">(</span><span class="no">NSDate</span> <span class="o">*</span><span class="p">)</span><span class="n">movie</span>
+</span><span class='line'><span class="n">dispatch_async</span><span class="p">(</span><span class="n">_uploadToParseInBackgroundQueue</span><span class="p">(),</span> <span class="o">^</span><span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="no">NSLog</span><span class="p">(</span><span class="err">@</span><span class="s2">&quot;%@上傳Start.......&quot;</span><span class="p">,</span><span class="n">movie</span><span class="o">.</span><span class="n">name</span><span class="p">);</span>
+</span><span class='line'>    <span class="sr">//</span> <span class="err">某個很花時間，但本身已經是丟到背景處理的</span><span class="n">metod</span>
+</span><span class='line'>    <span class="o">[</span><span class="nb">self</span> <span class="ss">uploadMovieInBackground</span><span class="p">:</span><span class="n">movie</span> <span class="ss">withCompleteBlock</span><span class="p">:</span><span class="o">^</span><span class="p">(</span><span class="no">BOOL</span> <span class="n">succeeded</span><span class="p">,</span> <span class="no">NSError</span> <span class="o">*</span> <span class="n">_Nullable</span> <span class="n">error</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="no">NSLog</span><span class="p">(</span><span class="err">@</span><span class="s2">&quot;%@上傳Done&quot;</span><span class="p">,</span><span class="n">movie</span><span class="o">.</span><span class="n">name</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="sr">//</span> <span class="err">這個</span><span class="no">Task</span><span class="err">執行完了，讓</span><span class="no">Queue</span> <span class="n">resume</span><span class="err">，讓排在下一個的</span><span class="no">Task</span><span class="err">可以被執行</span>
+</span><span class='line'>        <span class="n">dispatch_resume</span><span class="p">(</span><span class="n">_uploadToParseInBackgroundQueue</span><span class="p">());</span>
+</span><span class='line'>    <span class="p">}</span><span class="o">]</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="sr">//</span> <span class="err">上面的</span><span class="n">uploadMovieInBackground</span><span class="err">開始後，就暫停這個</span><span class="no">Queue</span><span class="err">，不再執行</span><span class="no">Task</span><span class="p">(</span><span class="err">外部依然可以隨時用</span><span class="n">dispatch_async</span> <span class="no">Passing</span> <span class="no">Task</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">dispatch_suspend</span><span class="p">(</span><span class="n">_uploadToParseInBackgroundQueue</span><span class="p">());</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><a href="https://developer.apple.com/library/ios/documentation/General/Conceptual/ConcurrencyProgrammingGuide/OperationQueues/OperationQueues.html#//apple_ref/doc/uid/TP40008091-CH102-SW14">dispatch_resume與dispatch_suspend的官方參考文件</a></p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
