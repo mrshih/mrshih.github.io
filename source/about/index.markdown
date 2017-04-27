@@ -23,7 +23,7 @@ MRSHIH，施安宏。目前是個人開發者兼Mobile APP Developer，現居於
 * Experienced in Web Back-end development. (Node.js, PHP, JSP)
 * Experienced in Web Front-end development. (Bootstrap, jQuery, HTML5, CSS)
 * Experienced in Cloud Web service. (AWS EC2, S3, Cloudfront, CDN)
-* Experienced in Database Operation. (MySQL)
+* Experienced in Database Operation. (MySQL, MongoDB)
 * Experienced in Software Develop Teamwork. (Agile , Git, Slack) 
 * Experienced in High Availability System Design. (Loadblance, DB Duplicate, Read Replicas, Memory Cache, CDN, Object-Store, Log Design...)
 * Experienced in Software Operations. (Docker, Circle-CI, PM2, Shell, CronJob)
