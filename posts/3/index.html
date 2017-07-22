@@ -9,7 +9,7 @@
   <meta name="author" content="施安宏">
 
   
-  <meta name="description" content="很多時候操作網路或者Disk的I/O，我們都會把工作丟到背景去執行，避免凍結使用者的畫面。但是這造成一個問題是一下子太多背景任務同時執行有可能導致APP崩潰。 比如影音APP使用者見獵心喜，一下子選了許多部影片要下載，如果現在把下載任務一股腦兒丟到背景， &hellip;">
+  <meta name="description" content="所有關於ViewController切換的行為基本稱做為Model，Navegation特有的Push等等也是Model的分支。 在iOS7裡面把制定切換ViewController的行為拆分成許多Class，目的是為了要降低耦合，讓Code重用度提高， &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -78,6 +78,430 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2016/01/08/first-presentation-flow/">iOS 實作SlideMenu - 初探ViewController切換</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-01-08T18:10:00+08:00" pubdate data-updated="true">Jan 8<sup>th</sup>, 2016</time>
+        
+           | <a href="/blog/2016/01/08/first-presentation-flow/#disqus_thread"
+             data-disqus-identifier="http://sah.tw/blog/2016/01/08/first-presentation-flow/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img src="/images/2016-01-08-first-presentation-flow.jpg" />
+所有關於ViewController切換的行為基本稱做為Model，Navegation特有的Push等等也是Model的分支。 在iOS7裡面把制定切換ViewController的行為拆分成許多Class，目的是為了要降低耦合，讓Code重用度提高，比如Coustom一個切換Animation物件可以用在好幾個ViewController之間。</p>
+
+<p>要切換ViewController你要告訴UIKit兩件事情，顯示成怎樣<code>
+UIModalPresentationStyle
+</code>和過場動畫<code>Animations</code>。</p>
+
+<h2>UIModalPresentationStyle</h2>
+
+<p><code>UIModalPresentationStyle</code>是<code>UIViewController</code>裡的參數。定義了Presented最終呈現的樣式，比如：</p>
+
+<ul>
+<li>覆蓋全螢幕類的<code>UIModalPresentationFullScreen</code></li>
+<li>iPad上常見的<code>UIModalPresentationPopover</code></li>
+<li><code>UIModalPresentationCurrentContext</code>指定特定ViewController去做覆蓋</li>
+<li>而我們想要的Slide Menu這樣的顯示效果不是上面幾種類型的，我們就必須要Coustom一個。也就必須實作<code>TransitioningDelegate</code>來提供下面兩種物件：
+
+<ul>
+<li><code>UIPresentationController</code></li>
+<li>實作<code>UIViewControllerAnimatedTransitioning</code>的Animation</li>
+</ul>
+</li>
+</ul>
+
+
+<p>兩個物件後面會提到怎麼產生。</p>
+
+<h2>使用Segue切換View Controller</h2>
+
+<p>用Code寫的話常見做法是在Prestenting View Controller裡面呼叫<code>presentViewController</code>。而在這個可視化當道的年代當然要配合Storyboard搭配Segue才不會在未來多螢幕適配被淘汰掉。</p>
+
+<p>在StoryBoard裡面拉出一條Segue，並且把Kind指定成Coustom。這樣就是告訴StoryBoard我們不用UIKit內建的展示和轉場效果，要自己建立一個Subcalss<code>UIStoryboardSegue</code>的Coustom Segue物件：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="vi">@interface</span> <span class="no">SlideLeftCustomSegue</span> <span class="p">:</span> <span class="no">UIStoryboardSegue</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>在這裡只要實作<code>perform</code>方法，在裡面設定：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="sr">//</span> <span class="err">系統調用</span><span class="n">prepareForSegue</span><span class="err">就是調用這裡</span>
+</span><span class='line'><span class="o">-</span> <span class="p">(</span><span class="n">void</span><span class="p">)</span><span class="n">perform</span><span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="no">UIViewController</span> <span class="o">*</span><span class="n">srcViewController</span> <span class="o">=</span> <span class="p">(</span><span class="no">UIViewController</span> <span class="o">*</span><span class="p">)</span> <span class="nb">self</span><span class="o">.</span><span class="n">sourceViewController</span><span class="p">;</span>
+</span><span class='line'>    <span class="no">SettingTableViewController</span> <span class="o">*</span><span class="n">destViewController</span> <span class="o">=</span> <span class="p">(</span><span class="no">SettingTableViewController</span> <span class="o">*</span><span class="p">)</span> <span class="nb">self</span><span class="o">.</span><span class="n">destinationViewController</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="no">SlideMenuShowTransition</span> <span class="o">*</span><span class="n">trainstionDelegate</span> <span class="o">=</span> <span class="o">[[</span><span class="no">SlideMenuShowTransition</span> <span class="n">alloc</span><span class="o">]</span><span class="n">init</span><span class="o">]</span><span class="p">;</span>
+</span><span class='line'>    <span class="o">[</span><span class="n">destViewController</span> <span class="ss">setTd</span><span class="p">:</span><span class="n">trainstionDelegate</span><span class="o">]</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="sr">//</span><span class="err">把</span><span class="no">Presented</span> <span class="no">View</span> <span class="no">Controller</span><span class="err">的</span><span class="sb">`ModalPresentationStyle屬性改成UIModalPresentationCustom</span>
+</span><span class='line'><span class="sb">    [destViewController setModalPresentationStyle:UIModalPresentationCustom];</span>
+</span><span class='line'><span class="sb">    </span>
+</span><span class='line'><span class="sb">    //設置TransitioningDelegate。這個代理主要用來提供待會兒切換會用到的所有物件。下面會介紹到</span>
+</span><span class='line'><span class="sb">    [destViewController setTransitioningDelegate:trainstionDelegate];</span>
+</span><span class='line'><span class="sb">    </span>
+</span><span class='line'><span class="sb">    //最後呼叫presentViewController，來呼叫UIKit做開始切換</span>
+</span><span class='line'><span class="sb">    [srcViewController presentViewController:destViewController animated:YES completion:nil];</span>
+</span><span class='line'><span class="sb">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>TransitioningDelegate</h2>
+
+<p>當系統發現Predented View Controller指定<code>ModalPresentationStyle</code>參數為<code>UIModalPresentationCustom</code>時，就會去呼叫<code>TransitioningDelegate</code>來提供上面有提到Model切換轉場所需的相關物件：<code>UIPresentationController</code>與Animation。</p>
+
+<p>只要創一個實作<code>TransitioningDelegate</code>的NSObject，並指定給Presented View Controller就可以了。</p>
+
+<p>執行的時候UIKit會先抓UIPresentaionController再依照情況抓取要的Animaion物件。</p>
+
+<ol>
+<li>提交<code>UIPresentaionController</code>來決定Presented View的Final的Frame。</li>
+<li>提交所有轉場，包誇Present View Controller進來, Dismiss View Controller，還有交互等等。我們這裡簡單討論Present還有Dismiss的Animation物件怎麼做。</li>
+</ol>
+
+
+<p>系統會先抓<code>UIPresentaionController</code>一部分是因為Animation物件需要知道Prested View Final Frame。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="sr">//</span> <span class="n">present</span><span class="err">時</span><span class="n">uikit</span><span class="err">會從這裡拿資料</span><span class="o">&lt;</span><span class="err">過場動畫</span><span class="o">&gt;</span>
+</span><span class='line'><span class="o">-</span> <span class="p">(</span><span class="nb">id</span><span class="o">&lt;</span><span class="no">UIViewControllerAnimatedTransitioning</span><span class="o">&gt;</span> <span class="n">_Nullable</span><span class="p">)</span><span class="ss">animationControllerForPresentedController</span><span class="p">:(</span><span class="no">UIViewController</span> <span class="o">*</span> <span class="n">_Nonnull</span><span class="p">)</span><span class="n">presented</span> <span class="ss">presentingController</span><span class="p">:(</span><span class="no">UIViewController</span> <span class="o">*</span> <span class="n">_Nonnull</span><span class="p">)</span><span class="n">presenting</span> <span class="ss">sourceController</span><span class="p">:(</span><span class="no">UIViewController</span> <span class="o">*</span> <span class="n">_Nonnull</span><span class="p">)</span><span class="n">source</span> <span class="p">{</span>
+</span><span class='line'>    <span class="no">SlideMenuAnimator</span> <span class="o">*</span><span class="n">animator</span> <span class="o">=</span> <span class="o">[[</span><span class="no">SlideMenuAnimator</span> <span class="n">alloc</span><span class="o">]</span><span class="n">init</span><span class="o">]</span><span class="p">;</span>
+</span><span class='line'>    <span class="o">[</span><span class="n">animator</span> <span class="ss">setPresenting</span><span class="p">:</span><span class="no">YES</span><span class="o">]</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">animator</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">//</span> <span class="n">dismiss</span><span class="err">時</span><span class="n">uikit</span><span class="err">會從這裡拿資料</span><span class="o">&lt;</span><span class="err">過場動畫</span><span class="o">&gt;</span>
+</span><span class='line'><span class="o">-</span> <span class="p">(</span><span class="nb">id</span><span class="o">&lt;</span><span class="no">UIViewControllerAnimatedTransitioning</span><span class="o">&gt;</span> <span class="n">_Nullable</span><span class="p">)</span><span class="ss">animationControllerForDismissedController</span><span class="p">:(</span><span class="no">UIViewController</span> <span class="o">*</span> <span class="n">_Nonnull</span><span class="p">)</span><span class="n">dismissed</span> <span class="p">{</span>
+</span><span class='line'>    <span class="no">SlideMenuAnimator</span> <span class="o">*</span><span class="n">animator</span> <span class="o">=</span> <span class="o">[[</span><span class="no">SlideMenuAnimator</span> <span class="n">alloc</span><span class="o">]</span><span class="n">init</span><span class="o">]</span><span class="p">;</span>
+</span><span class='line'>    <span class="o">[</span><span class="n">animator</span> <span class="ss">setPresenting</span><span class="p">:</span><span class="no">NO</span><span class="o">]</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">animator</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">//</span> <span class="no">UIKit</span><span class="err">在切換之初從這裡要</span><span class="no">UIPresentationController</span>
+</span><span class='line'><span class="o">-</span> <span class="p">(</span><span class="no">UIPresentationController</span> <span class="o">*</span><span class="p">)</span><span class="ss">presentationControllerForPresentedViewController</span><span class="p">:</span>
+</span><span class='line'><span class="p">(</span><span class="no">UIViewController</span> <span class="o">*</span><span class="p">)</span><span class="n">presented</span>
+</span><span class='line'>                                                      <span class="ss">presentingViewController</span><span class="p">:(</span><span class="no">UIViewController</span> <span class="o">*</span><span class="p">)</span><span class="n">presenting</span>
+</span><span class='line'>                                                          <span class="ss">sourceViewController</span><span class="p">:(</span><span class="no">UIViewController</span> <span class="o">*</span><span class="p">)</span><span class="n">source</span> <span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="no">SlideMenuPresentaionController</span><span class="o">*</span> <span class="n">myPresentation</span> <span class="o">=</span> <span class="o">[[</span><span class="no">SlideMenuPresentaionController</span> <span class="n">alloc</span><span class="o">]</span>
+</span><span class='line'>                                                <span class="ss">initWithPresentedViewController</span><span class="p">:</span><span class="n">presented</span> <span class="ss">presentingViewController</span><span class="p">:</span><span class="n">presenting</span><span class="o">]</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">return</span> <span class="n">myPresentation</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>UIPresentationController</h2>
+
+<p>在iOS 7裡面引進了這個<code>UIPresentationController</code>，可以決定以下事情</p>
+
+<ul>
+<li>Set the size of the presented view controller.</li>
+<li>Add custom views to change the visual appearance of the presented content.</li>
+<li>Supply transition animations for any of its custom views.</li>
+<li>Adapt the visual appearance of the presentation when changes occur in the app’s environment.（之後另設補充）</li>
+</ul>
+
+
+<p>這裡只先介紹前三項，指定Presented View Frame的方法，還有額外增加Coustom View如陰影層的方法:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="sr">//</span> <span class="err">決定了使用</span><span class="no">UIModalPresentationCustom</span><span class="err">這樣的</span><span class="no">Model</span><span class="err">切換方式，就可以在這裡直接指定</span><span class="no">PresentedView</span><span class="err">的</span><span class="n">frame</span>
+</span><span class='line'><span class="o">-</span> <span class="p">(</span><span class="no">CGRect</span><span class="p">)</span><span class="n">frameOfPresentedViewInContainerView</span> <span class="p">{</span>
+</span><span class='line'>    <span class="no">CGRect</span> <span class="n">presentedViewFrame</span> <span class="o">=</span> <span class="no">CGRectZero</span><span class="p">;</span>
+</span><span class='line'>    <span class="no">CGRect</span> <span class="n">containerBounds</span> <span class="o">=</span> <span class="o">[[</span><span class="nb">self</span> <span class="n">containerView</span><span class="o">]</span> <span class="n">bounds</span><span class="o">]</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">presentedViewFrame</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="no">CGSizeMake</span><span class="p">(</span><span class="n">floorf</span><span class="p">(</span><span class="n">containerBounds</span><span class="o">.</span><span class="n">size</span><span class="o">.</span><span class="n">width</span> <span class="o">*</span> <span class="mi">0</span><span class="o">.</span><span class="mi">7</span><span class="p">),</span>
+</span><span class='line'>                                         <span class="n">containerBounds</span><span class="o">.</span><span class="n">size</span><span class="o">.</span><span class="n">height</span><span class="p">);</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">presentedViewFrame</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="sr">//</span> <span class="no">Present</span><span class="err">的時候可以增加一些</span><span class="no">Coustom</span> <span class="no">View</span><span class="err">，靠</span><span class="n">animateAlongsideTransition</span><span class="err">來顯示新增的</span><span class="no">Coustom</span><span class="err">過場動畫</span>
+</span><span class='line'><span class="sr">//</span> <span class="err">這裡用</span><span class="n">dimmingView</span><span class="err">來做</span><span class="no">Coustom</span> <span class="no">View</span><span class="err">的例子</span>
+</span><span class='line'><span class="o">-</span> <span class="p">(</span><span class="n">void</span><span class="p">)</span><span class="n">presentationTransitionWillBegin</span> <span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nb">self</span><span class="o">.</span><span class="n">dimmingView</span> <span class="o">=</span> <span class="o">[[</span><span class="no">UIView</span> <span class="n">alloc</span><span class="o">]</span><span class="n">init</span><span class="o">]</span><span class="p">;</span>
+</span><span class='line'>    <span class="o">[</span><span class="nb">self</span><span class="o">.</span><span class="n">dimmingView</span> <span class="ss">setFrame</span><span class="p">:</span><span class="nb">self</span><span class="o">.</span><span class="n">containerView</span><span class="o">.</span><span class="n">frame</span><span class="o">]</span><span class="p">;</span>
+</span><span class='line'>    <span class="o">[</span><span class="nb">self</span><span class="o">.</span><span class="n">dimmingView</span> <span class="ss">setBackgroundColor</span><span class="p">:</span><span class="o">[</span><span class="no">UIColor</span> <span class="n">blackColor</span><span class="o">]]</span><span class="p">;</span>
+</span><span class='line'>    <span class="o">[</span><span class="nb">self</span><span class="o">.</span><span class="n">dimmingView</span> <span class="ss">setAlpha</span><span class="p">:</span><span class="mi">0</span><span class="o">.</span><span class="mi">3</span><span class="n">f</span><span class="o">]</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="sr">//</span> <span class="no">Add</span> <span class="n">a</span> <span class="n">custom</span> <span class="n">dimming</span> <span class="n">view</span> <span class="n">behind</span> <span class="n">the</span> <span class="n">presented</span> <span class="n">view</span> <span class="n">controller</span><span class="err">&#39;</span><span class="n">s</span> <span class="n">view</span>
+</span><span class='line'>    <span class="o">[[</span><span class="nb">self</span> <span class="n">containerView</span><span class="o">]</span> <span class="ss">addSubview</span><span class="p">:</span><span class="nb">self</span><span class="o">.</span><span class="n">dimmingView</span><span class="o">]</span><span class="p">;</span>
+</span><span class='line'>    <span class="o">[</span><span class="nb">self</span><span class="o">.</span><span class="n">dimmingView</span> <span class="ss">addSubview</span><span class="p">:</span><span class="o">[[</span><span class="nb">self</span> <span class="n">presentedViewController</span><span class="o">]</span> <span class="n">view</span><span class="o">]]</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">#pragma clang diagnostic push</span>
+</span><span class='line'><span class="c1">#pragma clang diagnostic ignored &quot;-Wundeclared-selector&quot;</span>
+</span><span class='line'>    <span class="no">UITapGestureRecognizer</span> <span class="o">*</span><span class="n">dimmingViewSingleTap</span> <span class="o">=</span>
+</span><span class='line'>    <span class="o">[[</span><span class="no">UITapGestureRecognizer</span> <span class="n">alloc</span><span class="o">]</span> <span class="ss">initWithTarget</span><span class="p">:</span><span class="nb">self</span><span class="o">.</span><span class="n">presentingViewController</span>
+</span><span class='line'>                                            <span class="ss">action</span><span class="p">:</span><span class="vi">@selector</span><span class="p">(</span><span class="n">handleDimmingViewSingleTap</span><span class="p">)</span><span class="o">]</span><span class="p">;</span>
+</span><span class='line'><span class="c1">#pragma clang diagnostic pop</span>
+</span><span class='line'>    <span class="o">[</span><span class="nb">self</span><span class="o">.</span><span class="n">dimmingView</span> <span class="ss">addGestureRecognizer</span><span class="p">:</span><span class="n">dimmingViewSingleTap</span><span class="o">]</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="sr">//</span> <span class="no">Fade</span> <span class="k">in</span> <span class="n">the</span> <span class="n">dimming</span> <span class="n">view</span> <span class="n">during</span> <span class="n">the</span> <span class="n">transition</span><span class="o">.</span>
+</span><span class='line'>    <span class="o">[</span><span class="nb">self</span><span class="o">.</span><span class="n">dimmingView</span> <span class="ss">setAlpha</span><span class="p">:</span><span class="mi">0</span><span class="o">.</span><span class="mi">0</span><span class="o">]</span><span class="p">;</span>
+</span><span class='line'>    <span class="sr">//</span> <span class="no">Use</span> <span class="n">the</span> <span class="n">transition</span> <span class="n">coordinator</span> <span class="n">to</span> <span class="n">set</span> <span class="n">up</span> <span class="n">the</span> <span class="n">animations</span><span class="o">.</span>
+</span><span class='line'>    <span class="o">[[[</span><span class="nb">self</span> <span class="n">presentingViewController</span><span class="o">]</span> <span class="n">transitionCoordinator</span><span class="o">]</span> <span class="ss">animateAlongsideTransition</span><span class="p">:</span><span class="o">^</span><span class="p">(</span><span class="nb">id</span><span class="o">&lt;</span><span class="no">UIViewControllerTransitionCoordinatorContext</span><span class="o">&gt;</span>  <span class="n">_Nonnull</span> <span class="n">context</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="o">[</span><span class="nb">self</span><span class="o">.</span><span class="n">dimmingView</span> <span class="ss">setAlpha</span><span class="p">:</span><span class="mi">0</span><span class="o">.</span><span class="mi">55</span><span class="o">]</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span> <span class="ss">completion</span><span class="p">:</span><span class="o">^</span><span class="p">(</span><span class="nb">id</span><span class="o">&lt;</span><span class="no">UIViewControllerTransitionCoordinatorContext</span><span class="o">&gt;</span>  <span class="n">_Nonnull</span> <span class="n">context</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="p">}</span><span class="o">]</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">-</span> <span class="p">(</span><span class="n">void</span><span class="p">)</span><span class="n">dismissalTransitionWillBegin</span> <span class="p">{</span>
+</span><span class='line'>    <span class="o">[[[</span><span class="nb">self</span> <span class="n">presentingViewController</span><span class="o">]</span> <span class="n">transitionCoordinator</span><span class="o">]</span> <span class="ss">animateAlongsideTransition</span><span class="p">:</span><span class="o">^</span><span class="p">(</span><span class="nb">id</span><span class="o">&lt;</span><span class="no">UIViewControllerTransitionCoordinatorContext</span><span class="o">&gt;</span>  <span class="n">_Nonnull</span> <span class="n">context</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="o">[</span><span class="nb">self</span><span class="o">.</span><span class="n">dimmingView</span> <span class="ss">setAlpha</span><span class="p">:</span><span class="mi">0</span><span class="o">.</span><span class="mi">0</span><span class="o">]</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span> <span class="ss">completion</span><span class="p">:</span><span class="o">^</span><span class="p">(</span><span class="nb">id</span><span class="o">&lt;</span><span class="no">UIViewControllerTransitionCoordinatorContext</span><span class="o">&gt;</span>  <span class="n">_Nonnull</span> <span class="n">context</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="p">}</span><span class="o">]</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Animation</h2>
+
+<p>建立一個實作<code>UIViewControllerAnimatedTransitioning</code> protocol的<code>NSObject</code>，裡面會有系統傳入的<code>UIViewControllerContextTransitioning</code>，這裡面會包含你後面要做動畫所需的所有物件。</p>
+
+<p>主要兩個方法，一個方法專門玩動畫，一個方法單純回傳動畫所需時間。</p>
+
+<p>我們可以把Present和Dismiss的動畫寫在一起，但<code>transitionContext</code>傳入的資訊什麼都有，就是沒有現在是Present還是Dismiss狀態的參數。</p>
+
+<p>所以要自己設一個，並且在<code>TransitioningDelegate</code>回傳動畫方法時指定給Animation物件知道:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="vi">@interface</span> <span class="no">SlideMenuAnimator</span> <span class="p">:</span> <span class="no">NSObject</span><span class="o">&lt;</span><span class="no">UIViewControllerAnimatedTransitioning</span><span class="o">&gt;</span>
+</span><span class='line'><span class="vi">@property</span> <span class="p">(</span><span class="n">nonatomic</span><span class="p">)</span> <span class="no">Boolean</span> <span class="n">presenting</span><span class="p">;</span>
+</span><span class='line'><span class="vi">@end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="sr">//</span> <span class="err">這裡</span><span class="no">UIKit</span><span class="err">會給我們兩個</span><span class="no">View</span><span class="err">，包在</span><span class="n">transitionContext</span><span class="err">裡面，只要取出來玩就好了</span>
+</span><span class='line'><span class="sr">//</span> <span class="err">這裡是真的作動畫的地方</span>
+</span><span class='line'><span class="o">-</span> <span class="p">(</span><span class="n">void</span><span class="p">)</span><span class="ss">animateTransition</span><span class="p">:(</span><span class="nb">id</span><span class="o">&lt;</span><span class="no">UIViewControllerContextTransitioning</span><span class="o">&gt;</span> <span class="n">_Nonnull</span><span class="p">)</span><span class="n">transitionContext</span> <span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="sr">//</span> <span class="no">Get</span> <span class="n">the</span> <span class="n">set</span> <span class="n">of</span> <span class="n">relevant</span> <span class="n">objects</span><span class="o">.</span>
+</span><span class='line'>    <span class="no">UIView</span> <span class="o">*</span><span class="n">containerView</span> <span class="o">=</span> <span class="o">[</span><span class="n">transitionContext</span> <span class="n">containerView</span><span class="o">]</span><span class="p">;</span>
+</span><span class='line'>    <span class="no">UIViewController</span> <span class="o">*</span><span class="n">fromVC</span> <span class="o">=</span> <span class="o">[</span><span class="n">transitionContext</span>
+</span><span class='line'>                                <span class="ss">viewControllerForKey</span><span class="p">:</span><span class="no">UITransitionContextFromViewControllerKey</span><span class="o">]</span><span class="p">;</span>
+</span><span class='line'>    <span class="no">UIViewController</span> <span class="o">*</span><span class="n">toVC</span>   <span class="o">=</span> <span class="o">[</span><span class="n">transitionContext</span>
+</span><span class='line'>                                <span class="ss">viewControllerForKey</span><span class="p">:</span><span class="no">UITransitionContextToViewControllerKey</span><span class="o">]</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="no">UIView</span> <span class="o">*</span><span class="n">toView</span> <span class="o">=</span> <span class="o">[</span><span class="n">transitionContext</span> <span class="ss">viewForKey</span><span class="p">:</span><span class="no">UITransitionContextToViewKey</span><span class="o">]</span><span class="p">;</span>
+</span><span class='line'>    <span class="no">UIView</span> <span class="o">*</span><span class="n">fromView</span> <span class="o">=</span> <span class="o">[</span><span class="n">transitionContext</span> <span class="ss">viewForKey</span><span class="p">:</span><span class="no">UITransitionContextFromViewKey</span><span class="o">]</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="sr">//</span> <span class="no">Set</span> <span class="n">up</span> <span class="n">some</span> <span class="n">variables</span> <span class="k">for</span> <span class="n">the</span> <span class="n">animation</span><span class="o">.</span>
+</span><span class='line'>    <span class="sr">//</span><span class="no">CGRect</span> <span class="n">containerFrame</span> <span class="o">=</span> <span class="n">containerView</span><span class="o">.</span><span class="n">frame</span><span class="p">;</span>
+</span><span class='line'>    <span class="sr">//</span><span class="no">CGRect</span> <span class="n">toViewStartFrame</span> <span class="o">=</span> <span class="o">[</span><span class="n">transitionContext</span> <span class="ss">initialFrameForViewController</span><span class="p">:</span><span class="n">toVC</span><span class="o">]</span><span class="p">;</span>
+</span><span class='line'>    <span class="no">CGRect</span> <span class="n">fromViewStartFrame</span> <span class="o">=</span> <span class="o">[</span><span class="n">transitionContext</span> <span class="ss">initialFrameForViewController</span><span class="p">:</span><span class="n">fromVC</span><span class="o">]</span><span class="p">;</span>
+</span><span class='line'>    <span class="no">CGRect</span> <span class="n">toViewFinalFrame</span> <span class="o">=</span> <span class="o">[</span><span class="n">transitionContext</span> <span class="ss">finalFrameForViewController</span><span class="p">:</span><span class="n">toVC</span><span class="o">]</span><span class="p">;</span>
+</span><span class='line'>    <span class="no">CGRect</span> <span class="n">fromViewFinalFrame</span> <span class="o">=</span> <span class="o">[</span><span class="n">transitionContext</span> <span class="ss">finalFrameForViewController</span><span class="p">:</span><span class="n">fromVC</span><span class="o">]</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="sr">//</span> <span class="mi">3</span><span class="o">.</span> <span class="no">Add</span> <span class="n">toVC</span><span class="err">&#39;</span><span class="n">s</span> <span class="n">view</span> <span class="n">to</span> <span class="n">containerView</span>
+</span><span class='line'>    <span class="o">[</span><span class="n">containerView</span> <span class="ss">addSubview</span><span class="p">:</span><span class="n">toView</span><span class="o">]</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="nb">self</span><span class="o">.</span><span class="n">presenting</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="o">[</span><span class="n">toView</span> <span class="ss">setFrame</span><span class="p">:</span><span class="no">CGRectOffset</span><span class="p">(</span><span class="n">toViewFinalFrame</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="o">*</span><span class="n">toViewFinalFrame</span><span class="o">.</span><span class="n">size</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span><span class="o">]</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span><span class="k">else</span> <span class="p">{</span>
+</span><span class='line'>        <span class="o">[</span><span class="n">fromView</span> <span class="ss">setFrame</span><span class="p">:</span><span class="n">fromViewStartFrame</span><span class="o">]</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="sr">//</span> <span class="no">Creating</span> <span class="n">the</span> <span class="n">animations</span> <span class="n">using</span> <span class="no">Core</span> <span class="no">Animation</span> <span class="ow">or</span> <span class="no">UIView</span> <span class="n">animation</span> <span class="nb">methods</span><span class="o">.</span>
+</span><span class='line'>    <span class="o">[</span><span class="no">UIView</span> <span class="ss">animateWithDuration</span><span class="p">:</span><span class="o">[</span><span class="nb">self</span> <span class="ss">transitionDuration</span><span class="p">:</span><span class="n">transitionContext</span><span class="o">]</span> <span class="ss">animations</span><span class="p">:</span><span class="o">^</span><span class="p">{</span>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="nb">self</span><span class="o">.</span><span class="n">presenting</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>            <span class="n">toView</span><span class="o">.</span><span class="n">frame</span> <span class="o">=</span> <span class="n">toViewFinalFrame</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">}</span><span class="k">else</span> <span class="p">{</span>
+</span><span class='line'>            <span class="n">fromView</span><span class="o">.</span><span class="n">frame</span> <span class="o">=</span> <span class="no">CGRectOffset</span><span class="p">(</span><span class="n">fromViewFinalFrame</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="o">*</span><span class="n">fromViewFinalFrame</span><span class="o">.</span><span class="n">size</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span> <span class="ss">completion</span><span class="p">:</span><span class="o">^</span><span class="p">(</span><span class="no">BOOL</span> <span class="n">finished</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="sr">//</span> <span class="mi">3</span><span class="o">.</span><span class="n">Cleaning</span> <span class="n">up</span> <span class="ow">and</span> <span class="n">completing</span> <span class="n">the</span> <span class="n">transition</span><span class="o">.</span>
+</span><span class='line'>        <span class="o">[</span><span class="n">transitionContext</span> <span class="ss">completeTransition</span><span class="p">:</span><span class="no">YES</span><span class="o">]</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span><span class="o">]</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>嚴謹有序的切換View Controller Flow</h2>
+
+<p>到這邊就可以做出一個會動，有PresentingView有陰影Mask的SlideMenu了，視覺上是仿照Google Photo。基本上iOS 7所引進的這些許多新方法都是為了要解構，使之可以更容易管理，更有邏輯性。</p>
+
+<p>有關切換ViewController來有些重要Feature，留待之後想到應用實作再增加</p>
+
+<ul>
+<li>InteractiveTransition交互動畫的部分</li>
+<li>跟<code>UIPresentationController</code>適配不同場景的應用Adapting to Different Size Classes</li>
+</ul>
+
+
+<h3>參考資料</h3>
+
+<p> <a href="https://developer.apple.com/videos/play/wwdc2014-228/">https://developer.apple.com/videos/play/wwdc2014-228/</a>
+&ndash; <a href="http://onevcat.com/2013/10/vc-transition-in-ios7/">http://onevcat.com/2013/10/vc-transition-in-ios7/</a>
+&ndash; <a href="https://developer.apple.com/library/ios/featuredarticles/ViewControllerPGforiPhoneOS/DefiningCustomPresentations.html#//apple_ref/doc/uid/TP40007457-CH25-SW1">https://developer.apple.com/library/ios/featuredarticles/ViewControllerPGforiPhoneOS/DefiningCustomPresentations.html#//apple_ref/doc/uid/TP40007457-CH25-SW1</a></p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
