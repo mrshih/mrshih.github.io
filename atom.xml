@@ -4,7 +4,7 @@
   <title><![CDATA[MR SHIH]]></title>
   <link href="http://sah.tw/atom.xml" rel="self"/>
   <link href="http://sah.tw/"/>
-  <updated>2017-07-22T23:19:11+08:00</updated>
+  <updated>2017-07-22T23:27:09+08:00</updated>
   <id>http://sah.tw/</id>
   <author>
     <name><![CDATA[施安宏]]></name>
@@ -14,11 +14,13 @@
 
   
   <entry>
-    <title type="html"><![CDATA[多人異步開發時會遇到問題會需要的基礎設施]]></title>
+    <title type="html"><![CDATA[多人異步開發的基礎設施]]></title>
     <link href="http://sah.tw/blog/2017/07/22/tec-infrastructure/"/>
     <updated>2017-07-22T14:20:09+08:00</updated>
     <id>http://sah.tw/blog/2017/07/22/tec-infrastructure</id>
-    <content type="html"><![CDATA[<p>​ 長期開發並維護一個產品跟短期衝刺生產出一個專案，最大的差別在於開發流程，專案是同步進行的，而產品開發實際上是異步進行的。</p>
+    <content type="html"><![CDATA[<p>​ <img src="http://mrshih.github.io/images/2017-07-22-tec-infrastructure.jpg" alt="2017-07-22-tec-infrastructure" /></p>
+
+<p>長期開發並維護一個產品跟短期衝刺生產出一個專案，最大的差別在於開發流程，專案是同步進行的，而產品開發實際上是異步進行的。開發元件可以用土法一路衝到最後，但開發系統沒有完善的基礎設施，案子很快就毀出現許多問題導致開發窒礙難行。</p>
 
 <h3>同步進行</h3>
 
