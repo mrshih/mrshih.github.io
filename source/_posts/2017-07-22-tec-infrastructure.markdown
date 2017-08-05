@@ -3,7 +3,7 @@ layout: post
 title: "多人異步開發產品的基礎設施"
 date: 2017-07-22 14:20:09 +0800
 comments: true
-categories: 
+categories: 系統產品開發
 ---
 
 ​	![2017-07-22-tec-infrastructure](http://mrshih.github.io/images/2017-07-22-tec-infrastructure.jpg)
