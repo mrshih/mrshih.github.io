@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: 系統產品開發 | MR SHIH]]></title>
+  <link href="http://sah.tw/blog/categories/xi-tong-chan-pin-kai-fa/atom.xml" rel="self"/>
+  <link href="http://sah.tw/"/>
+  <updated>2017-08-05T18:23:25+08:00</updated>
+  <id>http://sah.tw/</id>
+  <author>
+    <name><![CDATA[施安宏]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Production系統的穩定機制]]></title>
+    <link href="http://sah.tw/blog/2017/08/05/high-availability-production-environment-issue/"/>
+    <updated>2017-08-05T16:20:09+08:00</updated>
+    <id>http://sah.tw/blog/2017/08/05/high-availability-production-environment-issue</id>
+    <content type="html"><![CDATA[<p>​ <img src="http://mrshih.github.io/images/2017-07-22-tec-infrastructure.jpg" alt="2017-07-22-tec-infrastructure" /></p>
+
+<p>要上線一個系統，或更新一個系統的版本，首先最重要的就是系統穩定度。有些系統比如在銀行，上線後出了問題都是非常緊急的，一但系統上線開放給別人來使用，背後需要考慮的完善，才不會上線之後一直在救火救不完。</p>
+
+<p>底下從底層的Exception的機制、Log的紀錄方式、整體功能的完整性驗證、系統如何維持總是不死的狀態，到最後如果還是發生持續性錯誤如何處理，依序來談談資訊系統上到Production前，需要先考慮到的議題。</p>
+
+<h3>底層的Exception機制</h3>
+
+<p>最重要就是有錯誤產生就一定要在程式碼有catch到，並請定義好這個狀況搭配的錯誤代碼為何。有時會看到工程師在catch裡面不做任何事情，這是不被允許的，一旦出了問題大家都一頭霧水無法在第一時間了解狀況，影響到處理問題的黃金時間。而設計系統架構時就把錯誤回傳方式定義好，比如以下例子，後端程式只要判斷result為0，就可以知道有錯誤產生，並且讀取errorCode做相對應的處理。</p>
+
+<p>```
+{</p>
+
+<pre><code>"result": 0,
+"errorCode": 13057
+</code></pre>
+
+<p>}
+```</p>
+
+<h3>Log的紀錄方式</h3>
+
+<p>Log最終是要拿來分析的，不管是程式分析還是人眼分析，都需要一個清楚固定的格式，尤其是第一時間往往要靠人眼去分析，這時候Log寫的工整與完整，絕對有助於除錯。一個好的格式必定要包含時間When，是誰Who，發生了什麼事What，錯誤代碼或錯誤訊息。</p>
+
+<h3>整體功能的完整性驗證與壓力測試</h3>
+
+<p>上線或更版之前，必定要做兩件事，功能性驗證與壓力測試。功能性驗證我常用的做法是寫自動測試，把所有預期狀況都寫成一個case，上線前的版本都要掃過並驗證功能正常。再來壓力測試就是測試針對大量併發連線，大量持續呼叫，服務是不是依然回應正常。</p>
+
+<h3>維持總是不死的狀態</h3>
+
+<p>服務如果持續回應，但是回應一樣的錯誤怎麼辦？這時候系統要能判讀錯誤並自我修復，比如re-try機制，如果socket連線斷掉等等，系統要能夠自我偵測並且主動重新連線。另一種狀況則是如果系統遇到fatal error，要使用<a href="http://linux.vbird.org/linux_basic/0560daemons.php">守護進程</a>，讓作業系統保護這個程式，一但偵測到結束訊號，要主動重啟服務。</p>
+
+<h3>如果還是發生持續性錯誤如何處理</h3>
+
+<p>第一時間要通知維運人員，常見做法是發送Email，並包含足夠的錯誤訊息資訊，如果環境開放一點的可以串接Slack API。因為這個時候已經發生系統沒有考慮到的狀況，才會導致服務停擺。第一時間常是手動重啟系統，再來看Log找錯誤，加入開發排程，緊急的話開一個<a href="https://ihower.tw/blog/archives/5140">Hotfix branch</a>出來，修正後把錯誤的狀況寫入文件中把狀況、原因、如何處理寫清楚，避免再次發生。</p>
+
+<h3>不斷的進化的過程</h3>
+
+<p>如何開發一套系統能在各種狀況下穩定的提供服務，是需要開發團隊透過敏捷開發方式加上完善的文檔與強烈的責任感共同來達成，不是一個容易的目標但一但達成是非常有價值的經驗也能提供很高的自我成就感。以上僅是列出部分議題，還有更多HA機制比如多台互為備援等，等待日後去實踐。</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[多人異步開發產品的基礎設施]]></title>
+    <link href="http://sah.tw/blog/2017/07/22/tec-infrastructure/"/>
+    <updated>2017-07-22T14:20:09+08:00</updated>
+    <id>http://sah.tw/blog/2017/07/22/tec-infrastructure</id>
+    <content type="html"><![CDATA[<p>​ <img src="http://mrshih.github.io/images/2017-07-22-tec-infrastructure.jpg" alt="2017-07-22-tec-infrastructure" /></p>
+
+<p>長期開發並維護一個產品跟短期衝刺生產出一個專案，最大的差別在於開發流程。負責小元件或小專案在開發上是同步進行的，而產品或大系統在開發上是異步進行的。開發元件可以用土法一路衝到最後，但開發系統沒有完善的基礎設施，案子很快就會出現許多問題導致開發窒礙難行。</p>
+
+<p>如果以往是開發小系統，但突然有一天有機會接觸大系統的開發或規劃，沒有這些概念先Keep in mind，開發路上就會很辛苦了。</p>
+
+<h3>同步進行</h3>
+
+<p>小專案需求訪談後產生工作說明書然後簽字畫押好，只要規格寫的好範圍是可以被確定的，也不可以隨意亂改<del>，改了可以再收錢</del>。所以開發者一開始就能清楚界定專案的範圍，大部分未知的風險比如技術瓶頸可以被事先預知，開發時間可以被事先規劃。所以實務上從撰寫規格書界定專案範圍，再來實際開發最後到測試與驗收，流程上是以同步(sync)的方式進行。</p>
+
+<h3>異步進行</h3>
+
+<p>而大部分產品會給多個客戶使用那就會有多重意見和偏好，再來因為想做的功能多，甚至很多功能是要做但現在還沒辦法做，一開始也就是先畫出WBS圖來大略上界定範圍，很難一開始就寫好完整版規格書，界定所有API。而是隨著時間發展，常常是先寫好幾個客戶緊急需要的模組，然後就出貨給客戶，之後陸續再Release新版補給客戶其他沒有那麼緊急或重要的功能。而一但把時間因素拉長並考慮進去，開發上很多問題就會浮現了。</p>
+
+<h4>緊急事件</h4>
+
+<p>有緊急狀況發生比如出貨的產品臨時被要求在上線前要提供弱掃報告與修正，那這時後原先預定的下一個版號要新增的功能就要被置換成修正弱掃缺點。原本要被Merge回來的Feature支線就要暫緩，並且火速開一個Feature來修改弱點並發布成一個版本。</p>
+
+<h4>Feature要不要Release的抉擇</h4>
+
+<p>如果有很多新功能都接近完成，這時候要Release那些到下一版？通常第一個要考慮的是客戶的安心感。比如新功能要犧牲效能來換取穩定度，這時候要犧牲多少效能？這數字是客戶可以接受的嗎？客戶搞不好寧願犧牲穩定度來換取效能？如果客戶有多個有的可以有的不行呢？</p>
+
+<p>上述沒有考慮到就貿然Release出去，如果驚嚇到客戶，讓客戶對我們信心感和安全感下降這都是很嚴重的損失。</p>
+
+<h4>本版間的關係管理</h4>
+
+<p>隨著時間迭代，A客戶是0.8版，B客戶是0.9版，這時候怎麼從0.8升級到0.9？兩個版本之間又有什麼差別？如果是好幾10個版本分散在各地有辦法處理嗎？如果沒有搭配文件、程式碼版本控管、環境印象檔化，不用多久整個案子就會無法維護。</p>
+
+<p>文件記錄各版本的Release note，並且要有規範，標明新功能和已知問題等。版本控管Git要有Git Flow如Release branch在程式標明版本號，和Tag標註方便切換不同版本。運用Docker把運行環境標準化<a href="https://www.thoughtworks.com/insights/blog/infrastructure-code-reason-smile">Infrastructure as Code</a>，除了確保開發時與上線的反應相同，也避免環境升版降版時遺漏了設定造成的錯誤。</p>
+
+<h4>眾多協同開發會遇到的協作工具</h4>
+
+<p>Product version control document、Git、Auto test、CI Server、Project Management Know How(WBS etc…)、Document Guideline、Issue tracking等，以上這些就像是現代產品開發所必備的基礎設施，少了這些要開發大型系統或隨著時間迭代成長的產品是不可能的事情，沒有這些整個技術Team無法持續成長，也會欠下一堆技術債，累積到最後整個產品開發寸步難行，而對風險的忍受度也會異常的低，比如一個關鍵開發人員走了整個產品開發就無以為繼了。</p>
+
+<p>從開發元件與小APP到現在開發產品，遇到的問題很多已經不是單一技術面，更多是如何管理這堆技術生老病死的問題，僅記錄一些最近遇到的實際問題與想法。</p>
+]]></content>
+  </entry>
+  
+</feed>
