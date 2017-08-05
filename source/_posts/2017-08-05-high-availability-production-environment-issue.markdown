@@ -6,7 +6,7 @@ comments: true
 categories: 系統產品開發
 ---
 
-​	![2017-07-22-tec-infrastructure](http://mrshih.github.io/images/2017-07-22-tec-infrastructure.jpg)
+​	![2017-08-05-high-availability-production-environment-issu](http://mrshih.github.io/images/2017-08-05-high-availability-production-environment-issue.jpg)
 
 要上線一個系統，或更新一個系統的版本，首先最重要的就是系統穩定度。有些系統比如在銀行，上線後出了問題都是非常緊急的，一但系統上線開放給別人來使用，背後需要考慮的完善，才不會上線之後一直在救火救不完。
 
