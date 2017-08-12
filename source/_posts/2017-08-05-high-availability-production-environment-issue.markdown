@@ -3,7 +3,7 @@ layout: post
 title: "Production系統的穩定機制"
 date: 2017-08-05 16:20:09 +0800
 comments: true
-categories: 系統產品開發
+categories: 工匠
 ---
 
 ​	![2017-08-05-high-availability-production-environment-issu](http://mrshih.github.io/images/2017-08-05-high-availability-production-environment-issue.jpg)
