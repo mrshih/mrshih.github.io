@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "商業簡報說服對方的框架，吸引專業執行"
+title: "商業簡報說服對方的框架：吸引專業執行"
 date: 2017-08-12 23:34:06 +0800
 comments: true
 categories: 行腳商人
