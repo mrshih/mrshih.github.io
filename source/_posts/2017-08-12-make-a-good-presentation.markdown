@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "用商業簡報說服對方的框架"
+title: "怎麼用簡報有效傳達訊息與說服對方"
 date: 2017-08-12 23:34:06 +0800
 comments: true
 categories: 行腳商人
