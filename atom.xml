@@ -4,7 +4,7 @@
   <title><![CDATA[MR SHIH]]></title>
   <link href="http://sah.tw/atom.xml" rel="self"/>
   <link href="http://sah.tw/"/>
-  <updated>2017-09-03T15:11:26+08:00</updated>
+  <updated>2017-11-22T15:53:11+08:00</updated>
   <id>http://sah.tw/</id>
   <author>
     <name><![CDATA[施安宏]]></name>
@@ -12,6 +12,81 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[職場做好事情的判斷力]]></title>
+    <link href="http://sah.tw/blog/2017/11/22/office-partnership/"/>
+    <updated>2017-11-22T15:47:34+08:00</updated>
+    <id>http://sah.tw/blog/2017/11/22/office-partnership</id>
+    <content type="html"><![CDATA[<h2>判斷力的缺乏</h2>
+
+<p> 公司現在正在進行產業升級，要從硬體跨足軟體平台，老闆很重視軟體，認為是未來提升營收的成長主要動能，也是公司在市場攻城掠地擴大市佔率的重要工具，但合作的同事或底下的部署長搞不清楚狀況，把軟體研發的工作視為&#8217;額外&#8217;的工作，認為原本硬體工作做好就好，根本不會主動來學習軟體部分，甚至覺得是多餘的屎缺，麻煩事，為什麼我要學？</p>
+
+<p>但是硬體部份其實賣出去剩下都是維護而已，在老闆眼中只是例行性工作，就算出狀況要聯絡原廠也只算是緩衝工作，但不少人真的把大部分時間那去聯絡原廠解決問題，然後抱怨自己不被重視（可能硬體維護的錢公司常常公開說很重視，導致他們覺得自己做的事在老闆眼中很重要，但我覺得老闆&#8221;只在意&#8221;業務有沒有談高維護合約的錢而已，技術部你處理維護好只是&#8221;領薪水份內的事&#8221;）。</p>
+
+<h4>應用</h4>
+
+<p>上了這們課之後，學會以後跟他們說明工作有分緩衝工作跟核心工作，不要只是把時間都拿去處理緩衝工作，高風險低報酬，然後一直覺得自己明明那麼努力在做維護，公司還虧待輕視自己。</p>
+
+<p>老闆常常說維護很重要，其實是指維護的錢老闆覺得很重要，所以在業務部那是核心工作或根本偏形象工作，在技術部，維護只是緩衝工作。</p>
+
+<p>所以大家要把時間跟精力，放在研發新軟體上，這樣老闆對你的態度自然會變，自然會重視你。薪水 職位 尊重那些自然會來。</p>
+
+<h2>對局的不認識</h2>
+
+<p>自己之前常常搞不懂老闆一直逼我們技術人員pre-sales出去簡報的時候，為什麼要積極的去換名片？不就簡報完叫業務去問有沒有興趣就好了，真的出問題找業務去聯絡技術窗口，接著我們再來接手。我們技術人員就還是趕快簡報完回去開發程式比較重要。</p>
+
+<h4>應用</h4>
+
+<p>跟我有同樣想法的技術人員幾乎是全部，都覺得跟客戶換名片沒什麼意義。但上了這次課之後搭配以前的情境恍然大悟，也知道以後怎麼跟同事講換名片（搞懂title, 搞懂對方在這個案子力扮演的角色）的重要性了。</p>
+
+<p>就技術面來說，產品賣出去真的出問題，第一時間要是可以找到working-level的人，那就能很快地了解狀況。說不定對方還能幫我們現場做一些除錯，問題就直接解決了。</p>
+
+<p>業務面來說，而我們pre-sales成案也是有獎金，如果我能搞懂可能那些人是真正要使用的人（常常業務對口只是負責採購設備的單位），並與他建立關係，會後直接附上更多參考訊息，並且看對方的回饋態度，其實有沒有機會成案搞不好很容易就觀察出來，不用事後還白忙很多場，甚至因為我的主動聯絡真正要使用的人，成案的機會都會提升我覺得。</p>
+
+<p>以後我就完全知道出去換名片的意義，因為能對整個局更加了解，找出真正重要的關係人！以後部署出去做pre-sales也才好說服他們換名片，知道出去簡報重點在哪裡，搜集問題，搜集人的資訊，搞懂局！</p>
+
+<p>我也可以分享給老闆怎麼讓底下的人了解交換名片認識人的重要性，這樣他們才會實際去做！</p>
+
+<h2>對上位者需求的不理解</h2>
+
+<p>常常老闆會莫名其妙跑出不可行的idea，我都會直接說為什麼不可能，雖然老闆事後會理解不可行（應該吧&hellip;因為沒再提了），但當下都會有一些爭論。</p>
+
+<h4>應用</h4>
+
+<p>了解應該去滿足老闆有效掌控的慾望後就知道，先思考老闆背後動機是什麼，比如業績提升（感覺這裡有TOC裡面核心目標的味道），他心裡面想被滿足什麼，產品支援度提升，自己得意見被思考（感覺這裡有TOC裡面內心需求的味道），然後第一時間不急著反駁老闆的對外訴求，表示對於大方向，比如支援度提升認同，然後再說我們會去研究老闆的對外訴求。</p>
+
+<p>上完課後第一個工作日老闆來跟我產品應該增加A功能，我就學乖了，先說『沒錯，應該要提升對於這個功能的支援度，這樣才有辦法做xxx，我們會去研究看看A功能整合上有沒有問題』，當下老闆就沒有再打斷我們工作了。事後我們再提其他解法就可以了（如果老闆還記得&hellip;），畢竟滿足內心需求有很多種做法！</p>
+
+<h2>心中沒有指南針，浪來會亂飄</h2>
+
+<p>自己對於工作與產出是個很有責任感的人，對於專案的輕重緩急因為有上過專案管理啟蒙也有判斷力，公司業務都很喜歡與我合作。但有時日常生活的消耗時間，專案或技術或市場推行碰到阻力，一陣子沒有進展，或是不明原因，有時會有種好像不小心庸庸碌碌不知道自己在幹嘛的感覺。</p>
+
+<h4>應用</h4>
+
+<p>像今天在猶豫要不要跟大家出去買飯吃，平常大家會揪但我心裡是不太想的，中午時間喜歡快速解決，然後繼續工作。但今天轉念想到老師上課三不五時就會指的『你想從工作中獲的什麼』的那面牆，馬上就覺得我有我的理想與目標，我不是來這裡交朋友的，在工作上能與人愉快的合作建立自己得專業品牌才是我要的，這時候心裡立刻就不猶豫，自己去買飯火速解決。</p>
+
+<p>以後又有不知道自己在幹嘛的感覺時，就會提醒自己那三個目標，幫我做出較為正確的選擇。真的很實用。莫忘初衷。</p>
+
+<h2>結尾：不只雪中送炭，更錦上添花</h2>
+
+<p>還有很多的情境，但不算是問題，但依然可以應用課程的知識去做強化。比如對於客戶安全感的管理，之後定期主動的提供消息（明確計畫與專業態度），主動去管理他們的不安全感。並且之後比如產品如何上線等情境也都提供選項，一方面我們可以收斂想法，一方面可以滿足客戶的掌控慾。</p>
+
+<p>至於適度地提供壞消息並隨後擺平之，我把它定義為先說這個功能很難，要花多功，但我們可以做到，之後再完成，讓客戶提升安心感與風險免疫能力。</p>
+
+<h2>關於日後練習</h2>
+
+<ul>
+<li>同理心的練習：找到關注利益與主要憂慮，才能找對策（參考一般性通則與職場人際對策速查表）</li>
+<li>緩衝工作的判斷（比如客戶說不出明確時程，判定沒什麼成案機會是緩衝工作XD）</li>
+<li>練習看懂局：找出關鍵人物，模擬他要什麼（同理心練習），加入時間因子（上過專案管理啟蒙後覺得時間很重要，而且常常是最重要的），最後理出頭緒。</li>
+<li>人際關係計劃表：多跟有關的客戶窗口多聊天，在合作愉快得前提下，聊是否結婚，有沒有小孩，有沒有要出去旅行，有什麼興趣等等，只要記得客戶就會keep in mind。</li>
+</ul>
+
+
+<p>最後謝謝姚老師Bryan把這麼抽象的知識概念系統化的傳授給我們！</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[『大人學英文』對我未來日常生活的影響]]></title>
@@ -1617,96 +1692,6 @@ NSMutableArray
 <p>其實在Xcode裡面刻畫環境真的是很享受的過程，當你刻畫出的UI在<code>Storyboard</code>上跟UI出的圖一樣時，那樣的成就感很高。尤其Apple近幾年推出的<code>Autolayout</code>跟<code>SizeClass</code>其實都走在很前端的地方，給開發者很大的彈性與方便。</p>
 
 <p>這裡也推薦這個網站Zeplin，我現在配合的設計師可以很方便地更新圖給大家，上面尺寸也都可以標註到很細，甚至這個網站還有Mac的APP，裡面有個特異功能是可以把素材匯進到專案的<code>Assets.xcassets</code>真的很棒！</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[運用iOS Fastlane自動化部署TestFlight]]></title>
-    <link href="http://sah.tw/blog/2016/05/03/ios-fastlane/"/>
-    <updated>2016-05-03T14:59:51+08:00</updated>
-    <id>http://sah.tw/blog/2016/05/03/ios-fastlane</id>
-    <content type="html"><![CDATA[<p>老生常談得一件事情，如果一個團隊花一個禮拜的時間寫好自動部署的工具，比如用shell，把平常又臭又長或者很繁瑣的指令集結起來，之後這些繁瑣重複的工作就可以透過自動化工具省下不少時間。</p>
-
-<blockquote><p>表面上看起來或許一年之後你才能把省下來的那幾秒鐘累積成一個禮拜，達成回本的動作，但是如果你不這樣做，你把那一個禮拜的時間打散到一年裡面，換來的就是你一年的開發效率低落。</p>
-
-<p>長遠看來，有沒有做自動化工具的團隊，差距可謂天與地。</p></blockquote>
-
-<p>知道了自動化的重要性，再來就iOS而言有一套<a href="https://krausefx.com/blog/fastlane-is-now-part-of-fabric">國外Twitter青年才俊高富帥工程師從side project發展成全職開發的iOS自動化工具組</a>-fastlane，國外紅一陣子了，但中文的介紹似乎不多，秉持人飢己飢的精神(?)，也方便之後回顧，就來寫這篇吧。</p>
-
-<p>首先我會先請你到官方文件那裡安裝必要的工具，之後我在介紹你tips，讓你可以快速達到自動部署上TestFlight的要求。
-當然你之後可以串接Test的流程，確認沒問題了再上TestFlight。</p>
-
-<p>首先到<a href="https://github.com/fastlane/fastlane">Fastlane</a>的GitHub上依照最新的<code>Installation</code>章節安裝好Fastlane。接著依照<code>Quick Start</code>章節的步驟建好初步的文件。這中間可能會問你App ID啦，Apple ID的帳密呀，諸如此類的基礎設定。</p>
-
-<p>接著看到目錄裡面的Fastfile文件，下面文件已經是我改好可以Run的版本，跟初始化的版本會不太一樣，更下面我會介紹是怎麼改過來的：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>desc "Submit a new Beta Build to Apple TestFlight"
-</span><span class='line'>  desc "This will also make sure the profile is up to date"
-</span><span class='line'>  lane :beta do
-</span><span class='line'>    increment_build_number
-</span><span class='line'>    # match(type: "appstore") # more information: https://codesigning.guide
-</span><span class='line'>    gym(scheme: "SecureMedia", use_legacy_build_api: true) # Build your app - more options available
-</span><span class='line'>    pilot(team_name: "CUTE LIMITED")
-</span><span class='line'>
-</span><span class='line'>    # sh "your_script.sh"
-</span><span class='line'>    # You can also use other beta testing services here (run `fastlane actions`)
-</span><span class='line'>  end</span></code></pre></td></tr></table></div></figure>
-
-
-<p>看到<code>lane :beta do</code>，代表之後我們只要下<code>fastlane beta</code>就可以指定執行一直到<code>end</code>包起來的這個區塊的動作。</p>
-
-<p>我們先定義我們的beta要做什麼事情:<br/>
-1. 把cocoapod裝一次<br/>
-2. 把build號碼+1<br/>
-3. 用Production的Provisioning Profiles，build一個ipa出來<br/>
-4. 把這個版本送到TestFlight上，並送給tester</p>
-
-<p>基本上如果上述都手動的話，大約要花上15分鐘左右（切換Provisioning Profiles, 上傳時間, 還有等iTunes connect處理新版build, 最後再手動送出分發測試版本到tester手上），透過自動化工具可以做到打一行指令後就可以不理了。</p>
-
-<p>上述流程在Fastlane裡面被寫成三行，這三行的設定tips就分三項介紹</p>
-
-<h3>increment_build_number</h3>
-
-<p>Literally，<code>increment_build_number</code>就是自動增加build版號，別小看這個功能，以前常常是都發布出去了才發現沒有新增版號！需要配合設定Xcode參數<code>Current Project Version</code>。參照圖片或<a href="http://www.markschabacker.com/blog/2013/01/04/agvtool_with_new_projects/">這邊</a>。</p>
-
-<p><img src="http://mrshih.github.io/images/ios-fastlane-1.png" alt="image" /></p>
-
-<h3>gym</h3>
-
-<p>這是幫我們產生ipa檔案的。後面跟上兩個參數<code>scheme</code>通常就是你得App名稱，<code>use_legacy_build_api</code>，則是因為<a href="https://github.com/fastlane/gym/issues/104">Xcode 7.0的上傳API更改了，所以在使用時有時候會錯</a>，這時候要改用舊的。</p>
-
-<h3>pilot</h3>
-
-<p>這是幫我們自動部署到TestFlight的，使用時需要加上<code>team_name</code>參數是因為筆者帳號下有兩個Team，你如果不填上這個Fastlane跑到一半就會問你，這樣自動化就沒意義了。</p>
-
-<p>然後記得搭配pilot時，Xcode要配合在<code>info.plist</code>加上下面這個屬性：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;key&gt;ITSAppUsesNonExemptEncryption&lt;/key&gt;
-</span><span class='line'>&lt;false/&gt;</span></code></pre></td></tr></table></div></figure>
-
-
-<p>討論串是說iTunes connect建議手動上傳要使用這個參數。相關討論在這個<a href="https://github.com/fastlane/pilot/issues/156">issue</a>頁。</p>
-
-<h2>後記</h2>
-
-<p>之後可以串接上Slack做完成時的顯示，再更進一步可以搭配Hubot，這樣連<code>fastlane beta</code>都省了。然後因為沒接觸CI Server，之後也可以研究兩者如何搭配。</p>
-
-<p>其實筆者在用octopress發布文章的時候，明明指令沒幾行也硬是寫了三個shell來發布(new, preview, publish)，但實在是幫我省了很多時間，不然每次我可都要去google指令，很煩的。</p>
-
-<p>只能說工程師的懶沒有極限，但正是這種懶造就了人類文明的進步（？）。</p>
 ]]></content>
   </entry>
   

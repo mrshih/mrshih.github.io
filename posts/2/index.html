@@ -9,7 +9,7 @@
   <meta name="author" content="施安宏">
 
   
-  <meta name="description" content="成吉思汗的館長說他開館就是相信台灣應該擁有更好健身房，所以要持續的提供台灣一個高水準的健身聖地，提升台灣人健身運動的專業風氣。討厭看到市場上充斥的都是直銷與只想賺錢的商業健身房與似是而非的健身觀念。 之前去過其他健身房，別的可能就是放很養眼的美女帥男圖，可能也會放勵志標語， &hellip;">
+  <meta name="description" content="iOS 8之後搭配UISearchController，只要把屬性searchResultsUpdater指定物件在updateSearchResultsForSearchController這個方法中實作filtering and updating就可以了。非常方便。 Fetch data &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -78,6 +78,167 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2017/01/25/search/">iOS Search應用</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2017-01-25T18:18:02+08:00" pubdate data-updated="true">Jan 25<sup>th</sup>, 2017</time>
+        
+           | <a href="/blog/2017/01/25/search/#disqus_thread"
+             data-disqus-identifier="http://sah.tw/blog/2017/01/25/search/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>iOS 8之後搭配<code>UISearchController</code>，只要把屬性<code>searchResultsUpdater</code>指定物件在<code>updateSearchResultsForSearchController</code>這個方法中實作filtering and updating就可以了。非常方便。</p>
+
+<h3>Fetch data</h3>
+
+<p>從Server抓取資料，這裡我們用<code>originalDatas</code>這個instace variable存JSON陣列資料。注意Retain Cycle即可。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>// Feth data from server and reload.
+</span><span class='line'>__weak MemberListTableViewController *weakSelf = self;
+</span><span class='line'>[TNUserManager logInAccountInBackgroundWithAccount:@"andy" password:@"12344321" success:^{
+</span><span class='line'>    [TNUserManager getContactbookWithSuccess:^(NSDictionary *responseObject) {
+</span><span class='line'>        weakSelf.originalDatas = (NSArray*)responseObject;
+</span><span class='line'>        [weakSelf.tableView reloadData];
+</span><span class='line'>    } failure:^(ResultInfo *resultInfo) {
+</span><span class='line'>        NSLog(@"get data fail");
+</span><span class='line'>    }];
+</span><span class='line'>} failure:^(ResultInfo *resultInfo) {
+</span><span class='line'>    NSLog(@"login fail");
+</span><span class='line'>}];</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Filtering and Updating</h3>
+
+<p>利用<code>NSPredicate</code>制定陣列搜尋規則，這裡是指定陣列內有包涵<code>searchString</code>。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>/** Filtering **/
+</span><span class='line'>// 搜尋規則
+</span><span class='line'>NSPredicate *preicate = [NSPredicate predicateWithFormat:@"SELF CONTAINS[c] %@",searchString];
+</span><span class='line'>
+</span><span class='line'>// 搜尋
+</span><span class='line'>NSMutableArray *reslut = [[NSMutableArray alloc]init];
+</span><span class='line'>// loop each people
+</span><span class='line'>for (NSDictionary *each in self.originalDatas) {
+</span><span class='line'>    Boolean isMatch = false;
+</span><span class='line'>    
+</span><span class='line'>    // list all value of people
+</span><span class='line'>    NSMutableArray *values = [NSMutableArray arrayWithArray:[each allValues]];
+</span><span class='line'>    
+</span><span class='line'>    // 把property的屬性為array的提取出來
+</span><span class='line'>    for (id proerty in values) {
+</span><span class='line'>        if ([proerty isKindOfClass:[NSArray class]]) {
+</span><span class='line'>            if ([proerty filteredArrayUsingPredicate:preicate].count &gt; 0) {
+</span><span class='line'>                // show
+</span><span class='line'>                isMatch = true;
+</span><span class='line'>            }
+</span><span class='line'>        }
+</span><span class='line'>    }
+</span><span class='line'>    
+</span><span class='line'>    // 找剩下property的屬性為string的
+</span><span class='line'>    if (isMatch == false) {
+</span><span class='line'>        if ([values filteredArrayUsingPredicate:preicate].count &gt; 0) {
+</span><span class='line'>            // show
+</span><span class='line'>            isMatch = true;
+</span><span class='line'>        }
+</span><span class='line'>    }
+</span><span class='line'>    
+</span><span class='line'>    if (isMatch) {
+</span><span class='line'>        [reslut addObject:each];
+</span><span class='line'>    }
+</span><span class='line'>}
+</span><span class='line'>
+</span><span class='line'>/** Updateing **/
+</span><span class='line'>self.showDatas = [reslut mutableCopy];
+</span><span class='line'>[self.tableView reloadData];</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>後續優化idea</h3>
+
+<p>這個APP是做公司內部通訊錄的，而如果陣列裡面包涵員工ID，或到職日期等數字資料，就可以在<code>NSPredicate</code>字串比對完之後，搭配<a href="http://sah.tw/blog/2016/11/09/objc-quick-sort/">Sorting</a>來對數字做排序。</p>
+
+<p>潮一點的搞個數據應用，可以把搜尋歷史用SQLite記錄下來，把<code>搜尋後而且點擊</code>這個元素加入到Sorting的條件中。這樣一來使用者越長搜尋的排序就會越前面囉。</p>
+
+<p>最後也可以做成<a href="https://developer.apple.com/library/content/documentation/General/Conceptual/AppSearch/index.html#//apple_ref/doc/uid/TP40016308">讓iOS系統搜尋Bar也可以找到APP內的資訊</a>，不過這樣就要把通訊錄存在本地端DB，而不能只是In-Memory JSON處理了。</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1221,126 +1382,6 @@ NSMutableArray
 <p>其實在Xcode裡面刻畫環境真的是很享受的過程，當你刻畫出的UI在<code>Storyboard</code>上跟UI出的圖一樣時，那樣的成就感很高。尤其Apple近幾年推出的<code>Autolayout</code>跟<code>SizeClass</code>其實都走在很前端的地方，給開發者很大的彈性與方便。</p>
 
 <p>這裡也推薦這個網站Zeplin，我現在配合的設計師可以很方便地更新圖給大家，上面尺寸也都可以標註到很細，甚至這個網站還有Mac的APP，裡面有個特異功能是可以把素材匯進到專案的<code>Assets.xcassets</code>真的很棒！</p>
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2016/05/03/ios-fastlane/">運用iOS Fastlane自動化部署TestFlight</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2016-05-03T14:59:51+08:00" pubdate data-updated="true">May 3<sup>rd</sup>, 2016</time>
-        
-           | <a href="/blog/2016/05/03/ios-fastlane/#disqus_thread"
-             data-disqus-identifier="http://sah.tw/blog/2016/05/03/ios-fastlane/">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>老生常談得一件事情，如果一個團隊花一個禮拜的時間寫好自動部署的工具，比如用shell，把平常又臭又長或者很繁瑣的指令集結起來，之後這些繁瑣重複的工作就可以透過自動化工具省下不少時間。</p>
-
-<blockquote><p>表面上看起來或許一年之後你才能把省下來的那幾秒鐘累積成一個禮拜，達成回本的動作，但是如果你不這樣做，你把那一個禮拜的時間打散到一年裡面，換來的就是你一年的開發效率低落。</p>
-
-<p>長遠看來，有沒有做自動化工具的團隊，差距可謂天與地。</p></blockquote>
-
-<p>知道了自動化的重要性，再來就iOS而言有一套<a href="https://krausefx.com/blog/fastlane-is-now-part-of-fabric">國外Twitter青年才俊高富帥工程師從side project發展成全職開發的iOS自動化工具組</a>-fastlane，國外紅一陣子了，但中文的介紹似乎不多，秉持人飢己飢的精神(?)，也方便之後回顧，就來寫這篇吧。</p>
-
-<p>首先我會先請你到官方文件那裡安裝必要的工具，之後我在介紹你tips，讓你可以快速達到自動部署上TestFlight的要求。
-當然你之後可以串接Test的流程，確認沒問題了再上TestFlight。</p>
-
-<p>首先到<a href="https://github.com/fastlane/fastlane">Fastlane</a>的GitHub上依照最新的<code>Installation</code>章節安裝好Fastlane。接著依照<code>Quick Start</code>章節的步驟建好初步的文件。這中間可能會問你App ID啦，Apple ID的帳密呀，諸如此類的基礎設定。</p>
-
-<p>接著看到目錄裡面的Fastfile文件，下面文件已經是我改好可以Run的版本，跟初始化的版本會不太一樣，更下面我會介紹是怎麼改過來的：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>desc "Submit a new Beta Build to Apple TestFlight"
-</span><span class='line'>  desc "This will also make sure the profile is up to date"
-</span><span class='line'>  lane :beta do
-</span><span class='line'>    increment_build_number
-</span><span class='line'>    # match(type: "appstore") # more information: https://codesigning.guide
-</span><span class='line'>    gym(scheme: "SecureMedia", use_legacy_build_api: true) # Build your app - more options available
-</span><span class='line'>    pilot(team_name: "CUTE LIMITED")
-</span><span class='line'>
-</span><span class='line'>    # sh "your_script.sh"
-</span><span class='line'>    # You can also use other beta testing services here (run `fastlane actions`)
-</span><span class='line'>  end</span></code></pre></td></tr></table></div></figure>
-
-
-<p>看到<code>lane :beta do</code>，代表之後我們只要下<code>fastlane beta</code>就可以指定執行一直到<code>end</code>包起來的這個區塊的動作。</p>
-
-<p>我們先定義我們的beta要做什麼事情:<br/>
-1. 把cocoapod裝一次<br/>
-2. 把build號碼+1<br/>
-3. 用Production的Provisioning Profiles，build一個ipa出來<br/>
-4. 把這個版本送到TestFlight上，並送給tester</p>
-
-<p>基本上如果上述都手動的話，大約要花上15分鐘左右（切換Provisioning Profiles, 上傳時間, 還有等iTunes connect處理新版build, 最後再手動送出分發測試版本到tester手上），透過自動化工具可以做到打一行指令後就可以不理了。</p>
-
-<p>上述流程在Fastlane裡面被寫成三行，這三行的設定tips就分三項介紹</p>
-
-<h3>increment_build_number</h3>
-
-<p>Literally，<code>increment_build_number</code>就是自動增加build版號，別小看這個功能，以前常常是都發布出去了才發現沒有新增版號！需要配合設定Xcode參數<code>Current Project Version</code>。參照圖片或<a href="http://www.markschabacker.com/blog/2013/01/04/agvtool_with_new_projects/">這邊</a>。</p>
-
-<p><img src="http://mrshih.github.io/images/ios-fastlane-1.png" alt="image" /></p>
-
-<h3>gym</h3>
-
-<p>這是幫我們產生ipa檔案的。後面跟上兩個參數<code>scheme</code>通常就是你得App名稱，<code>use_legacy_build_api</code>，則是因為<a href="https://github.com/fastlane/gym/issues/104">Xcode 7.0的上傳API更改了，所以在使用時有時候會錯</a>，這時候要改用舊的。</p>
-
-<h3>pilot</h3>
-
-<p>這是幫我們自動部署到TestFlight的，使用時需要加上<code>team_name</code>參數是因為筆者帳號下有兩個Team，你如果不填上這個Fastlane跑到一半就會問你，這樣自動化就沒意義了。</p>
-
-<p>然後記得搭配pilot時，Xcode要配合在<code>info.plist</code>加上下面這個屬性：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;key&gt;ITSAppUsesNonExemptEncryption&lt;/key&gt;
-</span><span class='line'>&lt;false/&gt;</span></code></pre></td></tr></table></div></figure>
-
-
-<p>討論串是說iTunes connect建議手動上傳要使用這個參數。相關討論在這個<a href="https://github.com/fastlane/pilot/issues/156">issue</a>頁。</p>
-
-<h2>後記</h2>
-
-<p>之後可以串接上Slack做完成時的顯示，再更進一步可以搭配Hubot，這樣連<code>fastlane beta</code>都省了。然後因為沒接觸CI Server，之後也可以研究兩者如何搭配。</p>
-
-<p>其實筆者在用octopress發布文章的時候，明明指令沒幾行也硬是寫了三個shell來發布(new, preview, publish)，但實在是幫我省了很多時間，不然每次我可都要去google指令，很煩的。</p>
-
-<p>只能說工程師的懶沒有極限，但正是這種懶造就了人類文明的進步（？）。</p>
 </div>
   
   
