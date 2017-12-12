@@ -3,6 +3,12 @@
   
   
   <url>
+    <loc>http://sah.tw/blog/2017/12/12/work-performance/</loc>
+    <lastmod>2017-12-12T08:10:01+08:00</lastmod>
+    <priority>0.8</priority>
+  </url>
+  
+  <url>
     <loc>http://sah.tw/blog/2017/11/22/office-partnership/</loc>
     <lastmod>2017-11-22T15:47:34+08:00</lastmod>
     <priority>0.8</priority>
@@ -209,35 +215,35 @@
   
   <url>
     <loc>http://sah.tw/blog/</loc>
-    <lastmod>2017-11-22T16:29:06+08:00</lastmod>
+    <lastmod>2017-12-12T08:11:12+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   
   <url>
     <loc>http://sah.tw/blog/archives/</loc>
-    <lastmod>2017-11-22T16:29:06+08:00</lastmod>
+    <lastmod>2017-12-12T08:11:12+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   
   <url>
     <loc>http://sah.tw/archives/</loc>
-    <lastmod>2017-11-22T16:29:06+08:00</lastmod>
+    <lastmod>2017-12-12T08:11:12+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   
   <url>
     <loc>http://sah.tw/</loc>
-    <lastmod>2017-11-22T16:29:06+08:00</lastmod>
+    <lastmod>2017-12-12T08:11:12+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   
   <url>
     <loc>http://sah.tw/about/</loc>
-    <lastmod>2017-11-22T16:29:06+08:00</lastmod>
+    <lastmod>2017-12-12T08:11:12+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
