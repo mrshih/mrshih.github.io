@@ -9,7 +9,7 @@
   <meta name="author" content="施安宏">
 
   
-  <meta name="description" content="大家都有這樣的經驗：辛辛苦苦絞盡腦汁，經歷無數夜晚暴肝打word，期末滿懷信心交出報告後，換來的是又一次的失望。 不斷更新 如果說一般考試把時間與心力砸下去結果就會好，皇天不負苦心人，那期末報告真的是一件令人頭大的事，時間心力砸下去只怕教授也不領情。那有沒有什麼方法保證最高分？有！很簡單， &hellip;">
+  <meta name="description" content="本身工作偏開發，為何要了解Docker？ 最近Micro service火紅，大型服務被切成一個一個小模組，減少彼此耦合，個別跑在各自container上，方便重複部署，且彼此互相用Rest API或socket溝通。這樣帶來的好處在於可以在開發上減少後續迭代的困難，減少維運的難度，增加系統穩定性 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -78,6 +78,206 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2017/02/09/docker101/">Docker系列1 - 從Image到Service</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2017-02-09T13:22:36+08:00" pubdate data-updated="true">Feb 9<sup>th</sup>, 2017</time>
+        
+           | <a href="/blog/2017/02/09/docker101/#disqus_thread"
+             data-disqus-identifier="http://sah.tw/blog/2017/02/09/docker101/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h2>本身工作偏開發，為何要了解Docker？</h2>
+
+<p>最近Micro service火紅，大型服務被切成一個一個小模組，減少彼此耦合，個別跑在各自container上，方便重複部署，且彼此互相用Rest API或socket溝通。這樣帶來的好處在於可以在開發上減少後續迭代的困難，減少維運的難度，增加系統穩定性。</p>
+
+<p>但要獲得這些好處，軟體在最初開始設計架構的階段就要拆分服務，一開始設計不好之後就算有docker工具那也只是把所有服務丟到同一個Container上，沒有辦法發揮docker切割服務的優勢。</p>
+
+<p>所以想成為架構師，當然不能不了解這個工具。而從程式開發上來看，能夠把CI Keep in mind，有新Commit Push到develop branch，CI Server就自動執行下面步驟</p>
+
+<ol>
+<li>打包新的Image</li>
+<li>產生Container</li>
+<li>執行Service</li>
+<li>Run Test Code&hellip;</li>
+</ol>
+
+
+<p>能夠協助開發者確保最終程式碼在Production環境是可以正常運行，有問題可以立即發現與處理。</p>
+
+<p>Docker對比傳統VM優點在於所消耗資源很小，啟動速度很快，並且兼具傳統VM打包成Image擋可以Anywhere都快速建立起一樣的Service等優點。</p>
+
+<p>這篇文章主要就以上面幾點依序從包含如何製作Image，產生Container，利用Container啟動我們要的Service，最後如何匯出部署到另一台機器等一系列記錄下來。</p>
+
+<h2>Dockerfile與Base Image</h2>
+
+<p>要導入的Service是由三個部分組成</p>
+
+<ol>
+<li>Node.js專案，用Express作為Route Framework，為業務邏輯層負責API JSON的輸出</li>
+<li>Node.js專案，用Express作為Route Framework，使用Bootstrap來包含View的後台操作介面</li>
+<li>MySQL Instance</li>
+</ol>
+
+
+<p>之前做法是把Node.js專案都放在同台Server，但因爲HA需要，所以也有一台Hot standby的實體機並排在HAProxy下。這裡帶來第一個問題是當要重新build環境時靠Install Guide手動安裝很不方便，解決方法便是用<code>Dockerfile</code>，把Install Guide所需的環境與步驟打包成一個Image。</p>
+
+<p>1&amp;2專案相同部分是<code>Node.js專案，用Express作為Route Framework</code>，所以可以Build一個Base Image來當基底環境，之後只要分別把<code>/var/www</code>置換成對應的專案檔即可。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>FROM centos:7 // 指定CentOS
+</span><span class='line'>MAINTAINER daan.shih@gmail.com
+</span><span class='line'>RUN yum install -y epel-release // -y避免互動輸入
+</span><span class='line'>RUN yum install -y nodejs
+</span><span class='line'>RUN yum install -y npm
+</span><span class='line'>RUN npm install pm2 -g
+</span><span class='line'>RUN mkdir /var/www/
+</span><span class='line'>WORKDIR /var/www/</span></code></pre></td></tr></table></div></figure>
+
+
+<p>有了Dockerfile後就可以Build Image了</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>docker build -f /path/to/dockerfile ./</span></code></pre></td></tr></table></div></figure>
+
+
+<p>之後會得到一個Image ID，因為是只安裝npm基底就取名為npm-ready</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>docker tag [Image ID] npm-ready</span></code></pre></td></tr></table></div></figure>
+
+
+<p>現在打<code>docker images</code>應該可以看到類似<code>npm-ready               latest              43c671f848fd        22 hours ago        405.6 MB</code>的資訊</p>
+
+<h2>以Base Image為底，加入express專案檔</h2>
+
+<p>這時候我們已經有一個Image檔，包含npm與必須的tools，只缺express專案檔。所以接下來就以<code>FROM</code>指令，指定以<code>npm-ready:latest</code>為底，用<code>COPY</code>指令把我們需要的專案檔複製到Image中。</p>
+
+<p>這裡要注意第三行的<code>PSControlCenter/</code>這個目錄必須與Dockerfile同一個目錄（<code>docker build</code>後面會加上的path我們是打./），不然會出現找不到此目錄。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>FROM npm-ready:latest
+</span><span class='line'>MAINTAINER daan.shih@gmail.com
+</span><span class='line'>COPY ControlCenter/ /var/www/</span></code></pre></td></tr></table></div></figure>
+
+
+<p>得到新Image ID後幫它補上名字方便識別</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>docker tag [Image ID] control-center</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Image to Container</h3>
+
+<p>至此我們已經有一個包含全部所需要檔案的Image檔<code>control-center</code>了。現在只需要利用Image去產生一個Container，並且執行這個Container就行了。</p>
+
+<p>本來產生<code>create</code>與執行<code>start</code>是兩個指令，這裡可以用<code>run</code>來代表連續執行上面兩個指令。類似git裡面<code>pull</code>是連續執行<code>fetch</code>和<code>merge</code>。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>docker run -t -i -p 9453:3000 [Image ID] /bin/bash</span></code></pre></td></tr></table></div></figure>
+
+
+<p>這裡要注意的是<code>-p</code>，每個運行中的container的網路環境與host是完全分離的，所以我們要從外部去訪問container，就要用這個指令來指定port的相依關係。</p>
+
+<p>這個例子裡我們在host輸入127.0.0.1:9453就會訪問到container的3000 port。</p>
+
+<p>建立完container後，這時可以透過下面指令拿到Container ID</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>docker ps -a // -a會列出所有container(包含停止)</span></code></pre></td></tr></table></div></figure>
+
+
+<p>運行container後，想再得到運行狀態中的container的bash shell可執行</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>docker exec -it [container-id] bash</span></code></pre></td></tr></table></div></figure>
+
+
+<p>exec指令就是對該運行中的container下達指令。</p>
+
+<h2>Run Service</h2>
+
+<p>到這裡我們已經利用Image去產生Container，並起啟動了Container，指定了Port的映射關係，最後取得該Container的Shell。這時環境已經建立起來，我們就可利用PM2把service給run起來：</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>pm2 start ./bin/www --watch --name "www"</span></code></pre></td></tr></table></div></figure>
+
+
+<p>然後在Host瀏覽器訪問127.0.0.9453，就可以看到服務啟動了。</p>
+
+<h2>部署在另一台機器上</h2>
+
+<p>把control-center這個Image用<code>save</code>指令匯出成.tar檔</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>docker save control-center &gt; ./control-center.tar</span></code></pre></td></tr></table></div></figure>
+
+
+<p>接著在另一台的Dokcer instance上用<code>load</code>指令，指定tar檔路徑匯入成image</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>docker load &lt; /path/to/control-center.tar</span></code></pre></td></tr></table></div></figure>
+
+
+<p>再來用<code>docker images</code>來確認是否有成功匯入Image<code>control-center</code>。</p>
+
+<p>之後我們便可以把該Image<code>control-center</code>打包匯出到其他機器，短短的兩行幾秒內就把服務給建立起來，非常輕鬆寫意的部屬方式。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>docker run -t -i -p 9453:3000 [Image ID] /bin/bash
+</span><span class='line'>pm2 start ./bin/www --watch --name "www"</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Next</h2>
+
+<p>下次介紹另一個Docker的重要概念：Volume。Container與Image有個很重要原則是裡面不要存Data，也就是不要把MySQL的資料給存在Image裡，所以在資料庫相關的Container裡有關Data的部分會採用另外掛載的方式。</p>
+
+<h3>參考FYI</h3>
+
+<ul>
+<li><a href="http://dockone.io/article/783">http://dockone.io/article/783</a></li>
+<li><a href="http://dockone.io/article/128">http://dockone.io/article/128</a></li>
+</ul>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1009,287 +1209,6 @@ NSMutableArray
 <p>當然，不要過度強調DRY，因為這關係到切架構與抽象化整體的規劃能力，抽象的不好那是會用弄越糟的，但至少在這個簡單的Case裡Merge Sort做成Method絕對是make sense的。</p>
 
 <p>這裡可以練習把Merge Sort用<code>Category</code>的方式做成<code>NSArray</code>的Method。基礎OOP，把一些地方改成<code>Self</code>就可以了。</p>
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2016/08/24/iap-payment-model-design/">In-App-Purchase交易模組設計</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2016-08-24T23:30:18+08:00" pubdate data-updated="true">Aug 24<sup>th</sup>, 2016</time>
-        
-           | <a href="/blog/2016/08/24/iap-payment-model-design/#disqus_thread"
-             data-disqus-identifier="http://sah.tw/blog/2016/08/24/iap-payment-model-design/">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>網路上很多介紹如何運用<code>StoreKit</code>裡面的API在iOS上付款的文章，但實務上因為<code>In-App-Purchase</code>是程式裡面需要密集配合業務需求的部分，如果沒有一個良好抽象化的設計，在高可維護性與彈性，可擴展能力下功夫，一旦業務需求一複雜或反覆迭代更改，就會讓IAP相關的邏輯變得難以修改與維護。</p>
-
-<p>以上原因，所以如何在APP中設計一套可維護可擴展易整合的IAP架構，是開發大型APP與進階開發者應該關心的議題。接下來的文章把IAP付款架構有關執行交易與交易結果處理的這部分，抽象成TNStoreObserver類別。</p>
-
-<h2>StoreObserver</h2>
-
-<p>付款流程是APP根據一組定義在iTunesConnect的商品ID，向Apple Server請求對應的<code>SKPayment</code>物件，裡面包含了Localization的商品名稱與價錢，把這個想成一個商品。而一旦把這個<code>SKPayment</code>物件放到由系統維護的<code>SKPaymentQueue</code>時，這時候就開始進入按指紋，輸入iTunes Store帳密的程序。</p>
-
-<p>而<code>StoreKit</code>說明，當<code>SKPayment</code>加入到<code>SKPaymentQueue</code>後，開發者需要實作一個adopt<code>SKPaymentTransactionObserver</code>protocol的物件，並加入到<code>SKPaymentQueue</code>裡。之後這個Observer就是負責處理各種交易結果。比如成功時就要開啟對應的功能等。</p>
-
-<p>所以這個Class就取名叫StoreObserver，職責是實作<code>SKPaymentTransactionObserver</code>protocol，處理交易完成的後續行為。並負責與<code>SKPaymentQueue</code>互動，比如購買，取回過去的購買紀錄。最後可方便的在任何地方發動購買，然後在需要的地方容易接收到結果。</p>
-
-<p>基於以上需求，開去構思這個模組。</p>
-
-<p>先處理交易的部分，這就是單純與StoreKit串接。以下兩個Public方法：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>// 購買SKProduct
-</span><span class='line'>// Create and add a payment request to the payment queue
-</span><span class='line'>-(void)buy:(SKProduct *)product
-</span><span class='line'>{
-</span><span class='line'>    SKMutablePayment *payment = [SKMutablePayment paymentWithProduct:product];
-</span><span class='line'>  [[SKPaymentQueue defaultQueue] addPayment:payment];
-</span><span class='line'>}
-</span><span class='line'>
-</span><span class='line'>// 取回過去完成交易的非消耗品購買與自動續訂紀錄
-</span><span class='line'>-(void)restore
-</span><span class='line'>{
-</span><span class='line'>    [[SKPaymentQueue defaultQueue] restoreCompletedTransactions];
-</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
-
-
-<p>實作上會把這個<code>StoreObserver</code>做成<code>Singleton</code>，因為APP裡面可能會有許多頁面允許付款，只要<code>[[StoreObserver sharedInstance] buy:product];</code>就可以購買商品。然後因應上面的<code>restore</code>方法，這裡需要一個<code>NSArray</code>來裝取回的商品們，命名為<code>productsRestored</code>。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>+ (StoreObserver *)sharedInstance
-</span><span class='line'>{
-</span><span class='line'>    static dispatch_once_t onceToken;
-</span><span class='line'>    static StoreObserver * storeObserverSharedInstance;
-</span><span class='line'>    
-</span><span class='line'>    dispatch_once(&onceToken, ^{
-</span><span class='line'>        storeObserverSharedInstance = [[StoreObserver alloc] init];
-</span><span class='line'>    });
-</span><span class='line'>    return storeObserverSharedInstance;
-</span><span class='line'>}
-</span><span class='line'>
-</span><span class='line'>
-</span><span class='line'>- (instancetype)init
-</span><span class='line'>{
-</span><span class='line'>  self = [super init];
-</span><span class='line'>  if (self != nil)
-</span><span class='line'>    {
-</span><span class='line'>        _productsRestored = [[NSMutableArray alloc] initWithCapacity:0];
-</span><span class='line'>    }
-</span><span class='line'>  return self;
-</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
-
-
-<p>這邊重要的來了，如果程式的某個地方呼叫了<code>StoreObserver</code>的<code>buy</code>發法，之後<code>StoreObserver</code>收到交易完成的資訊，而APP裡面可能會有很多地方因為這個交易而產生UI上的變化，比如買了一部影片，影片要開始播放，影片櫃需要新增新影片，會員的購買紀律需要增加一筆。該怎麼通知那麼多地方？這裡用了<code>NSNotificationCenter</code>。</p>
-
-<p>為什麼呢？因為在上述一對多的狀況下，<code>StoreObserver</code>會被設計成它不關心那些畫面或地方需要這些訊息。但它會把資料準備好，接著廣播。</p>
-
-<p>當通知的人不關心他會通知到誰，但可能需要被通知的人很多時，<code>NSNotificationCenter</code>機制就派上用場了。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>NSString * const TNIAPPurchaseNotification = @"TNIAPPurchaseNotification";</span></code></pre></td></tr></table></div></figure>
-
-
-<p>再來是讓接收廣播的地方容易做處理。在這個Class裡面我們設置三個Property，<code>status</code>，<code>message</code>和<code>purchasedID</code>。當這個Class實作<code>SKPaymentTransactionObserver</code>時，根據收到的資訊做整理，讓接收的人可以很方便利用交易結果。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>typedef NS_ENUM(NSInteger, TNIAPPurchaseNotificationStatus)
-</span><span class='line'>{
-</span><span class='line'>    TNIAPPurchaseFailed, // Indicate that the purchase was unsuccessful
-</span><span class='line'>    TNIAPPurchaseSucceeded, // Indicate that the purchase was successful
-</span><span class='line'>    TNIAPRestoredFailed, // Indicate that restore products was unsuccessful
-</span><span class='line'>    TNIAPRestoredSucceeded // Indicate that restore products was successful
-</span><span class='line'>};
-</span><span class='line'>
-</span><span class='line'>@property (nonatomic) TNIAPPurchaseNotificationStatus status;
-</span><span class='line'>@property (nonatomic, copy) NSString *purchasedID;
-</span><span class='line'>@property (nonatomic, copy) NSString *message;</span></code></pre></td></tr></table></div></figure>
-
-
-<p>比如當我們實作的<code>SKPaymentTransactionObserver</code>方法被<code>SKPaymentQueue</code>呼叫時，整理一下再POST Notification出去</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>// Called when an error occur while restoring purchases. Notify the user about the error.
-</span><span class='line'>- (void)paymentQueue:(SKPaymentQueue *)queue restoreCompletedTransactionsFailedWithError:(NSError *)error
-</span><span class='line'>{
-</span><span class='line'>    if (error.code != SKErrorPaymentCancelled)
-</span><span class='line'>    {
-</span><span class='line'>        self.status = IAPRestoredFailed;
-</span><span class='line'>        self.message = error.localizedDescription;
-</span><span class='line'>        [[NSNotificationCenter defaultCenter] postNotificationName:TNIAPPurchaseNotification object:self];
-</span><span class='line'>    }
-</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>實際運作</h2>
-
-<p>這邊我們不考慮要怎麼取得到SKPayment物件，因為這部分邏輯不在<code>StoreObserver</code>負責範圍內。</p>
-
-<h3>在任何地方容易的發動購買</h3>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>SKProduct *product = (SKProduct *)productRequestResponse[indexPath.row];
-</span><span class='line'>        // Attempt to purchase the tapped product
-</span><span class='line'>        [[TNStoreObserver sharedInstance] buy:product];</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>在需要的地方容易收到並做處理</h3>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>[[NSNotificationCenter defaultCenter] addObserver:self
-</span><span class='line'>                                             selector:@selector(handlePurchasesNotification:)
-</span><span class='line'>                                                 name:TNIAPPurchaseNotification
-</span><span class='line'>                                               object:[StoreObserver sharedInstance]];
-</span><span class='line'>
-</span><span class='line'>// Update the UI according to the purchase request notification result
-</span><span class='line'>-(void)handlePurchasesNotification:(NSNotification *)notification
-</span><span class='line'>{
-</span><span class='line'>    StoreObserver *purchasesNotification = (StoreObserver *)notification.object;
-</span><span class='line'>    
-</span><span class='line'>    IAPPurchaseNotificationStatus status = (IAPPurchaseNotificationStatus)purchasesNotification.status;
-</span><span class='line'>    NSString *message = purchasesNotification.message;
-</span><span class='line'>    NSString *purchasedID = purchasesNotification.purchasedID;
-</span><span class='line'>   
-</span><span class='line'>
-</span><span class='line'>  switch (status)
-</span><span class='line'>    {
-</span><span class='line'>        case IAPPurchaseFailed:
-</span><span class='line'>            //購買失敗...
-</span><span class='line'>          break;
-</span><span class='line'>            
-</span><span class='line'>        case IAPDownloadSucceeded:
-</span><span class='line'>        {
-</span><span class='line'>            //購買成功...
-</span><span class='line'>        }
-</span><span class='line'>          break;
-</span><span class='line'>        
-</span><span class='line'>        case IAPRestoredSucceeded:
-</span><span class='line'>        {
-</span><span class='line'>            //回復成功...
-</span><span class='line'>        }
-</span><span class='line'>            break;
-</span><span class='line'>            
-</span><span class='line'>        case IAPRestoredFailed:
-</span><span class='line'>            //回復失敗...
-</span><span class='line'>            break;
-</span><span class='line'>  } 
-</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
-
 </div>
   
   

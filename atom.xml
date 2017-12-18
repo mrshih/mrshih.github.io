@@ -4,7 +4,7 @@
   <title><![CDATA[MR SHIH]]></title>
   <link href="http://sah.tw/atom.xml" rel="self"/>
   <link href="http://sah.tw/"/>
-  <updated>2017-12-12T08:14:30+08:00</updated>
+  <updated>2017-12-18T23:46:41+08:00</updated>
   <id>http://sah.tw/</id>
   <author>
     <name><![CDATA[施安宏]]></name>
@@ -12,6 +12,49 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[專案談判與協商]]></title>
+    <link href="http://sah.tw/blog/2017/12/18/project-negotiate/"/>
+    <updated>2017-12-18T22:08:47+08:00</updated>
+    <id>http://sah.tw/blog/2017/12/18/project-negotiate</id>
+    <content type="html"><![CDATA[<p><img src="http://mrshih.github.io/images/2017-12-18-project-negotiate.jpg" alt="2017-12-18-project-negotiate" /></p>
+
+<h3>錨定對方，立於不敗而後求勝</h3>
+
+<p>談判的目標即是達成合作，要達成合作就必須雙方都同意接受，這時候如議價即是找出雙方對某物價格的<strong>交集區間，也就是ZOPA(Zone of Possible Agreement)</strong>。</p>
+
+<p>比如合約議價這件事，甲方預算上限如果是100萬，乙方最低賣價為80萬，則議價上ZOPA即為80~100萬，乙方要盡可能逼近100萬合約價，甲方則是能盡可能逼近80萬合約價。</p>
+
+<p>這邊有一種策略叫做錨定：<strong>人在估計數值時，容易將他人提供的數據當作起始值來進行推測</strong>，也就是身為乙方，一開始可以開出自己底價的150%，來讓雙方的起始談判價從120開始談起，爭取40萬的緩衝空間給對方殺價。同樣策略甲方也可以開出低於自己預算的50%從50開始出價，來讓整個談判起始點從50萬開始談。</p>
+
+<h3>如何避免被錨定</h3>
+
+<p>一但錨定對方成功，就是所謂的立於不敗而後求勝了，因為無論怎麼退，你都是贏的，贏多贏少的問題。但當然人在江湖飄哪有不挨刀，有一天<strong>你被錨定了？</strong>其實要找出對應方法，從另一個角度看問題答案就呼之欲出了：<strong>你為什麼會被錨定?</strong>不外乎以下幾點：</p>
+
+<ol>
+<li>對於市場行情不熟悉，你可以google，也可以問</li>
+<li>沒有備案（BATNA），所以不知道底線如何定，什麼時候就不繼續buy-in，所以有備案就有底氣</li>
+</ol>
+
+
+<h3>課堂Case2的檢討</h3>
+
+<ol>
+<li><strong>一開始就要錨定對方</strong>，喊出一個很低的天數。</li>
+<li><strong>緩衝一開始就要抓多一點</strong>。立即要爭取20％~30％的緩衝天數。</li>
+<li>準備備案。心裏預定最壞狀況找外包，先拿到外包預估的天數當底線（Reservation Price）。</li>
+<li><strong>發現Target沒有交集，要用其他資源去交換</strong>，而非在我方關鍵資源上退讓。如用加班費與獎金去換取與R&amp;D沒有交集的天數降低。</li>
+</ol>
+
+
+<h3>發現Target沒有交集ZOPA，要用其他資源去交換，突破僵局</h3>
+
+<p>這裡就是說當對同一個議題沒有交集ZOPA時，比如錢與天數，嘗試引入其他資源進入這個局，來突破僵局。比如議價上有可能對方的底價跟你的預算真的沒有交集，那是不是嘗試用保固或者產品特色公司特色，未來折扣等方式來讓交易能談成。</p>
+
+<p>這裡則又帶入了一個新議題，我該如何帶入<strong>正確的外部資源?</strong>這可以靠事前做功課，也可以透過對對方提案來遲是了解。比如工程師說期限內無法完成，但<strong>假設</strong>工程師缺錢，那很有可能可以為了錢來替你加班趕工縮短工期，那這時候加班費與專案獎金就是可以拿來交換工期的其他資源。</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[工作價值衡量]]></title>
@@ -1355,257 +1398,6 @@ NSMutableArray
 <p>當然，不要過度強調DRY，因為這關係到切架構與抽象化整體的規劃能力，抽象的不好那是會用弄越糟的，但至少在這個簡單的Case裡Merge Sort做成Method絕對是make sense的。</p>
 
 <p>這裡可以練習把Merge Sort用<code>Category</code>的方式做成<code>NSArray</code>的Method。基礎OOP，把一些地方改成<code>Self</code>就可以了。</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[In-App-Purchase交易模組設計]]></title>
-    <link href="http://sah.tw/blog/2016/08/24/iap-payment-model-design/"/>
-    <updated>2016-08-24T23:30:18+08:00</updated>
-    <id>http://sah.tw/blog/2016/08/24/iap-payment-model-design</id>
-    <content type="html"><![CDATA[<p>網路上很多介紹如何運用<code>StoreKit</code>裡面的API在iOS上付款的文章，但實務上因為<code>In-App-Purchase</code>是程式裡面需要密集配合業務需求的部分，如果沒有一個良好抽象化的設計，在高可維護性與彈性，可擴展能力下功夫，一旦業務需求一複雜或反覆迭代更改，就會讓IAP相關的邏輯變得難以修改與維護。</p>
-
-<p>以上原因，所以如何在APP中設計一套可維護可擴展易整合的IAP架構，是開發大型APP與進階開發者應該關心的議題。接下來的文章把IAP付款架構有關執行交易與交易結果處理的這部分，抽象成TNStoreObserver類別。</p>
-
-<h2>StoreObserver</h2>
-
-<p>付款流程是APP根據一組定義在iTunesConnect的商品ID，向Apple Server請求對應的<code>SKPayment</code>物件，裡面包含了Localization的商品名稱與價錢，把這個想成一個商品。而一旦把這個<code>SKPayment</code>物件放到由系統維護的<code>SKPaymentQueue</code>時，這時候就開始進入按指紋，輸入iTunes Store帳密的程序。</p>
-
-<p>而<code>StoreKit</code>說明，當<code>SKPayment</code>加入到<code>SKPaymentQueue</code>後，開發者需要實作一個adopt<code>SKPaymentTransactionObserver</code>protocol的物件，並加入到<code>SKPaymentQueue</code>裡。之後這個Observer就是負責處理各種交易結果。比如成功時就要開啟對應的功能等。</p>
-
-<p>所以這個Class就取名叫StoreObserver，職責是實作<code>SKPaymentTransactionObserver</code>protocol，處理交易完成的後續行為。並負責與<code>SKPaymentQueue</code>互動，比如購買，取回過去的購買紀錄。最後可方便的在任何地方發動購買，然後在需要的地方容易接收到結果。</p>
-
-<p>基於以上需求，開去構思這個模組。</p>
-
-<p>先處理交易的部分，這就是單純與StoreKit串接。以下兩個Public方法：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>// 購買SKProduct
-</span><span class='line'>// Create and add a payment request to the payment queue
-</span><span class='line'>-(void)buy:(SKProduct *)product
-</span><span class='line'>{
-</span><span class='line'>    SKMutablePayment *payment = [SKMutablePayment paymentWithProduct:product];
-</span><span class='line'>  [[SKPaymentQueue defaultQueue] addPayment:payment];
-</span><span class='line'>}
-</span><span class='line'>
-</span><span class='line'>// 取回過去完成交易的非消耗品購買與自動續訂紀錄
-</span><span class='line'>-(void)restore
-</span><span class='line'>{
-</span><span class='line'>    [[SKPaymentQueue defaultQueue] restoreCompletedTransactions];
-</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
-
-
-<p>實作上會把這個<code>StoreObserver</code>做成<code>Singleton</code>，因為APP裡面可能會有許多頁面允許付款，只要<code>[[StoreObserver sharedInstance] buy:product];</code>就可以購買商品。然後因應上面的<code>restore</code>方法，這裡需要一個<code>NSArray</code>來裝取回的商品們，命名為<code>productsRestored</code>。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>+ (StoreObserver *)sharedInstance
-</span><span class='line'>{
-</span><span class='line'>    static dispatch_once_t onceToken;
-</span><span class='line'>    static StoreObserver * storeObserverSharedInstance;
-</span><span class='line'>    
-</span><span class='line'>    dispatch_once(&onceToken, ^{
-</span><span class='line'>        storeObserverSharedInstance = [[StoreObserver alloc] init];
-</span><span class='line'>    });
-</span><span class='line'>    return storeObserverSharedInstance;
-</span><span class='line'>}
-</span><span class='line'>
-</span><span class='line'>
-</span><span class='line'>- (instancetype)init
-</span><span class='line'>{
-</span><span class='line'>  self = [super init];
-</span><span class='line'>  if (self != nil)
-</span><span class='line'>    {
-</span><span class='line'>        _productsRestored = [[NSMutableArray alloc] initWithCapacity:0];
-</span><span class='line'>    }
-</span><span class='line'>  return self;
-</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
-
-
-<p>這邊重要的來了，如果程式的某個地方呼叫了<code>StoreObserver</code>的<code>buy</code>發法，之後<code>StoreObserver</code>收到交易完成的資訊，而APP裡面可能會有很多地方因為這個交易而產生UI上的變化，比如買了一部影片，影片要開始播放，影片櫃需要新增新影片，會員的購買紀律需要增加一筆。該怎麼通知那麼多地方？這裡用了<code>NSNotificationCenter</code>。</p>
-
-<p>為什麼呢？因為在上述一對多的狀況下，<code>StoreObserver</code>會被設計成它不關心那些畫面或地方需要這些訊息。但它會把資料準備好，接著廣播。</p>
-
-<p>當通知的人不關心他會通知到誰，但可能需要被通知的人很多時，<code>NSNotificationCenter</code>機制就派上用場了。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>NSString * const TNIAPPurchaseNotification = @"TNIAPPurchaseNotification";</span></code></pre></td></tr></table></div></figure>
-
-
-<p>再來是讓接收廣播的地方容易做處理。在這個Class裡面我們設置三個Property，<code>status</code>，<code>message</code>和<code>purchasedID</code>。當這個Class實作<code>SKPaymentTransactionObserver</code>時，根據收到的資訊做整理，讓接收的人可以很方便利用交易結果。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>typedef NS_ENUM(NSInteger, TNIAPPurchaseNotificationStatus)
-</span><span class='line'>{
-</span><span class='line'>    TNIAPPurchaseFailed, // Indicate that the purchase was unsuccessful
-</span><span class='line'>    TNIAPPurchaseSucceeded, // Indicate that the purchase was successful
-</span><span class='line'>    TNIAPRestoredFailed, // Indicate that restore products was unsuccessful
-</span><span class='line'>    TNIAPRestoredSucceeded // Indicate that restore products was successful
-</span><span class='line'>};
-</span><span class='line'>
-</span><span class='line'>@property (nonatomic) TNIAPPurchaseNotificationStatus status;
-</span><span class='line'>@property (nonatomic, copy) NSString *purchasedID;
-</span><span class='line'>@property (nonatomic, copy) NSString *message;</span></code></pre></td></tr></table></div></figure>
-
-
-<p>比如當我們實作的<code>SKPaymentTransactionObserver</code>方法被<code>SKPaymentQueue</code>呼叫時，整理一下再POST Notification出去</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>// Called when an error occur while restoring purchases. Notify the user about the error.
-</span><span class='line'>- (void)paymentQueue:(SKPaymentQueue *)queue restoreCompletedTransactionsFailedWithError:(NSError *)error
-</span><span class='line'>{
-</span><span class='line'>    if (error.code != SKErrorPaymentCancelled)
-</span><span class='line'>    {
-</span><span class='line'>        self.status = IAPRestoredFailed;
-</span><span class='line'>        self.message = error.localizedDescription;
-</span><span class='line'>        [[NSNotificationCenter defaultCenter] postNotificationName:TNIAPPurchaseNotification object:self];
-</span><span class='line'>    }
-</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>實際運作</h2>
-
-<p>這邊我們不考慮要怎麼取得到SKPayment物件，因為這部分邏輯不在<code>StoreObserver</code>負責範圍內。</p>
-
-<h3>在任何地方容易的發動購買</h3>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>SKProduct *product = (SKProduct *)productRequestResponse[indexPath.row];
-</span><span class='line'>        // Attempt to purchase the tapped product
-</span><span class='line'>        [[TNStoreObserver sharedInstance] buy:product];</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>在需要的地方容易收到並做處理</h3>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>[[NSNotificationCenter defaultCenter] addObserver:self
-</span><span class='line'>                                             selector:@selector(handlePurchasesNotification:)
-</span><span class='line'>                                                 name:TNIAPPurchaseNotification
-</span><span class='line'>                                               object:[StoreObserver sharedInstance]];
-</span><span class='line'>
-</span><span class='line'>// Update the UI according to the purchase request notification result
-</span><span class='line'>-(void)handlePurchasesNotification:(NSNotification *)notification
-</span><span class='line'>{
-</span><span class='line'>    StoreObserver *purchasesNotification = (StoreObserver *)notification.object;
-</span><span class='line'>    
-</span><span class='line'>    IAPPurchaseNotificationStatus status = (IAPPurchaseNotificationStatus)purchasesNotification.status;
-</span><span class='line'>    NSString *message = purchasesNotification.message;
-</span><span class='line'>    NSString *purchasedID = purchasesNotification.purchasedID;
-</span><span class='line'>   
-</span><span class='line'>
-</span><span class='line'>  switch (status)
-</span><span class='line'>    {
-</span><span class='line'>        case IAPPurchaseFailed:
-</span><span class='line'>            //購買失敗...
-</span><span class='line'>          break;
-</span><span class='line'>            
-</span><span class='line'>        case IAPDownloadSucceeded:
-</span><span class='line'>        {
-</span><span class='line'>            //購買成功...
-</span><span class='line'>        }
-</span><span class='line'>          break;
-</span><span class='line'>        
-</span><span class='line'>        case IAPRestoredSucceeded:
-</span><span class='line'>        {
-</span><span class='line'>            //回復成功...
-</span><span class='line'>        }
-</span><span class='line'>            break;
-</span><span class='line'>            
-</span><span class='line'>        case IAPRestoredFailed:
-</span><span class='line'>            //回復失敗...
-</span><span class='line'>            break;
-</span><span class='line'>  } 
-</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
-
 ]]></content>
   </entry>
   
