@@ -1,0 +1,338 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>微服務架構Service Discovery篇 - MR SHIH</title>
+  <meta name="author" content="施安宏">
+
+  
+  <meta name="description" content="想像一下來到一個陌生國度，你既沒有地圖也不會說當地語言，你不知道要買生活用品要去哪家店，你也不知道餓了哪裡有餐廳可以吃飯，什麼事情也不能做。 沒錯，一個沒有Service Discovery機制的微服務架構就如上面的情境，什麼事情都做不了，可以說Service &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://sah.tw/blog/2018/04/21/service-discovery">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="MR SHIH" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-31868165-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body    class="collapse-sidebar sidebar-footer" >
+  <header role="banner"><hgroup>
+  <h1><a href="/">MR SHIH</a></h1>
+  
+    <h2>必幸施</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:sah.tw" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/about">About</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">微服務架構Service Discovery篇</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2018-04-21T15:07:48+08:00" pubdate data-updated="true">Apr 21<sup>st</sup>, 2018</time>
+        
+           | <a href="#disqus_thread"
+             data-disqus-identifier="http://sah.tw">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p><img src="http://mrshih.github.io/images/2018-04-21-service-discovery.png" alt="2018-04-21-service-discovery" /></p>
+
+<p>想像一下來到一個陌生國度，你既沒有地圖也不會說當地語言，你不知道要買生活用品要去哪家店，你也不知道餓了哪裡有餐廳可以吃飯，什麼事情也不能做。</p>
+
+<p>沒錯，一個沒有Service Discovery機制的微服務架構就如上面的情境，什麼事情都做不了，可以說Service Discovery機制是談微服務架構必備的基礎設施也不為過。</p>
+
+<h3>為什麼要Service Discovery?</h3>
+
+<p>簡而言之，一個微服務架構底下可能有數十到數萬個微服務，彼此之間是解耦合的，不會留存各自的組態資訊，所以需要一個熟門熟路的總機，要找誰、需要什麼問它就對了。</p>
+
+<p>它要解決以下情境：</p>
+
+<ol>
+<li>一個服務請求(如HTTP Post)進來
+
+<ol type="a">
+<li>有沒有微服務可以支援這個請求？</li>
+<li>有的話，只有一個嗎？如果有多個我要請誰來執行呢？</li>
+</ol>
+</li>
+<li>一個微服務上線
+
+<ol>
+<li>我該如何讓別人知道我這個微服務能做什麼？</li>
+<li>如果微服務不正常或下線了，要怎麼讓別人知道？</li>
+</ol>
+</li>
+</ol>
+
+
+<h3>如何解決情境問題？</h3>
+
+<p>而為了以上情境問題，一個Service Discovery透過實現以下兩個邏輯層來解決問題</p>
+
+<h4>Query</h4>
+
+<p>要<strong>維護</strong>一份可用服務的清單。可以想像成一個數位電話簿，可以回答這件事情<strong>現在</strong>誰可以做。</p>
+
+<p>不過這裡先留的伏筆，注意剛剛提到的兩個字眼<strong>維護</strong>與<strong>現在</strong>。這兩個字眼代表現在的清單比需要知道當下所有微服務的狀態，有沒有服務其實已經掛掉了？這部分是由另一個邏輯層<strong>Registry</strong>所負責，等等會提到。</p>
+
+<p>Query這裡具體實現可以用資料庫的方式來實現清單的保存。一般來說單一MySQL就已足夠應付數千同時查詢請求，透過實體橫向 Read Scale來擴展。如再進一步有效能方面要求，可引入Cache機制，但狀態一致性就會增加空窗時間，這時候就是與業務需求之間的Trade off了。</p>
+
+<p>而如果有多個微服務可提供要Pass給哪一個呢？簡單做法就是Round-robin，所以Service Discovery也會有Load balance的角色存在。</p>
+
+<h4>Registry</h4>
+
+<p>這裏就是用來維護當前裝態了。大致上會有Registry與Unregistry。</p>
+
+<p>Registry時以Docker來說，就是紀錄Container IP與 ID等資訊。還有這個Container能夠提供那些接口API Path可使用。</p>
+
+<p>Unregistry則就是把這個服務標示為無效，讓查詢時不要把這個Service也列入可用名單內做挑選。</p>
+
+<h3>誰像誰註冊(Registry)？</h3>
+
+<p>實際在實現註冊功能時會遇到一個問題，是Service Discovery主動對新服務做註冊，還是新服務來主動對Sercice Discovery做註冊。</p>
+
+<p>Service Discovery主動對新服務做註冊有以下優點
+1. 讓Container對Service的存在一無所知，解偶。
+2. 服務之需要當被動元件。之需要專心對Request產生Response。</p>
+
+<p>但缺點就是</p>
+
+<ol>
+<li>Service Discovery負擔已經繁重，還需要做掉其實可以由Container來負責的主動註冊這個動作。</li>
+<li>因為每個Container啟動有快有慢，所以所有Container需要等待統一秒數才能被註冊，比如7秒。這也意味著不能有低於7秒的，而對Container做啟動優惠7秒也沒有太大意義。</li>
+</ol>
+
+
+<p>而新服務來主動對Sercice Discovery做註冊，把上面反過來看就是了。根據我的經驗，<code>新服務來主動對Sercice Discovery做註冊</code>以長期來看，會是一個較好管理彈性也較高的做法。</p>
+
+<h3>如何知道服務狀態是否正常？</h3>
+
+<p>這裡大致上分主動與被動做法：</p>
+
+<p>主動作法如既然已經有一份清單，就可以定期對每個服務發送健康狀態檢查的請求，粗略的可以是Ping，而如果對於Container掌控度較大，則可以協調出一個專門的API接口來進行狀態檢查。</p>
+
+<p>被動做法則是當選出一個服務並對其呼叫，如果沒有回應則<strong>標示此服務為下線並報修</strong>，同時在找從其餘可用服務中挑一個，以此類推一直到沒有服務可用為止。</p>
+
+<p>兩種做法各有優缺點，Service-Discovery責任已經很重，要定期對眾多微服務做定期檢查責任略顯吃重，如要採用主動建議切出一個獨立邏輯的服務運行，主動優點當然就是發現故障服務的時間會迅速許多，尤其當微服務增多時更明顯，不會有服務已經掛掉卻躲在那裡。</p>
+
+<p>被動已是可用的方案，而主動則算是好還可以再更好的方案。長期而言應在架構上選擇主動方式。</p>
+
+<h3>Server-side Discover與Clint-side Discovery</h3>
+
+<p>Service Discovery這個主題還有分Server-side Discover(ssd)y與Clint-side Discovery(csd)。不過絕大多數方案如k8s都採行ssd作法，而我認為csd只是做了一半的ssd，實在也沒有什麼非用不可的應用情境，所以就沒多做介紹，想了解可參考附錄。</p>
+
+<h3>結論</h3>
+
+<p>只要談到微服務架構就必定會談到Service Discovery，這算是整個架構的核心基礎設施了，在上面幾個Section大致上把幾個實作時會考慮的問題談過一輪，看下來會發現在註冊Registry那一塊，Service與微服務不管採行什麼做法都是需要有幾個共同溝通的API來合作，而對外查詢方面則須考慮效能問題，長期規劃也會有架構設計上的考慮，而上面所說也全都要建立在業務需求上來做最後設計決策。而業務需求會一直變，架構上也就會一直演進。</p>
+
+<p>所以全面了解Service Discovery的眉角可以更好的去支持業務需求。</p>
+
+<h3>附錄</h3>
+
+<p><a href="http://columns.chicken-house.net/2017/12/31/microservice9-servicediscovery/">安德魯的部落格-微服務基礎建設 &ndash; Service Discovery</a></p>
+
+<p><a href="https://ithelp.ithome.com.tw/articles/10193407">Day 4 Service discovery 和 Service registry</a></p>
+
+<p><a href="http://microservices.io/patterns/cn/client-side-discovery.html">模式: 客户端服务发现</a></p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">施安宏</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2018-04-21T15:07:48+08:00" pubdate data-updated="true">Apr 21<sup>st</sup>, 2018</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://sah.tw/blog/2018/04/21/service-discovery/" data-via="DaanSHIH" data-counturl="http://sah.tw/blog/2018/04/21/service-discovery/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2017/12/18/project-negotiate/" title="Previous Post: 專案談判與協商">&laquo; 專案談判與協商</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2018 - 施安宏 -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'mrshih';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://sah.tw/blog/2018/04/21/service-discovery/';
+        var disqus_url = 'http://sah.tw/blog/2018/04/21/service-discovery/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id; js.async = true;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

@@ -9,7 +9,7 @@
   <meta name="author" content="施安宏">
 
   
-  <meta name="description" content="錨定對方，立於不敗而後求勝 談判的目標即是達成合作，要達成合作就必須雙方都同意接受，這時候如議價即是找出雙方對某物價格的交集區間，也就是ZOPA(Zone of Possible Agreement)。 比如合約議價這件事，甲方預算上限如果是100萬，乙方最低賣價為80萬， &hellip;">
+  <meta name="description" content="想像一下來到一個陌生國度，你既沒有地圖也不會說當地語言，你不知道要買生活用品要去哪家店，你也不知道餓了哪裡有餐廳可以吃飯，什麼事情也不能做。 沒錯，一個沒有Service Discovery機制的微服務架構就如上面的情境，什麼事情都做不了，可以說Service &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -78,6 +78,143 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2018/04/21/service-discovery/">微服務架構Service Discovery篇</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2018-04-21T15:07:48+08:00" pubdate data-updated="true">Apr 21<sup>st</sup>, 2018</time>
+        
+           | <a href="/blog/2018/04/21/service-discovery/#disqus_thread"
+             data-disqus-identifier="http://sah.tw/blog/2018/04/21/service-discovery/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img src="http://mrshih.github.io/images/2018-04-21-service-discovery.png" alt="2018-04-21-service-discovery" /></p>
+
+<p>想像一下來到一個陌生國度，你既沒有地圖也不會說當地語言，你不知道要買生活用品要去哪家店，你也不知道餓了哪裡有餐廳可以吃飯，什麼事情也不能做。</p>
+
+<p>沒錯，一個沒有Service Discovery機制的微服務架構就如上面的情境，什麼事情都做不了，可以說Service Discovery機制是談微服務架構必備的基礎設施也不為過。</p>
+
+<h3>為什麼要Service Discovery?</h3>
+
+<p>簡而言之，一個微服務架構底下可能有數十到數萬個微服務，彼此之間是解耦合的，不會留存各自的組態資訊，所以需要一個熟門熟路的總機，要找誰、需要什麼問它就對了。</p>
+
+<p>它要解決以下情境：</p>
+
+<ol>
+<li>一個服務請求(如HTTP Post)進來
+
+<ol type="a">
+<li>有沒有微服務可以支援這個請求？</li>
+<li>有的話，只有一個嗎？如果有多個我要請誰來執行呢？</li>
+</ol>
+</li>
+<li>一個微服務上線
+
+<ol>
+<li>我該如何讓別人知道我這個微服務能做什麼？</li>
+<li>如果微服務不正常或下線了，要怎麼讓別人知道？</li>
+</ol>
+</li>
+</ol>
+
+
+<h3>如何解決情境問題？</h3>
+
+<p>而為了以上情境問題，一個Service Discovery透過實現以下兩個邏輯層來解決問題</p>
+
+<h4>Query</h4>
+
+<p>要<strong>維護</strong>一份可用服務的清單。可以想像成一個數位電話簿，可以回答這件事情<strong>現在</strong>誰可以做。</p>
+
+<p>不過這裡先留的伏筆，注意剛剛提到的兩個字眼<strong>維護</strong>與<strong>現在</strong>。這兩個字眼代表現在的清單比需要知道當下所有微服務的狀態，有沒有服務其實已經掛掉了？這部分是由另一個邏輯層<strong>Registry</strong>所負責，等等會提到。</p>
+
+<p>Query這裡具體實現可以用資料庫的方式來實現清單的保存。一般來說單一MySQL就已足夠應付數千同時查詢請求，透過實體橫向 Read Scale來擴展。如再進一步有效能方面要求，可引入Cache機制，但狀態一致性就會增加空窗時間，這時候就是與業務需求之間的Trade off了。</p>
+
+<p>而如果有多個微服務可提供要Pass給哪一個呢？簡單做法就是Round-robin，所以Service Discovery也會有Load balance的角色存在。</p>
+
+<h4>Registry</h4>
+
+<p>這裏就是用來維護當前裝態了。大致上會有Registry與Unregistry。</p>
+
+<p>Registry時以Docker來說，就是紀錄Container IP與 ID等資訊。還有這個Container能夠提供那些接口API Path可使用。</p>
+
+<p>Unregistry則就是把這個服務標示為無效，讓查詢時不要把這個Service也列入可用名單內做挑選。</p>
+
+<h3>誰像誰註冊(Registry)？</h3>
+
+<p>實際在實現註冊功能時會遇到一個問題，是Service Discovery主動對新服務做註冊，還是新服務來主動對Sercice Discovery做註冊。</p>
+
+<p>Service Discovery主動對新服務做註冊有以下優點
+1. 讓Container對Service的存在一無所知，解偶。
+2. 服務之需要當被動元件。之需要專心對Request產生Response。</p>
+
+<p>但缺點就是</p>
+
+<ol>
+<li>Service Discovery負擔已經繁重，還需要做掉其實可以由Container來負責的主動註冊這個動作。</li>
+<li>因為每個Container啟動有快有慢，所以所有Container需要等待統一秒數才能被註冊，比如7秒。這也意味著不能有低於7秒的，而對Container做啟動優惠7秒也沒有太大意義。</li>
+</ol>
+
+
+<p>而新服務來主動對Sercice Discovery做註冊，把上面反過來看就是了。根據我的經驗，<code>新服務來主動對Sercice Discovery做註冊</code>以長期來看，會是一個較好管理彈性也較高的做法。</p>
+
+<h3>如何知道服務狀態是否正常？</h3>
+
+<p>這裡大致上分主動與被動做法：</p>
+
+<p>主動作法如既然已經有一份清單，就可以定期對每個服務發送健康狀態檢查的請求，粗略的可以是Ping，而如果對於Container掌控度較大，則可以協調出一個專門的API接口來進行狀態檢查。</p>
+
+<p>被動做法則是當選出一個服務並對其呼叫，如果沒有回應則<strong>標示此服務為下線並報修</strong>，同時在找從其餘可用服務中挑一個，以此類推一直到沒有服務可用為止。</p>
+
+<p>兩種做法各有優缺點，Service-Discovery責任已經很重，要定期對眾多微服務做定期檢查責任略顯吃重，如要採用主動建議切出一個獨立邏輯的服務運行，主動優點當然就是發現故障服務的時間會迅速許多，尤其當微服務增多時更明顯，不會有服務已經掛掉卻躲在那裡。</p>
+
+<p>被動已是可用的方案，而主動則算是好還可以再更好的方案。長期而言應在架構上選擇主動方式。</p>
+
+<h3>Server-side Discover與Clint-side Discovery</h3>
+
+<p>Service Discovery這個主題還有分Server-side Discover(ssd)y與Clint-side Discovery(csd)。不過絕大多數方案如k8s都採行ssd作法，而我認為csd只是做了一半的ssd，實在也沒有什麼非用不可的應用情境，所以就沒多做介紹，想了解可參考附錄。</p>
+
+<h3>結論</h3>
+
+<p>只要談到微服務架構就必定會談到Service Discovery，這算是整個架構的核心基礎設施了，在上面幾個Section大致上把幾個實作時會考慮的問題談過一輪，看下來會發現在註冊Registry那一塊，Service與微服務不管採行什麼做法都是需要有幾個共同溝通的API來合作，而對外查詢方面則須考慮效能問題，長期規劃也會有架構設計上的考慮，而上面所說也全都要建立在業務需求上來做最後設計決策。而業務需求會一直變，架構上也就會一直演進。</p>
+
+<p>所以全面了解Service Discovery的眉角可以更好的去支持業務需求。</p>
+
+<h3>附錄</h3>
+
+<p><a href="http://columns.chicken-house.net/2017/12/31/microservice9-servicediscovery/">安德魯的部落格-微服務基礎建設 &ndash; Service Discovery</a></p>
+
+<p><a href="https://ithelp.ithome.com.tw/articles/10193407">Day 4 Service discovery 和 Service registry</a></p>
+
+<p><a href="http://microservices.io/patterns/cn/client-side-discovery.html">模式: 客户端服务发现</a></p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -835,103 +972,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2017/02/13/docker-volume/">Docker系列2 - 運用Volume分離資料</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2017-02-13T14:23:05+08:00" pubdate data-updated="true">Feb 13<sup>th</sup>, 2017</time>
-        
-           | <a href="/blog/2017/02/13/docker-volume/#disqus_thread"
-             data-disqus-identifier="http://sah.tw/blog/2017/02/13/docker-volume/">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h2>為什麼要用volume？</h2>
-
-<p>Docker的Container有個重要的原則是不儲存資料。為什麼呢？比如你做一個Web Service的Image，你把NPM,前端分流Nginx等軟體都安裝好了，這時候要把網頁的檔案放進去，一種做法是在<code>Dockerfile</code>裡面用<code>COPY</code>把網頁檔給複製進Image裡面，然後再Run起來。</p>
-
-<p>可是這種把不斷變動的資料檔案存在Image裡的做法會帶來許多問題，我如果改一行Code我不就要重新Build或新Commit一個Image嗎？我如果有好多個網站要跑在不同的Container上，我不就要做好多個Image？如果是DB的Image，把DB File放在Image裡面，那不就隨著時間過去Image就要一直更新了?</p>
-
-<p>所以在製作Image上，常見的best practice是把執行環境打包成Image，而時常會修改的檔案比如網頁檔案或資料庫檔案這些<code>資料</code>就另外掛載在Volume上，也就是Mount在Host機上的資料夾。這樣就可解決上面所提及的問題。</p>
-
-<p>底下我們就以網頁服務常見的/var/www資料夾與資料庫常見的/var/lib/mysql為例，操作如何把這兩個存<code>資料</code>的地方給另外存在volume上。</p>
-
-<h2>製作data volume container</h2>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>docker create -v absolute/path/to/host/dir:/var/lib/mysql --name dbdata mysql   //產生一個container, 掛載host資料夾(absolute/path/to/host/dir)到container的/var/lib/mysql</span></code></pre></td></tr></table></div></figure>
-
-
-<p>這裡的-v用法就是用來掛載volume的，去mount一個host資料夾為container的data volume。並且把這個container指名為dbdata，這種container又稱作為<code>data volume container</code>。</p>
-
-<p>這種container特別在於本身只是用來記載那個host資料夾對應mount到container的那個資料夾，所以container本身是不用啟動(run)的。</p>
-
-<p>PS. 如果Host的dir沒有指定，則docker會在系統的某個陰暗角落建立一個新的資料夾。可以用<code>docker inspect container-id</code>指令回傳結果裡key<code>Mounts</code>的Dictionary裡找到那個陰暗角落。</p>
-
-<h2>使用data volume container</h2>
-
-<p>有了data volume container後，只要以後在run container時透過<code>--volumes-from</code>參數，就可以直接把指定的<code>data volume container</code>的volume給掛載進來。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>docker run --name=mysqldb -d -p 3306:3306 --volumes-from= dbdata mysql</span></code></pre></td></tr></table></div></figure>
-
-
-<p>這時候新產生名為mysqldb的container，cd到<code>/var/lib/mysql</code>就會發現與host的<code>absolute/path/to/host/dir</code>資料夾是連動的，也就是mount再一起了。</p>
-
-<p>舉個實用情境，假如資料庫版本要升級，只要在<code>Dockerfile</code>裡面升級資料庫版本，然後把新的container啟動時掛載dbdata，資料就還是一樣。而如果當初沒有把<code>資料</code>從Image分離出來，是要不原本DB的資料給匯出，再匯入新Image，非常麻煩，而不這麼做DB的紀錄就消失不見囉。</p>
-
-<p>這裡的效果也就是<a href="https://docs.docker.com/engine/tutorials/dockervolumes/">官方介紹</a>的volume主要用途，把<code>資料</code>與container分開，達到data persistence的目的。</p>
-
-<p><code>Data volumes are designed to persist data, independent of the container’s life cycle.</code></p>
-
-<h2>同理可證的Web Service</h2>
-
-<p>一但建構好基本環境，比如NPM, PM2, Nginx&hellip;etc，打包成一個Image後創建Container，以後Run這個Container只要搭配以下參數，就可以在本地修改，然後在container裡面實際測試了。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>-v absolute/path/to/host/web/dir/project:/var/www/project</span></code></pre></td></tr></table></div></figure>
-
-
-<p>比如以下指令就是啟動一個已經安裝所需運行環境的image（npm-ready），然後指定Host資料夾（/Users/shih/Desktop/lab/PSControlCenter）掛載到Container的/var/www上。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>docker run -i -t --name center -p 9453:3001 -v /Users/shih/Desktop/lab/PSControlCenter:/var/www npm-ready</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>FYI</h2>
-
-<ul>
-<li><a href="https://docs.docker.com/engine/tutorials/dockervolumes/">https://docs.docker.com/engine/tutorials/dockervolumes/</a></li>
-<li><a href="https://jiajially.gitbooks.io/dockerguide/content/chapter_fastlearn/docker_run/data_manager.html">https://jiajially.gitbooks.io/dockerguide/content/chapter_fastlearn/docker_run/data_manager.html</a></li>
-</ul>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/2">&larr; Older</a>
@@ -949,7 +989,7 @@
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2017 - 施安宏 -
+  Copyright &copy; 2018 - 施安宏 -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
 </p>
 
