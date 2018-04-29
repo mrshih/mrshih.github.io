@@ -54,6 +54,7 @@ Unregistry則就是把這個服務標示為無效，讓查詢時不要把這個S
 而實際在實現註冊功能時會遇到一個問題，是Service Discovery主動對新服務做註冊，還是新服務來主動對Sercice Discovery做註冊。
 
 Service Discovery主動對新服務做註冊有以下優點
+
 1. 讓Container對Service的存在一無所知，解偶。
 2. 服務只當被動元件。只需要專心對Request產生Response即可。
 
