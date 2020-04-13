@@ -4,7 +4,7 @@
   <title><![CDATA[MR SHIH]]></title>
   <link href="http://sah.tw/atom.xml" rel="self"/>
   <link href="http://sah.tw/"/>
-  <updated>2020-04-12T23:18:28+08:00</updated>
+  <updated>2020-04-13T12:03:39+08:00</updated>
   <id>http://sah.tw/</id>
   <author>
     <name><![CDATA[施安宏]]></name>
@@ -12,6 +12,67 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[產品要長壽就要降低維運成本]]></title>
+    <link href="http://sah.tw/blog/2020/04/12/product-version-update/"/>
+    <updated>2020-04-12T23:28:28+08:00</updated>
+    <id>http://sah.tw/blog/2020/04/12/product-version-update</id>
+    <content type="html"><![CDATA[<p><img src="http://mrshih.github.io/images/2020-04-12-product-version-update1.png" alt="2020-04-12-product-version-update1.png" /></p>
+
+<p>當任產品經理這期間無到有的三個產品，共賣出4000多萬，而這三年產品的改版多達20多版，灑在20多家客戶機房內，要如何去保持可維運性，降低維運成本，如何規劃實作時有什麼地方要注意，底下一些實務經驗分享</p>
+
+<h3>平時紀錄要收集好</h3>
+
+<p>很多時候意見被反應到產品經理這邊，第一時間是沒有辦法馬上決定要怎麼做，平時實在太忙，一定需要一個記錄軟體來把所有的需求給記錄下來，像我自己是用PivotTracker平時把意見都入到列表，等到排定的時間到了，再一起看所有需求，根據這段時間維運如建置、使用者到維護的反饋，來決定哪些需求要被排定下來。如果沒有這種ICE BOX來收集寶貴的回饋想法是一定會忘記的。</p>
+
+<h2>改版原則：讓現場更新人員好做事，降低後續維運成本</h2>
+
+<p>依照我產品的特性，都在客戶端機房內且沒有網路，所以作業環境蠻嚴苛的，需要人員實際到場，所以改版要盡可能的容易且有標準SOP，來讓現場作業都能順利完成，不然損耗的是寶貴的人力資源。所以改版最重要的一點就是要讓第一線人員好做事，底下的措施都是讓長期的維護成本能夠控制在很低的方法：</p>
+
+<h3>要有一套標準的升版SOP</h3>
+
+<p>在規劃上要有一套標準的升版SOP，這仰賴架構規劃與程式設計師在一開始就把這件事情納入考量，有看過一些系統要更版每次要做的事情都不一樣，都一些該版本特殊的tip需要做，甚至全部都是tip。當然特殊tip有時不可避免，但應該降到最低，怎麼做下一步就會說。</p>
+
+<p>在工具上可採用Docker把運行環境打包其來，讓環境標準化、可管理化，可以很有效降低維護管理與執行成本。</p>
+
+<h3>更版文件紀錄手動影響事項</h3>
+
+<p>大部分的版本應該避免讓開發人員有需要做除了標準升版流程外的事情，但總會有幾個版本的某些變動需要配合一些手動調整，這時就需要在Readme裡面獨立一個Section是更版時需要額外手動做的事項列表，這樣子現場部署人員能很容易知道自己需要做那些動作。</p>
+
+<h3>資料庫版本程式自己管，資料庫利用Upgrade Shell管理好Schema</h3>
+
+<p>資料庫的變動是一件嚴肅重要的事情，確保讓程式自己handel自己需要的版本，一種做法是把每個版本的變動寫成shell，並在程式執行時確保這些shell會被執行，如圖示：</p>
+
+<p><img src="http://mrshih.github.io/images/2020-04-12-product-version-update2.png" alt="2020-04-12-product-version-update2.png" /></p>
+
+<p>絕對避免讓維運人員要自己去操作SQL，會做一些特製Shelll，這樣風險太高了。</p>
+
+<h3>能夠跨多版本升級，對外API需要向下相容，讓維運人員只要想著更新到最新版即可</h3>
+
+<p>我做的軟體產品有個特性，就是系統都灑在客戶的機房內，隨著建置時間的不同，版本會不一治。而通常情況客戶舊版本用的好好的，是不會想配合變更版本的，所以也不能透過日常維護去變更版本，而且這樣維護成本也會過高。所以可能的升級時間點就是客戶遇到遇到新需求需要更版的時候，而最新版的時間點可能已經過了好幾版，所以要讓維運人員好做事，就是在每次版本更新時都注意要能夠從向下相容，讓維運人員只要負責一次就升級到最新版即可，比如從v1直接升級到v8。</p>
+
+<h2>更版文件紀錄已知問題</h2>
+
+<p>有些問題是已知但沒有排在該版本去解決，或是是release後才發現的問題，這些都要補在Reademe裡面，如果有客戶反應有問題，維運人員去看Reademe就可以第一時間跟客戶說只要升版即可解決這個問題，或支援這個feature，這個已知問題的Section也是需要被獨立出來的。</p>
+
+<h2>READEME結構</h2>
+
+<p>所以綜合上述所說，每次釋出版本後READEME應該要有以下章節，重要性由高到低</p>
+
+<ul>
+<li>版本資訊（如image id）</li>
+<li>更新後需人員手動修改部分</li>
+<li>已知問題</li>
+<li>ADD Feature、FIX Bug&hellip;&hellip;</li>
+</ul>
+
+
+<h2>盡可能降低後續維運成本才是真本事</h2>
+
+<p>一套產品系統能否成功，長期能否維護是關鍵，而如果在設計上這個產品的維護與改版難度是成指數成長，很快的就必須要放棄這個產品，因為改版的成本已經大於帶來的效益了。所以這篇文章都只是在盡力做一件事，降低長期維運成本。產品系統才能活下來。</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[微服務架構Container篇，幫助業務面對未知挑戰]]></title>
@@ -1280,67 +1341,6 @@
 <p>這其實也牽扯到如何設計A/B Testing？一個APP最關鍵的不是他介面看起來炫不炫，而是最終用戶能不能持續地用你想讓他用的功能。記住If<strong><strong> ,Then</strong></strong> ,Because___.</p>
 
 <p>如果你的變因錯誤的把畫面好看當成目標，那你甚至會覺得隨著畫面滾動把Tabbar隱藏起來是好的。那這樣一來或許畫面變好看，可是面積變多，但你APP整體功能使用率是下降的。</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Binary search與Obj-C]]></title>
-    <link href="http://sah.tw/blog/2016/11/18/binary-searchyu-obj-c/"/>
-    <updated>2016-11-18T16:41:19+08:00</updated>
-    <id>http://sah.tw/blog/2016/11/18/binary-searchyu-obj-c</id>
-    <content type="html"><![CDATA[<h2>Binary search概念</h2>
-
-<p>Binary search概念其實很簡單，recursive版本實際寫起來很像<a href="http://sah.tw/blog/2016/11/09/objc-quick-sort/">Quick sort in-place</a>版本前面divide的味道。每次的遞迴都把排序後的數列對切一半然後去其中一半來繼續處理，詳細可以看<a href="https://zh.wikipedia.org/wiki/%E4%BA%8C%E5%88%86%E6%90%9C%E7%B4%A2%E7%AE%97%E6%B3%95">Wiki</a>的介紹。</p>
-
-<h2>Binary search概念轉換成Code</h2>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>/**
-</span><span class='line'> * @return Retrun index of number in array.
-</span><span class='line'> * If number not found in array return false.
-</span><span class='line'> */
-</span><span class='line'>- (NSNumber *)binarySearchIndexInArray:(NSArray &lt;NSNumber *&gt;*)array forNumber:(NSNumber *)number leftRange:(NSInteger)left rightRange:(NSInteger)right {
-</span><span class='line'>    
-</span><span class='line'>    if (left &gt; right) {
-</span><span class='line'>        return [NSNumber numberWithBool:false];
-</span><span class='line'>    }
-</span><span class='line'>    
-</span><span class='line'>    NSInteger midIndex = (left+right)/2;
-</span><span class='line'>    NSNumber* mid = array[midIndex];
-</span><span class='line'>    
-</span><span class='line'>    if (number.floatValue &gt; mid.floatValue) { // 對切的右邊
-</span><span class='line'>        return [self binarySearchIndexInArray:array forNumber:number leftRange:midIndex+1 rightRange:right];
-</span><span class='line'>    }else if (number.floatValue &lt; mid.floatValue){ // 對切的左邊
-</span><span class='line'>        return [self binarySearchIndexInArray:array forNumber:number leftRange:left rightRange:midIndex-1];
-</span><span class='line'>    }else{ // equal，找到了
-</span><span class='line'>        return  [NSNumber numberWithInteger:midIndex];
-</span><span class='line'>    }
-</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>關於搜尋</h2>
-
-<p>這個搜尋法的前提是你的數列要幾經排序好了。這個前置條件才讓我發現我之前一直以為搜尋是有什麼神奇的方法，能夠在一個大數列裡面找到target的位置，現在接觸演算法就理解現實運作方法是先排序之後再用方法搜尋的。</p>
 ]]></content>
   </entry>
   

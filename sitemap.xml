@@ -3,6 +3,12 @@
   
   
   <url>
+    <loc>http://sah.tw/blog/2020/04/12/product-version-update/</loc>
+    <lastmod>2020-04-12T23:28:28+08:00</lastmod>
+    <priority>0.8</priority>
+  </url>
+  
+  <url>
     <loc>http://sah.tw/blog/2018/04/29/docker-container-design-principle/</loc>
     <lastmod>2018-04-29T15:34:59+08:00</lastmod>
     <priority>0.8</priority>
@@ -233,35 +239,35 @@
   
   <url>
     <loc>http://sah.tw/blog/</loc>
-    <lastmod>2020-04-12T23:18:28+08:00</lastmod>
+    <lastmod>2020-04-13T12:03:39+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   
   <url>
     <loc>http://sah.tw/blog/archives/</loc>
-    <lastmod>2020-04-12T23:18:28+08:00</lastmod>
+    <lastmod>2020-04-13T12:03:39+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   
   <url>
     <loc>http://sah.tw/archives/</loc>
-    <lastmod>2020-04-12T23:18:28+08:00</lastmod>
+    <lastmod>2020-04-13T12:03:39+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   
   <url>
     <loc>http://sah.tw/</loc>
-    <lastmod>2020-04-12T23:18:28+08:00</lastmod>
+    <lastmod>2020-04-13T12:03:39+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   
   <url>
     <loc>http://sah.tw/about/</loc>
-    <lastmod>2020-04-12T23:18:28+08:00</lastmod>
+    <lastmod>2020-04-13T12:03:39+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>

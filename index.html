@@ -9,7 +9,7 @@
   <meta name="author" content="施安宏">
 
   
-  <meta name="description" content="業務應用系統為什麼要導入新架構微服務與Container？這些技術具備怎樣特性去解決以往哪些較難克服的情境問題？而當我們在設計一個Container時又有什麼原則我們該考慮才能真的解決上述的情境問題呢？我們可以先把一個Container想像成機械公敵裡面的單一機器人來理解： 啟動簡單迅速、消耗品 &hellip;">
+  <meta name="description" content="當任產品經理這期間無到有的三個產品，共賣出4000多萬，而這三年產品的改版多達20多版，灑在20多家客戶機房內，要如何去保持可維運性，降低維運成本，如何規劃實作時有什麼地方要注意，底下一些實務經驗分享 平時紀錄要收集好 很多時候意見被反應到產品經理這邊，第一時間是沒有辦法馬上決定要怎麼做， &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -78,6 +78,97 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2020/04/12/product-version-update/">產品要長壽就要降低維運成本</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2020-04-12T23:28:28+08:00" pubdate data-updated="true">Apr 12<sup>th</sup>, 2020</time>
+        
+           | <a href="/blog/2020/04/12/product-version-update/#disqus_thread"
+             data-disqus-identifier="http://sah.tw/blog/2020/04/12/product-version-update/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img src="http://mrshih.github.io/images/2020-04-12-product-version-update1.png" alt="2020-04-12-product-version-update1.png" /></p>
+
+<p>當任產品經理這期間無到有的三個產品，共賣出4000多萬，而這三年產品的改版多達20多版，灑在20多家客戶機房內，要如何去保持可維運性，降低維運成本，如何規劃實作時有什麼地方要注意，底下一些實務經驗分享</p>
+
+<h3>平時紀錄要收集好</h3>
+
+<p>很多時候意見被反應到產品經理這邊，第一時間是沒有辦法馬上決定要怎麼做，平時實在太忙，一定需要一個記錄軟體來把所有的需求給記錄下來，像我自己是用PivotTracker平時把意見都入到列表，等到排定的時間到了，再一起看所有需求，根據這段時間維運如建置、使用者到維護的反饋，來決定哪些需求要被排定下來。如果沒有這種ICE BOX來收集寶貴的回饋想法是一定會忘記的。</p>
+
+<h2>改版原則：讓現場更新人員好做事，降低後續維運成本</h2>
+
+<p>依照我產品的特性，都在客戶端機房內且沒有網路，所以作業環境蠻嚴苛的，需要人員實際到場，所以改版要盡可能的容易且有標準SOP，來讓現場作業都能順利完成，不然損耗的是寶貴的人力資源。所以改版最重要的一點就是要讓第一線人員好做事，底下的措施都是讓長期的維護成本能夠控制在很低的方法：</p>
+
+<h3>要有一套標準的升版SOP</h3>
+
+<p>在規劃上要有一套標準的升版SOP，這仰賴架構規劃與程式設計師在一開始就把這件事情納入考量，有看過一些系統要更版每次要做的事情都不一樣，都一些該版本特殊的tip需要做，甚至全部都是tip。當然特殊tip有時不可避免，但應該降到最低，怎麼做下一步就會說。</p>
+
+<p>在工具上可採用Docker把運行環境打包其來，讓環境標準化、可管理化，可以很有效降低維護管理與執行成本。</p>
+
+<h3>更版文件紀錄手動影響事項</h3>
+
+<p>大部分的版本應該避免讓開發人員有需要做除了標準升版流程外的事情，但總會有幾個版本的某些變動需要配合一些手動調整，這時就需要在Readme裡面獨立一個Section是更版時需要額外手動做的事項列表，這樣子現場部署人員能很容易知道自己需要做那些動作。</p>
+
+<h3>資料庫版本程式自己管，資料庫利用Upgrade Shell管理好Schema</h3>
+
+<p>資料庫的變動是一件嚴肅重要的事情，確保讓程式自己handel自己需要的版本，一種做法是把每個版本的變動寫成shell，並在程式執行時確保這些shell會被執行，如圖示：</p>
+
+<p><img src="http://mrshih.github.io/images/2020-04-12-product-version-update2.png" alt="2020-04-12-product-version-update2.png" /></p>
+
+<p>絕對避免讓維運人員要自己去操作SQL，會做一些特製Shelll，這樣風險太高了。</p>
+
+<h3>能夠跨多版本升級，對外API需要向下相容，讓維運人員只要想著更新到最新版即可</h3>
+
+<p>我做的軟體產品有個特性，就是系統都灑在客戶的機房內，隨著建置時間的不同，版本會不一治。而通常情況客戶舊版本用的好好的，是不會想配合變更版本的，所以也不能透過日常維護去變更版本，而且這樣維護成本也會過高。所以可能的升級時間點就是客戶遇到遇到新需求需要更版的時候，而最新版的時間點可能已經過了好幾版，所以要讓維運人員好做事，就是在每次版本更新時都注意要能夠從向下相容，讓維運人員只要負責一次就升級到最新版即可，比如從v1直接升級到v8。</p>
+
+<h2>更版文件紀錄已知問題</h2>
+
+<p>有些問題是已知但沒有排在該版本去解決，或是是release後才發現的問題，這些都要補在Reademe裡面，如果有客戶反應有問題，維運人員去看Reademe就可以第一時間跟客戶說只要升版即可解決這個問題，或支援這個feature，這個已知問題的Section也是需要被獨立出來的。</p>
+
+<h2>READEME結構</h2>
+
+<p>所以綜合上述所說，每次釋出版本後READEME應該要有以下章節，重要性由高到低</p>
+
+<ul>
+<li>版本資訊（如image id）</li>
+<li>更新後需人員手動修改部分</li>
+<li>已知問題</li>
+<li>ADD Feature、FIX Bug&hellip;&hellip;</li>
+</ul>
+
+
+<h2>盡可能降低後續維運成本才是真本事</h2>
+
+<p>一套產品系統能否成功，長期能否維護是關鍵，而如果在設計上這個產品的維護與改版難度是成指數成長，很快的就必須要放棄這個產品，因為改版的成本已經大於帶來的效益了。所以這篇文章都只是在盡力做一件事，降低長期維運成本。產品系統才能活下來。</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -886,162 +977,6 @@
 <p>Product version control document、Git、Auto test、CI Server、Project Management Know How(WBS etc…)、Document Guideline、Issue tracking等，以上這些就像是現代產品開發所必備的基礎設施，少了這些要開發大型系統或隨著時間迭代成長的產品是不可能的事情，沒有這些整個技術Team無法持續成長，也會欠下一堆技術債，累積到最後整個產品開發寸步難行，而對風險的忍受度也會異常的低，比如一個關鍵開發人員走了整個產品開發就無以為繼了。</p>
 
 <p>從開發元件與小APP到現在開發產品，遇到的問題很多已經不是單一技術面，更多是如何管理這堆技術生老病死的問題，僅記錄一些最近遇到的實際問題與想法。</p>
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2017/04/12/letsencrypt-nginx-centos/">Letsencrypt在nginx與centos環境下實作tips</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2017-04-12T14:20:09+08:00" pubdate data-updated="true">Apr 12<sup>th</sup>, 2017</time>
-        
-           | <a href="/blog/2017/04/12/letsencrypt-nginx-centos/#disqus_thread"
-             data-disqus-identifier="http://sah.tw/blog/2017/04/12/letsencrypt-nginx-centos/">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>基本上我認為現在<a href="https://lynn1205.wordpress.com/2017/01/18/%E4%BB%80%E9%BA%BC%E6%98%AF%E4%BC%BA%E6%9C%8D%E5%99%A8%E6%86%91%E8%AD%89ssl/">HTTPS</a>的功用只是用來加密連線，在CA亂發或誤發的時代，不能指望CA這樣的盈利民間機構能盡責的做到驗證申請者的角色。
-但然而能做到加密Server與Clint之間的通訊內容其實也就已經足夠了。</p>
-
-<p>與其繳錢給盈利CA，現在你有更好的選擇-<a href="https://letsencrypt.org">letsencrypt</a>，免費開源自動化更新的CA。</p>
-
-<p>網路上的教學文章不少，而我這邊整理幾個好用的tip，主旨在於自動化與降低維運的難度。</p>
-
-<h2>Step0. CentOS+Nginx</h2>
-
-<p>因為自己的Server是用這樣的環境，加上這個環境也非常普遍可靠穩定，所以本文章就以這個環境當做基底。</p>
-
-<h2>Step1. Nginx強制指定/.well-known/acme-challenge/檔案路徑</h2>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>/etc/nginx/nginx.conf
-</span><span class='line'>
-</span><span class='line'>server {
-</span><span class='line'>  listen       80;
-</span><span class='line'>  
-</span><span class='line'>  location ^~ /.well-known/acme-challenge/ {
-</span><span class='line'>      default_type    "text/plain";
-</span><span class='line'>      root    /var/www/letsencrypt;
-</span><span class='line'>  }
-</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
-
-
-<p>你必須向letsencrypt證明DNS指向的這台server是你host的，等等letsencrypt會去你domain下的<code>/.well-known/acme-challenge/</code>path查找文件，如果找得到就能證明是你host，也才能簽發證書給你。</p>
-
-<p>而這裡統一指向<code>/var/www/letsencrypt</code>是因為有可能你現在用單純的html環境，有可能之後換成<code>proxy_pass</code>反向代理到node.js等，這都會使得<code>/.well-known/acme-challenge/</code>這個url路徑指向的檔案在你host的server上產生變動，這種業務上變動跟HTTPS是無關且可以切開來降低兩邊的耦合度，而隨著日後的domain變多，統一指定路徑這樣的做法也能夠降低後續維運的難度。</p>
-
-<h2>Step2. 申請憑證</h2>
-
-<p>去下載官方的驗證tool <a href="https://certbot.eff.org">certbot</a>並安裝，下面例子自行把abc代換成你的domain</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>certbot certonly --webroot -w /var/www/letsencrypt/ -d abc.com.tw -d www.abc.com.tw</span></code></pre></td></tr></table></div></figure>
-
-
-<p>成功的話會出現包含Congratulations!一大段話，憑證會被存在<code>/etc/letsencrypt/live/abc下</code>。</p>
-
-<h2>Step3. 安裝憑證到Nginx</h2>
-
-<p>/etc/nginx/conf.d/abc.conf</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>listen       443 ssl;
-</span><span class='line'>server_name  www.abc.com.tw;
-</span><span class='line'>
-</span><span class='line'>ssl_certificate      /etc/letsencrypt/live/abc/fullchain.pem;
-</span><span class='line'>ssl_certificate_key  /etc/letsencrypt/live/abc/privkey.pem;</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>Step4. 強制導流HTTP連線到HTTPS</h2>
-
-<p>/etc/nginx/nginx.conf</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>server {
-</span><span class='line'>  listen 80;
-</span><span class='line'>  server_name _;
-</span><span class='line'>  return 301 https://$host$request_uri;
-</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>Step5. 把更新任務加入crontab自動化更新憑證</h2>
-
-<p>以下為更新腳本，我是命名為renewCerts.sh，並存放在/etc/letsencrypt/下</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>#!/bin/sh
-</span><span class='line'># This script renews all the Let's Encrypt certificates with a validity &lt; 30 days
-</span><span class='line'>
-</span><span class='line'>if ! /usr/bin/certbot renew &gt; /var/log/letsencrypt/renew.log 2&gt;&1 ; then
-</span><span class='line'>    echo Automated renewal failed:
-</span><span class='line'>    cat /var/log/letsencrypt/renew.log
-</span><span class='line'>    exit 1
-</span><span class='line'>fi
-</span><span class='line'>nginx -t && nginx -s reload</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>Step6. 把sh加入crobtab</h2>
-
-<p>打開crontab設定檔</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>sudo crontab -e</span></code></pre></td></tr></table></div></figure>
-
-
-<p>加入sh設定每日自動執行然後儲存</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>@daily sh /etc/letsencrypt/renewCerts.sh</span></code></pre></td></tr></table></div></figure>
-
 </div>
   
   
